@@ -1,0 +1,1477 @@
+project:
+  name: Vibe Chat — 7일 MVP (Spring Boot 3.x + React 18 + TypeScript)
+  description: 실시간 채팅(텍스트/이미지/GIF/≤10초 영상), 태그 기반 검색, 신고, 기본 인증(게스트/구글[P1]), Redis 캐싱/세션, MySQL 영속화, Docker 기반 로컬 데모를 7일 내
+    구현하기 위한 결정론적 작업 계획 및 검증 기준 정의.
+
+frontend_status:
+  current_phase: "MVP 완료 - 프론트엔드 100% 구현됨"
+  completion_percentage: 100
+  
+  components_created:
+    ui_components:
+      - Avatar
+      - Badge  
+      - Button
+      - Card
+      - Carousel
+      - ContextMenu (NEW)
+      - EmojiPicker (NEW)
+      - FilePreview (NEW)
+      - ImageCard
+      - Input
+      - LoadingDots (NEW)
+      - Modal
+      - NotificationBadge (NEW)
+      - Progress
+      - SearchBar (NEW)
+      - Spinner
+      - Toast
+      - ToastContainer
+      - Tooltip
+    
+    demo_components:
+      - ChatMessage
+      - FeatureShowcase
+      - MessageActions (NEW)
+      - MessageInput (ENHANCED)
+      - MessageReactions (NEW)
+      - ProfileCard (NEW)
+      - RoomCard
+      - RoomListCard (NEW)
+      - TagInput
+      - ThreadView (NEW)
+      - UserList (NEW)
+      - VoiceMessage (NEW)
+    
+    layout_components:
+      - Footer
+      - Hero (ENHANCED)
+      - Layout (CLEANED)
+      - Navbar (ENHANCED)
+  
+  pages_created:
+    - Home (ENHANCED)
+    - Room (ENHANCED)
+    - RoomDemo (NEW - 완전한 데모 페이지)
+    - CreateRoom
+    - Profile (NEW)
+    - RoomList (NEW)
+    - Settings
+    - Components (ENHANCED)
+    - NotFound
+    - ErrorPage
+  
+  hooks_created:
+    - useAuth
+    - useDarkMode (ENHANCED)
+    - useMessages
+    - useRooms (ENHANCED)
+  
+  features_implemented:
+    core_features:
+      - ✅ 완전한 채팅 인터페이스 (메시지 전송/수신/반응)
+      - ✅ 실시간 타이핑 인디케이터
+      - ✅ 온라인 사용자 목록
+      - ✅ 메시지 액션 (답글/수정/삭제/신고)
+      - ✅ 스레드 뷰
+      - ✅ 이모지 선택기 및 반응
+      - ✅ 컨텍스트 메뉴
+      - ✅ 파일 업로드 미리보기
+      - ✅ 검색 기능 (자동완성 포함)
+      - ✅ 방 생성/조회/참여
+      - ✅ 프로필 관리
+      - ✅ 방 목록 관리
+    
+    ui_ux_features:
+      - ✅ 다크모드 (시스템 선호도 감지, localStorage 저장)
+      - ✅ 반응형 디자인 (모바일 430x932 최적화)
+      - ✅ Linear 디자인 시스템 완전 적용
+      - ✅ 로딩 상태 관리
+      - ✅ 에러 핸들링
+      - ✅ 토스트 알림
+      - ✅ 모달 및 팝업
+      - ✅ 균일한 카드 레이아웃
+      - ✅ 개선된 알림 배지
+    
+    demo_features:
+      - ✅ 완전한 데모 환경 (/room/demo)
+      - ✅ 백엔드 독립적 동작
+      - ✅ 모든 채팅 기능 시뮬레이션
+      - ✅ 자동 응답 시스템
+      - ✅ 상호작용 가능한 컴포넌트 쇼케이스
+tasks:
+  - id: setup-monorepo
+    title: 모노레포 구조 및 기본 환경 설정
+    priority: P0
+    description: 프로젝트 루트/백엔드/프론트엔드/인프라 디렉터리 생성, 공통 .env.example 배치, README 스켈레톤 추가. Git ignore, 라이선스/에디터 설정 포함. Docker 기반 로컬
+      실행을 위한 기본 전제 구성.
+    files:
+      - path: backend/Dockerfile
+        description: Spring Boot 3.3.x 백엔드 컨테이너 빌드 스크립트(Temurin 21, FFmpeg 설치 포함)
+        type: create
+      - path: frontend/Dockerfile
+        description: React 18 + Vite 프런트엔드 빌드/서빙 컨테이너 스크립트
+        type: create
+      - path: infra/docker-compose.yml
+        description: nginx, backend, frontend, mysql, redis, 볼륨/네트워크 선언
+        type: create
+      - path: .env.example
+        description: 백엔드/프론트 환경변수 템플릿
+        type: create
+      - path: README.md
+        description: 프로젝트 개요/실행 방법/구조 문서 스켈레톤
+        type: create
+    subtasks:
+      - id: setup-monorepo-structure
+        title: 폴더 구조 생성
+        description: backend/, frontend/, infra/{nginx,db,scripts}/, docs/ 디렉터리와 기본 파일 배치
+        category: setup
+        implementation_notes:
+          - 루트 수준 .gitignore에 node_modules, build, target, .idea, .vscode, dist, uploads 제외 설정
+          - 문서 디렉터리 프레임 추가(ERD.md, API.md, WEBSOCKET.md, REPORTING.md)
+      - id: setup-monorepo-env
+        title: .env.example 작성
+        description: TRD의 환경변수를 모두 포함한 예시 파일 제공 및 주석 설명
+        category: setup
+        implementation_notes:
+          - "Backend: SPRING_DATASOURCE_URL 등 기본값 설정"
+          - "Frontend: VITE_API_BASE, VITE_WS_URL 기본값 설정"
+      - id: setup-monorepo-readme
+        title: README 스켈레톤
+        description: 실행 개요, 기술 스택, 디렉터리 구조, 빠른 시작 섹션 추가
+        category: setup
+        implementation_notes:
+          - docker-compose up 단일 명령 강조
+          - 문서 링크 자리표시자 추가
+    completion_criteria:
+      - 루트에 정의된 디렉터리와 파일이 모두 존재
+      - docker-compose.yml 구문 유효성 검사 통과
+      - .env.example 변수 목록이 TRD 25항목과 일치
+    risks:
+      - risk: 로컬 포트 충돌
+        mitigation: docker-compose 포트 매핑 환경변수화 및 기본 포트 가용성 체크
+      - risk: 플랫폼 간 경로/권한 문제
+        mitigation: 볼륨 마운트에 대한 uid/gid 주석 및 Windows/WSL2 가이드 추가
+    order: 1
+
+  - id: infra-docker-compose
+    title: Docker Compose 서비스 구성
+    priority: P0
+    status: completed
+    description: nginx, backend, frontend, mysql, redis, 볼륨 및 네트워크 정의
+    order: 2
+  - id: infra-docker-compose
+    title: Docker Compose 서비스 구성
+    priority: P0
+    description: nginx, backend, frontend, mysql, redis, 볼륨(mysql-data, redis-data, uploads, frontend-dist) 및 네트워크(vibechat)
+      정의. 업로드 경로와 정적 파일 서빙 볼륨 마운트.
+    files:
+      - path: infra/docker-compose.yml
+        description: 서비스/볼륨/네트워크 정의
+        type: modify
+      - path: infra/nginx/nginx.conf
+        description: /, /api, /ws, /uploads 라우팅 및 업그레이드 헤더 유지 설정
+        type: create
+    subtasks:
+      - id: compose-services
+        title: 서비스 정의
+        description: 5개 서비스와 종속성(wait-for) 설정, 환경변수 전달
+        category: deploy
+        implementation_notes:
+          - nginx가 frontend-dist 볼륨을 읽어 정적 서빙
+          - /ws 업그레이드 헤더와 proxy_http_version 1.1 설정
+      - id: compose-volumes
+        title: 볼륨/네트워크 구성
+        description: mysql-data, redis-data, uploads, frontend-dist 영속 볼륨 정의
+        category: deploy
+        implementation_notes:
+          - uploads 볼륨을 nginx 컨테이너 /var/www/uploads로 마운트
+          - backend 컨테이너에도 동일 경로 마운트
+    dependencies:
+      - setup-monorepo
+    completion_criteria:
+      - docker-compose config 성공
+      - nginx 컨테이너가 /uploads 정적 서빙 응답 200
+      - 모든 컨테이너가 동일 네트워크에서 통신 가능
+    risks:
+      - risk: nginx 업그레이드 헤더 누락으로 WS 실패
+        mitigation: Upgrade, Connection 헤더와 proxy_set_header 정의 체크리스트 포함
+      - risk: 볼륨 권한 오류
+        mitigation: uploads 디렉터리 755 권한 및 사용자 매핑 가이드 제공
+    order: 2
+  - id: backend-build-init
+    title: 백엔드 빌드/의존성 초기화 및 보일러플레이트
+    priority: P0
+    description: Spring Boot 3.3.x(Java 21) 프로젝트 초기화, 의존성 추가(Web, Security, JPA, WebSocket, Validation, Redis, Spring
+      Session, flyway, modelmapper, jackson, tika, thumbnailator, bucket4j-redis, owasp sanitizer, springdoc-openapi,
+      lombok). Actuator 활성. 기본 패키지/구성 클래스 생성.
+    files:
+      - path: backend/src/main/resources/application.yml
+        description: DB/Redis/세션/로그/Swagger/업로드 경로/레이트 제한 환경변수 바인딩
+        type: create
+      - path: backend/pom.xml
+        description: Maven 빌드 도구 의존성 정의
+        type: create
+      - path: backend/src/main/java/com/vibechat/config/SecurityConfig.java
+        description: 세션 기반 보안, CSRF 설정, WebSocket Origin 허용
+        type: create
+      - path: backend/src/main/java/com/vibechat/config/SwaggerConfig.java
+        description: springdoc-openapi UI 설정
+        type: create
+      - path: backend/src/main/java/com/vibechat/config/RedisConfig.java
+        description: Redis 연결 및 Template/Cache 설정
+        type: create
+      - path: backend/src/main/java/com/vibechat/config/ModelMapperConfig.java
+        description: ModelMapper 매핑 전략 설정
+        type: create
+      - path: backend/src/main/java/com/vibechat/config/ValidationConfig.java
+        description: Validator Bean 설정
+        type: create
+    subtasks:
+      - id: backend-deps
+        title: 의존성 선언
+        description: pom.xml에 TRD 명시 라이브러리 추가
+        category: setup
+        implementation_notes:
+          - spring-boot-starter-web, data-jpa, security, websocket, validation
+          - spring-session-data-redis, springdoc-openapi-starter-ui
+      - id: backend-actuator
+        title: Actuator 활성화
+        description: /actuator/health 노출 및 보안 범위 지정
+        category: setup
+        implementation_notes:
+          - 관리 엔드포인트 노출 기반은 최소화(health만)
+      - id: backend-logging
+        title: JSON 로깅/MDC
+        description: Logback JSON 패턴, 요청 correlationId 필터
+        category: setup
+        implementation_notes:
+          - MDC 필터로 요청 ID 주입
+          - 에러시 스택/컨텍스트 포함
+    dependencies:
+      - infra-docker-compose
+    completion_criteria:
+      - mvn -q -DskipTests package 성공
+      - /actuator/health 200 응답
+      - Swagger UI 로딩 성공(/swagger-ui.html)
+    risks:
+      - risk: 의존성 충돌
+        mitigation: Spring Boot BOM 사용 및 버전 고정
+      - risk: CORS/CSRF 오구성
+        mitigation: 개발 프로필에서 허용 오리진과 CSRF 더블 서밋 헤더 문서화
+    order: 3
+
+  - id: data-flyway-er
+    title: ERD 마이그레이션 및 인덱스 구현(Flyway)
+    priority: P0
+    status: pending
+    description: TRD 4항 ERD와 인덱싱 전략을 Flyway 스크립트로 구현
+    requirements:
+      - users, chat_rooms, tags, room_tags, messages, message_reports 테이블 생성
+      - 적절한 인덱스 설정 (messages(room_id, created_at DESC), tags(name prefix))
+    files:
+      - backend/src/main/resources/db/migration/V1__init_schema.sql
+    order: 4
+
+  - id: backend-entity-repo
+    title: JPA 엔티티/리포지토리 정의
+    priority: P0
+    status: pending
+    description: ERD에 따른 엔티티 및 리포지토리 인터페이스 구현
+    requirements:
+      - User, ChatRoom, Tag, RoomTag, Message, MessageReport 엔티티
+      - 검색/페이지네이션/카운트 기본 메서드
+    files:
+      - backend/src/main/java/com/vibechat/domain/*
+      - backend/src/main/java/com/vibechat/repository/*
+    order: 5
+
+  - id: backend-auth-guest
+    title: 게스트 사용자 생성 API
+    priority: P0
+    status: pending
+    description: 세션 기반 게스트 닉네임 등록, 중복 검사, 세션 쿠키 인증
+    requirements:
+      - POST /api/users/guest 엔드포인트
+      - 닉네임 검증 (@NotBlank, @Size)
+      - Spring Session Redis 저장
+      - RFC7807 에러 포맷
+    files:
+      - backend/src/main/java/com/vibechat/controller/AuthController.java
+      - backend/src/main/java/com/vibechat/service/UserService.java
+    api_integration:
+      frontend_hook: useAuth
+      frontend_component: NicknameModal
+    order: 6
+
+  - id: backend-room-tag-api
+    title: 방 생성/조회/검색 및 태그 자동완성 API
+    priority: P0
+    status: pending
+    description: RoomService/TagService 구현, 방 생성/조회/검색, 태그 자동완성
+    requirements:
+      - POST /api/rooms (방 생성)
+      - GET /api/rooms/{id} (방 상세)
+      - GET /api/rooms/search (태그 기반 검색)
+      - GET /api/tags/autocomplete (자동완성)
+      - Redis 캐시 적용 (검색: TTL 1m, 태그: TTL 5m)
+    files:
+      - backend/src/main/java/com/vibechat/service/RoomService.java
+      - backend/src/main/java/com/vibechat/service/TagService.java
+      - backend/src/main/java/com/vibechat/controller/RoomController.java
+      - backend/src/main/java/com/vibechat/controller/TagController.java
+    api_integration:
+      frontend_hook: useRooms
+      frontend_pages: [Home, CreateRoom, RoomList]
+      frontend_components: [SearchBar, RoomCard, RoomListCard]
+    order: 7
+
+  - id: backend-join-room
+    title: 방 참가 API(공개/비공개)
+    priority: P0
+    status: pending
+    description: 닉네임 중복 방지, 초대 코드 검증, 제안 닉네임 반환
+    requirements:
+      - POST /api/rooms/{roomId}/join
+      - 닉네임 중복 체크 (Redis SET 사용)
+      - 초대 코드 검증 (비공개 방)
+      - 409 에러 시 제안 닉네임 제공
+    files:
+      - backend/src/main/java/com/vibechat/controller/RoomController.java (modify)
+      - backend/src/main/java/com/vibechat/service/RoomService.java (modify)
+    api_integration:
+      frontend_pages: [Room, RoomDemo]
+      frontend_components: [Navbar]
+    order: 8
+
+  - id: backend-ws-config
+    title: WebSocket/STOMP 설정 및 보안
+    priority: P0
+    status: pending
+    description: /ws 엔드포인트, SockJS, SimpleBroker, 보안 설정
+    requirements:
+      - /ws STOMP 엔드포인트
+      - SockJS 폴백 지원
+      - SimpleBroker(/topic) + /app 프리픽스
+      - 하트비트 10000/10000
+      - 오리진 화이트리스트 검증
+    files:
+      - backend/src/main/java/com/vibechat/websocket/WebSocketConfig.java
+      - backend/src/main/java/com/vibechat/websocket/StompEventListener.java
+    frontend_integration:
+      frontend_service: stompClient.ts
+    order: 9
+
+  - id: backend-presence-typing
+    title: Presence/Typing Redis 연동 및 브로드캐스트
+    priority: P0
+    status: pending
+    description: 입장/퇴장 시 presence 세트 갱신, 타이핑 이벤트 처리
+    requirements:
+      - presence:room:{roomId}:sessions Redis SET 관리
+      - typing:room:{roomId} SET (TTL 3s)
+      - /topic/rooms/{roomId}/presence 브로드캐스트
+      - /topic/rooms/{roomId}/typing 브로드캐스트
+    files:
+      - backend/src/main/java/com/vibechat/service/PresenceService.java
+    order: 10
+
+  - id: backend-message-core
+    title: 메시지 저장/브로드캐스트 및 레이트 제한
+    priority: P0
+    status: pending
+    description: 메시지 전송/저장/브로드캐스트, XSS 정제, 레이트 제한
+    requirements:
+      - /app/rooms/{roomId}/send STOMP 핸들러
+      - XSS 정제 (OWASP HTML Sanitizer)
+      - Bucket4j 레이트 제한 (20/min, 버스트 10)
+      - clientTempId 포함 브로드캐스트
+      - GET /api/rooms/{roomId}/messages (커서 페이징)
+    files:
+      - backend/src/main/java/com/vibechat/controller/ChatWsController.java
+      - backend/src/main/java/com/vibechat/service/MessageService.java
+      - backend/src/main/java/com/vibechat/controller/MessageController.java
+    order: 11
+
+  - id: backend-report-api
+    title: 신고 API 구현
+    priority: P0
+    status: pending
+    description: 메시지 신고 기능, 중복 방지, 감사 로그
+    requirements:
+      - POST /api/messages/{messageId}/report
+      - 중복 신고 방지
+      - 감사 로그 기록
+      - reason enum, details 길이 제한
+    files:
+      - backend/src/main/java/com/vibechat/controller/ReportController.java
+      - backend/src/main/java/com/vibechat/service/ReportService.java
+    order: 12
+
+  - id: backend-upload-api
+    title: 미디어 업로드 API(검증/저장/썸네일/FFmpeg)
+    priority: P1
+    status: pending
+    description: 파일 업로드, MIME 검증, 썸네일 생성, 비디오 처리
+    requirements:
+      - POST /api/upload/media
+      - Apache Tika MIME 검증
+      - 크기 제한 (최대 20MB)
+      - 이미지 썸네일 (512px)
+      - GIF 첫 프레임 썸네일
+      - MP4 길이 검증 (≤10s) 및 포스터 추출
+      - UUID 파일명, 경로 트래버설 방지
+    files:
+      - backend/src/main/java/com/vibechat/controller/UploadController.java
+      - backend/src/main/java/com/vibechat/service/UploadService.java
+    order: 13
+
+  - id: backend-scheduler-trim
+    title: 메시지 보관 트림 스케줄러
+    priority: P0
+    status: pending
+    description: 방별 최근 1,000개 메시지만 유지하는 스케줄러
+    requirements:
+      - 방별 메시지 카운트 확인
+      - 1,000개 초과 시 오래된 메시지 삭제
+      - 비동기 스케줄러 구현
+      - 배치 처리로 락 영향 최소화
+    files:
+      - backend/src/main/java/com/vibechat/scheduler/MessageTrimJob.java
+    order: 14
+
+  - id: backend-tests
+    title: 백엔드 단위/통합/WS 테스트
+    priority: P0
+    status: pending
+    description: Service 단위 테스트, REST 통합, WebSocket 통합 테스트
+    requirements:
+      - Service 단위 테스트 (Room/Tag/Message/Report/Upload)
+      - REST 통합 테스트 (MockMvc)
+      - WebSocket 통합 테스트 (STOMP 클라이언트)
+      - 레이트 제한 및 에러 경로 테스트
+      - RFC7807 에러 포맷 검증
+    files:
+      - backend/src/test/java/com/vibechat/**
+    order: 15
+  - id: data-flyway-er
+    title: ERD 마이그레이션 및 인덱스 구현(Flyway)
+    priority: P0
+    description: TRD 4항 ERD와 인덱싱 전략을 Flyway 스크립트로 구현. 개발용 초기 데이터 시드 스크립트 제공.
+    files:
+      - path: backend/src/main/resources/db/migration/V1__init_schema.sql
+        description: users, chat_rooms, tags, room_tags, messages, message_reports 테이블 및 인덱스 생성
+        type: create
+      - path: infra/db/init.sql
+        description: 개발 편의를 위한 초기 데이터(옵션)
+        type: create
+      - path: infra/scripts/seed.sh
+        description: 로컬 개발 시 샘플 데이터 투입 스크립트
+        type: create
+    subtasks:
+      - id: flyway-schema
+        title: 스키마 정의
+        description: 모든 테이블/PK/FK/인덱스 구현
+        category: data
+        implementation_notes:
+          - messages(room_id, created_at DESC) 커버링 인덱스
+          - tags(name prefix), popularity 인덱스
+      - id: flyway-verify
+        title: 마이그레이션 검증
+        description: 애플리케이션 부팅 시 Flyway 자동 실행 확인
+        category: data
+        implementation_notes:
+          - DB 클린 상태 및 이미 존재 상태 모두 테스트
+    dependencies:
+      - backend-build-init
+    completion_criteria:
+      - 애플리케이션 부팅 시 Flyway 성공 로그
+      - "기본 쿼리 성능: 메시지 30개 조회 ≤ 50ms(로컬)"
+    risks:
+      - risk: 인덱스 누락으로 쿼리 지연
+        mitigation: 실행 계획(EXPLAIN) 확인 및 인덱스 추가
+    order: 4
+  - id: backend-entity-repo
+    title: JPA 엔티티/리포지토리 정의
+    priority: P0
+    description: ERD에 따른 엔티티 및 리포지토리 인터페이스 구현. 생성/조회 최소 연산 보장.
+    files:
+      - path: backend/src/main/java/com/vibechat/domain/*
+        description: User, ChatRoom, Tag, RoomTag, Message, MessageReport 엔티티
+        type: create
+      - path: backend/src/main/java/com/vibechat/repository/*
+        description: 각 엔티티 리포지토리 인터페이스
+        type: create
+    subtasks:
+      - id: entity-mapping
+        title: 엔티티 매핑
+        description: 필드 타입/제약, 연관관계 최소화(필요시 FK만)
+        category: data
+        implementation_notes:
+          - created_at/updated_at 자동화(Auditing)
+      - id: repo-interfaces
+        title: 리포지토리 메서드
+        description: 검색/페이지네이션/카운트 기본 메서드 추가
+        category: data
+        implementation_notes:
+          - messages by roomId beforeId 정렬 쿼리 준비
+    dependencies:
+      - data-flyway-er
+    completion_criteria:
+      - 엔티티 검증 테스트 통과
+      - 기본 CRUD 동작 확인
+    risks:
+      - risk: 양방향 연관 무분별 사용으로 N+1
+        mitigation: 필요 필드만 조회하는 쿼리 메서드 제공
+    order: 5
+  - id: backend-auth-guest
+    title: 게스트 사용자 생성 API
+    priority: P0
+    description: 세션 기반 게스트 닉네임 등록. 중복 검사는 방 입장 시 재확인. 세션 쿠키로 인증 유지.
+    files:
+      - path: backend/src/main/java/com/vibechat/controller/AuthController.java
+        description: POST /api/users/guest 엔드포인트
+        type: create
+      - path: backend/src/main/java/com/vibechat/service/UserService.java
+        description: 게스트 사용자 생성/조회 로직
+        type: create
+    subtasks:
+      - id: guest-dto-validate
+        title: DTO/검증
+        description: "@NotBlank, @Size로 닉네임 검증"
+        category: api
+        implementation_notes:
+          - RFC7807 에러 포맷 채택
+      - id: session-issue
+        title: 세션 발급/저장
+        description: Spring Session Redis에 세션 저장
+        category: security
+        implementation_notes:
+          - 쿠키 속성(SameSite=Lax, HttpOnly)
+    dependencies:
+      - backend-build-init
+      - backend-entity-repo
+    completion_criteria:
+      - POST /api/users/guest 201 응답
+      - 세션 쿠키가 Redis에 생성됨
+    risks:
+      - risk: 세션 스토어 미연결
+        mitigation: Redis 연결 실패 시 부팅 실패로 빠르게 표면화
+    order: 6
+  - id: backend-room-tag-api
+    title: 방 생성/조회/검색 및 태그 자동완성 API
+    priority: P0
+    description: RoomService/TagService 구현. 방 생성, 상세 조회, 태그 기반 검색, 자동완성 캐시(P1).
+    files:
+      - path: backend/src/main/java/com/vibechat/service/RoomService.java
+        description: 방 생성/조회/검색 로직
+        type: create
+      - path: backend/src/main/java/com/vibechat/service/TagService.java
+        description: 태그 자동완성/인기 태그 캐시
+        type: create
+      - path: backend/src/main/java/com/vibechat/controller/RoomController.java
+        description: POST /api/rooms, GET /api/rooms/{id}, GET /api/rooms/search
+        type: create
+      - path: backend/src/main/java/com/vibechat/controller/TagController.java
+        description: GET /api/tags/autocomplete
+        type: create
+      - path: backend/src/main/java/com/vibechat/dto/*
+        description: 요청/응답 DTO
+        type: create
+    subtasks:
+      - id: room-create-validate
+        title: 방 생성 DTO/검증
+        description: 제목/설명/태그 개수/비공개 여부 검증
+        category: api
+        implementation_notes:
+          - 태그 1..5 제한, 길이 제한 적용
+      - id: room-search
+        title: 태그 기반 검색
+        description: tags 쿼리 파싱, 페이징, 참여자 수 계산 캐시 고려
+        category: core
+        implementation_notes:
+          - "Redis 캐시: cache:rooms:search:{tagsHash} TTL 1m(P1)"
+      - id: tags-autocomplete
+        title: 태그 자동완성
+        description: 프리픽스 인덱스 사용, Redis 캐시 TTL 5m(P1)
+        category: core
+        implementation_notes:
+          - cache:tags:prefix:{q} 키 설계 준수
+    dependencies:
+      - backend-entity-repo
+      - backend-auth-guest
+    completion_criteria:
+      - POST/GET/SEARCH/Autocomplete Swagger 호출 2xx
+      - 잘못된 입력 시 4xx + 필드 에러 메시지
+    risks:
+      - risk: 검색 성능 저하
+        mitigation: 인덱스 검증 및 Redis 캐시 활성(P1)
+    order: 7
+  - id: backend-join-room
+    title: 방 참가 API(공개/비공개)
+    priority: P0
+    status: completed
+    description: 닉네임(옵션)과 초대 코드 검증. 룸 스코프 닉네임 중복 방지. 제안 닉네임 반환 로직 포함.
+    files:
+      - path: backend/src/main/java/com/vibechat/controller/RoomController.java
+        description: POST /api/rooms/{roomId}/join 추가
+        type: modify
+      - path: backend/src/main/java/com/vibechat/service/RoomService.java
+        description: 초대코드/닉네임 중복 검증
+        type: modify
+    subtasks:
+      - id: nickname-conflict-check
+        title: 닉네임 중복 체크
+        description: nickname:room:{roomId} SET 사용
+        category: core
+        implementation_notes:
+          - 세션 종료 시 TTL 만료 또는 DISCONNECT 훅에서 삭제
+      - id: invite-validate
+        title: 초대 코드 검증
+        description: 비공개 방은 inviteCode 일치 시 입장 성공
+        category: core
+        implementation_notes:
+          - 유효하지 않으면 401/403 반환
+    dependencies:
+      - backend-room-tag-api
+    completion_criteria:
+      - POST /api/rooms/{id}/join 200/401/403 검증
+      - 닉네임 중복 시 409 또는 제안 닉네임 제공
+    risks:
+      - risk: 세션/닉네임 세트 불일치
+        mitigation: WebSocket DISCONNECT 이벤트로 정리
+    order: 8
+  - id: backend-ws-config
+    title: WebSocket/STOMP 설정 및 보안
+    priority: P0
+    description: /ws 엔드포인트, SockJS 허용, SimpleBroker, /app 프리픽스, 하트비트 10000/10000 설정. 오리진 화이트리스트 검증.
+    files:
+      - path: backend/src/main/java/com/vibechat/websocket/WebSocketConfig.java
+        description: STOMP 엔드포인트/브로커/하트비트/메시지 사이즈 설정
+        type: create
+      - path: backend/src/main/java/com/vibechat/websocket/StompEventListener.java
+        description: CONNECT/DISCONNECT/SUBSCRIBE 이벤트 리스너
+        type: create
+    subtasks:
+      - id: ws-endpoint
+        title: 엔드포인트/브로커 구성
+        description: /ws SockJS, SimpleBroker와 /app 설정
+        category: websocket
+        implementation_notes:
+          - setAllowedOriginsStrict(true) + ALLOWED_ORIGINS 사용
+      - id: ws-security
+        title: 오리진/CSRF 정책
+        description: 핸드셰이크에서 Origin 검증, CSRF는 REST만 활성
+        category: security
+        implementation_notes:
+          - 세션 ID와 STOMP 세션 매핑
+    dependencies:
+      - infra-docker-compose
+      - backend-join-room
+    completion_criteria:
+      - STOMP 연결/구독/송신 성공
+      - Nginx 경유 /ws 업그레이드 성공
+    risks:
+      - risk: 브라우저/프록시 호환성 이슈
+        mitigation: SockJS 폴백 사용 및 프록시 설정 체크
+    order: 9
+  - id: backend-presence-typing
+    title: Presence/Typing Redis 연동 및 브로드캐스트
+    priority: P0
+    description: Redis 키 설계에 따라 입장/퇴장 시 presence 세트 갱신, 타이핑 이벤트 SET+TTL 처리. /topic/rooms/{roomId}/presence 및 /typing 브로드캐스트.
+    files:
+      - path: backend/src/main/java/com/vibechat/service/PresenceService.java
+        description: presence 관련 Redis 세트 관리/카운트 브로드캐스트
+        type: create
+    subtasks:
+      - id: presence-sets
+        title: Presence 세트 관리
+        description: presence:room:{roomId}:sessions, presence:session:{stompSessionId} 관리
+        category: websocket
+        implementation_notes:
+          - TTL 1h 설정, 카운트 캐시 옵션 제공
+      - id: typing-set
+        title: Typing 세트 관리
+        description: typing:room:{roomId} SET(userId) TTL 3s
+        category: websocket
+        implementation_notes:
+          - 주기적 refresh, 변경 시 브로드캐스트
+    dependencies:
+      - backend-ws-config
+    completion_criteria:
+      - CONNECT/DISCONNECT 시 PresenceEvent 반영
+      - TypingEvent 1초 내 반영
+    risks:
+      - risk: 세션 누수로 카운트 부정확
+        mitigation: 만료 스캐너 또는 DISCONNECT 핸들 robust 처리
+    order: 10
+  - id: backend-message-core
+    title: 메시지 저장/브로드캐스트 및 레이트 제한
+    priority: P0
+    description: /app/rooms/{roomId}/send 처리. 메시지 DTO 검증, XSS 정제, Bucket4j로 20/min(버스트 10) 레이트 제한, 저장 후 clientTempId 포함
+      브로드캐스트. 메시지 조회 API(읽기) 포함.
+    files:
+      - path: backend/src/main/java/com/vibechat/controller/ChatWsController.java
+        description: STOMP 메시지 수신 컨트롤러
+        type: create
+      - path: backend/src/main/java/com/vibechat/service/MessageService.java
+        description: 메시지 저장/조회/정제/검증
+        type: create
+      - path: backend/src/main/java/com/vibechat/controller/MessageController.java
+        description: GET /api/rooms/{roomId}/messages
+        type: create
+    subtasks:
+      - id: message-validate
+        title: 메시지 검증/정제
+        description: 텍스트 2000자 제한, HTML Sanitizer 적용
+        category: core
+        implementation_notes:
+          - 유형별 필드 존재성 검증(IMAGE/GIF/VIDEO)
+      - id: message-rate-limit
+        title: 레이트 제한
+        description: userId+roomId 버킷 키로 20/min 버스트 10
+        category: security
+        implementation_notes:
+          - 초과 시 429 + retryAfterSeconds
+      - id: message-broadcast
+        title: 브로드캐스트/ACK
+        description: 저장 후 clientTempId 포함 MessageEvent 송신
+        category: websocket
+        implementation_notes:
+          - 전송 실패 시 ERROR frame 처리 가이드
+      - id: message-read
+        title: 메시지 조회 API
+        description: beforeId 커서/limit 쿼리 구현(기본 30, 최대 50)
+        category: api
+        implementation_notes:
+          - 인덱스 기반 정렬, 역순 누적
+    dependencies:
+      - backend-presence-typing
+    completion_criteria:
+      - 두 브라우저 간 텍스트 송수신 p95 ≤ 1초
+      - pending→sent 전환 동작
+      - 메시지 조회 30개 ≤ 50ms
+    risks:
+      - risk: Sanitizer로 내용 변형 오탐
+        mitigation: 허용 태그/텍스트만 반환 정책 유지
+    order: 11
+  - id: backend-report-api
+    title: 신고 API 구현
+    priority: P0
+    description: POST /api/messages/{messageId}/report 엔드포인트. 동일 사용자 동일 메시지 중복 신고 방지. 감사 로그 기록.
+    files:
+      - path: backend/src/main/java/com/vibechat/controller/ReportController.java
+        description: 신고 엔드포인트
+        type: create
+      - path: backend/src/main/java/com/vibechat/service/ReportService.java
+        description: 신고 저장/중복 검사/감사 로그
+        type: create
+    subtasks:
+      - id: report-validate
+        title: DTO/검증
+        description: reason enum, details 길이 제한
+        category: api
+        implementation_notes:
+          - 중복 신고 409 혹은 201 with flagged
+      - id: report-audit
+        title: 감사 로깅
+        description: JSON 로그에 신고 이벤트 기록
+        category: security
+        implementation_notes:
+          - MDC 요청ID 포함
+    dependencies:
+      - backend-message-core
+    completion_criteria:
+      - POST 신고 201, 중복 방지 동작
+      - 로그에 신고 이벤트 기록 확인
+    risks:
+      - risk: 스팸성 신고
+        mitigation: 레이트 제한 5/분 적용(P15)
+    order: 12
+  - id: backend-upload-api
+    title: 미디어 업로드 API(검증/저장/썸네일/FFmpeg)
+    priority: P1
+    description: POST /api/upload/media 구현. Apache Tika MIME 검증, 크기 제한, 이미지 썸네일(Thumbnailator), GIF 첫 프레임 썸네일, MP4 길이
+      검증(≤10s) 및 1초 포스터 추출. 저장 경로 UUID 파일명, 디렉터리 트래버설 방지.
+    files:
+      - path: backend/src/main/java/com/vibechat/controller/UploadController.java
+        description: 업로드 엔드포인트(form-data)
+        type: create
+      - path: backend/src/main/java/com/vibechat/service/UploadService.java
+        description: 검증/저장/썸네일/FFmpeg 처리
+        type: create
+      - path: infra/scripts/ffmpeg-check.sh
+        description: FFmpeg 가용성 사전 점검 스크립트
+        type: create
+    subtasks:
+      - id: upload-validate
+        title: MIME/크기/길이 검증
+        description: 이미지/GIF/MP4만 허용, 최대 20MB, 영상≤10s
+        category: core
+        implementation_notes:
+          - 확장자 불신, Tika로 MIME 판별
+      - id: upload-store
+        title: 파일 저장/경로 안전화
+        description: UUID+확장자, /var/www/uploads 하위에만 저장
+        category: core
+        implementation_notes:
+          - 경로 정규화 및 경로 우회 방지
+      - id: upload-thumbs
+        title: 썸네일/포스터
+        description: 이미지 512px 긴 변 기준 리사이즈, GIF 첫 프레임, 비디오 1초 포스터
+        category: core
+        implementation_notes:
+          - 트랜스코딩 없음, durationSec 저장
+    dependencies:
+      - infra-docker-compose
+      - backend-build-init
+    completion_criteria:
+      - 형식/크기/길이 위반 시 4xx 반환
+      - 성공 시 {type,url,thumbUrl?,durationSec?} 반환
+    risks:
+      - risk: FFmpeg 미설치
+        mitigation: Dockerfile에 설치 및 기동 시 ffmpeg-check.sh 실행
+    order: 13
+  - id: backend-scheduler-trim
+    title: 메시지 보관 트림 스케줄러
+    priority: P0
+    description: 방별 최근 1,000개 메시지만 유지하도록 created_at DESC 기준 트림. 비동기 스케줄러 구현.
+    files:
+      - path: backend/src/main/java/com/vibechat/scheduler/MessageTrimJob.java
+        description: 정기 트림 작업
+        type: create
+    subtasks:
+      - id: trim-strategy
+        title: 트림 전략
+        description: 방별 카운트 조회 후 초과분 일괄 삭제(soft delete는 데모 범위 미적용)
+        category: data
+        implementation_notes:
+          - 오프피크 실행, 배치 크기 제한
+    dependencies:
+      - backend-message-core
+    completion_criteria:
+      - 테스트 환경에서 메시지 >1000 생성 후 트림 확인
+      - 실행 시간/락 영향 최소
+    risks:
+      - risk: 대량 삭제로 락 경합
+        mitigation: 배치로 나눠 처리 및 인덱스 활용
+    order: 14
+  - id: backend-tests
+    title: 백엔드 단위/통합/WS 테스트
+    priority: P0
+    description: Service 단위 테스트, REST 통합(MockMvc), WebSocket 통합(STOMP 클라이언트) 작성. 레이트 제한/에러 경로 포함.
+    files:
+      - path: backend/src/test/java/com/vibechat/**
+        description: 단위/통합 테스트 소스
+        type: create
+    subtasks:
+      - id: unit-services
+        title: Service 단위 테스트
+        description: Room/Tag/Message/Report/Upload(검증)
+        category: test
+        implementation_notes:
+          - happy path + 경계/에러 케이스
+      - id: it-rest
+        title: REST 통합 테스트
+        description: 방 생성/검색/참여/메시지 조회/신고/업로드
+        category: test
+        implementation_notes:
+          - RFC7807 에러 포맷 검증
+      - id: it-ws
+        title: WS 통합 테스트
+        description: send/subscribe, presence/typing, clientTempId ACK
+        category: test
+        implementation_notes:
+          - p95 지연 측정 로그 수집(테스트 타이밍 측정)
+    dependencies:
+      - backend-message-core
+      - backend-upload-api
+    completion_criteria:
+      - P0 REST/WS 테스트 Green
+      - 업로드 검증 단위 테스트 통과
+    risks:
+      - risk: WS 통합 환경 타이밍 불안정
+        mitigation: 타임아웃/재시도 설정 및 하트비트 대기
+    order: 15
+  - id: frontend-setup
+    title: 프론트엔드 초기 설정(Vite/TS/Tailwind/Router/Redux/Query)
+    priority: P0
+    description: React 18 + TS + Vite 초기화. Tailwind/Headless UI/Heroicons. Redux Toolkit, React Query, React Router 설정. 기본 레이아웃.
+    files:
+      - path: frontend/vite.config.ts
+        description: Vite 설정
+        type: create
+      - path: frontend/tailwind.config.js
+        description: Tailwind 설정
+        type: create
+      - path: frontend/src/app/providers.tsx
+        description: 스토어/QueryClient/Theme Provider
+        type: create
+      - path: frontend/src/app/router.tsx
+        description: 라우터 정의
+        type: create
+      - path: frontend/src/styles/index.css
+        description: 글로벌 스타일
+        type: create
+    subtasks:
+      - id: fe-state-init
+        title: 스토어/슬라이스 골격
+        description: user/rooms/messages 슬라이스 생성
+        category: ui
+        implementation_notes:
+          - 전역/서버 상태 분리 가이드
+      - id: fe-axios
+        title: Axios 인스턴스
+        description: Base URL/CSRF 더블 서밋 헤더 설정
+        category: ui
+        implementation_notes:
+          - 에러 인터셉터에서 RFC7807 처리
+    dependencies:
+      - setup-monorepo
+    completion_criteria:
+      - Vite dev 빌드 성공
+      - 기본 라우트 로딩
+    risks:
+      - risk: CSS 충돌
+        mitigation: Tailwind preflight와 컴포넌트 범위 스타일 준수
+    order: 16
+  - id: frontend-rooms-search
+    title: 홈/방 목록/검색 UI + API 연동
+    priority: P0
+    description: 홈 화면에서 태그 자동완성/검색, 방 리스트/상세 진입. React Query 훅 작성.
+    files:
+      - path: frontend/src/pages/Home.tsx
+        description: 홈/검색 페이지
+        type: create
+      - path: frontend/src/services/api/rooms.ts
+        description: 방/검색 API 클라이언트
+        type: create
+      - path: frontend/src/services/api/tags.ts
+        description: 태그 자동완성 API 클라이언트
+        type: create
+    subtasks:
+      - id: fe-search-form
+        title: 검색 폼/검증
+        description: react-hook-form + zod
+        category: ui
+        implementation_notes:
+          - 태그 최대 5개 검증
+      - id: fe-rooms-list
+        title: 리스트/페이지네이션
+        description: 검색 결과 표시, 참여자 수 표시
+        category: ui
+        implementation_notes:
+          - 로딩/빈 상태 UX
+    dependencies:
+      - frontend-setup
+      - backend-room-tag-api
+    completion_criteria:
+      - 검색→상세 진입 플로우 동작
+      - 오류 시 토스트 메시지 표시
+    risks:
+      - risk: 자동완성 과다 호출
+        mitigation: 디바운스/쿼리 캐시 TTL 설정
+    order: 17
+  - id: frontend-auth-guest-nickname
+    title: 게스트 닉네임 설정 UI
+    priority: P0
+    description: 최초 방문 시 닉네임 입력/검증, 세션 발급 API 연동. 로컬 스토리지에 표시용 캐싱.
+    files:
+      - path: frontend/src/features/user/NicknameModal.tsx
+        description: 닉네임 입력 모달
+        type: create
+      - path: frontend/src/services/api/auth.ts
+        description: 게스트 생성 API 클라이언트
+        type: create
+    subtasks:
+      - id: fe-nickname-validate
+        title: 입력 검증
+        description: 길이/금지 문자 체크
+        category: ui
+        implementation_notes:
+          - 중복 에러 메시지 가이드
+    dependencies:
+      - frontend-setup
+      - backend-auth-guest
+    completion_criteria:
+      - 닉네임 설정→세션 쿠키 발급 확인
+      - 재방문 시 닉네임 표시
+    risks:
+      - risk: 팝업 차단/포커스 이슈
+        mitigation: 모달 접근성 준수 및 자동 포커스
+    order: 18
+  - id: frontend-room-create-join
+    title: 방 생성/참여 UI
+    priority: P0
+    description: 방 생성 폼(비공개/태그), 초대코드/닉네임 기반 입장 흐름. 실패 시 원인 표시.
+    files:
+      - path: frontend/src/pages/CreateRoom.tsx
+        description: 방 생성 페이지/모달
+        type: create
+      - path: frontend/src/services/api/roomJoin.ts
+        description: 방 참가 API 클라이언트
+        type: create
+    subtasks:
+      - id: fe-room-create
+        title: 방 생성 폼
+        description: zod 검증, 제출 후 상세 이동
+        category: ui
+        implementation_notes:
+          - 태그 칩 UI, 비공개 토글
+      - id: fe-room-join
+        title: 방 참가/초대코드
+        description: join API 연동, 닉네임 충돌 처리
+        category: ui
+        implementation_notes:
+          - 제안 닉네임 수락 플로우
+    dependencies:
+      - frontend-rooms-search
+      - backend-join-room
+    completion_criteria:
+      - 공개/비공개 방 생성/입장 성공
+      - 에러 시 적절한 코드/메시지 노출
+    risks:
+      - risk: 초대 코드 UX 혼란
+        mitigation: 명확한 오류 복구/도움말 제공
+    order: 19
+  - id: frontend-ws-client
+    title: STOMP 클라이언트 및 구독 관리
+    priority: P0
+    description: "@stomp/stompjs + sockjs-client로 싱글턴 클라이언트 구성, 자동 재연결(지수 백오프), 전송 큐, 하트비트, 구독 관리(messages/typing/presence)."
+    files:
+      - path: frontend/src/services/ws/stompClient.ts
+        description: STOMP 클라이언트 래퍼
+        type: create
+    subtasks:
+      - id: ws-reconnect
+        title: 재연결/백오프
+        description: 1→2→4→... 최대 10s, 상태 콜백
+        category: websocket
+        implementation_notes:
+          - 오프라인 큐 처리 후 재전송
+      - id: ws-subscriptions
+        title: 토픽 구독/해제
+        description: /topic/rooms/{id}/messages|typing|presence
+        category: websocket
+        implementation_notes:
+          - 구독 ID 관리 및 클린업
+    dependencies:
+      - backend-ws-config
+    completion_criteria:
+      - /ws 연결 성공/자동 재연결 동작
+      - 구독 수신 이벤트 로그 확인
+    risks:
+      - risk: 중복 구독
+        mitigation: 구독 ID 맵으로 중복 방지/정리
+    order: 20
+  - id: frontend-chat-ui
+    title: 채팅 UI(리스트/입력/전송) 및 페이징
+    priority: P0
+    description: 메시지 리스트 가상 스크롤, 최초 30개 로딩, 과거 로딩(beforeId), 입력창/전송, pending→sent 관리(clientTempId 기준). 실패 재시도(P1).
+    files:
+      - path: frontend/src/pages/Room.tsx
+        description: 채팅 방 화면
+        type: create
+      - path: frontend/src/features/messages/messageSlice.ts
+        description: 메시지 상태 관리(byRoomId)
+        type: create
+      - path: frontend/src/services/api/messages.ts
+        description: 메시지 조회 API 클라이언트
+        type: create
+    subtasks:
+      - id: fe-message-list
+        title: 가상 스크롤/자동 스크롤
+        description: 신규 수신 시 하단 고정, 과거 로딩 성능
+        category: ui
+        implementation_notes:
+          - 이미지 지연 로딩/썸네일 우선
+      - id: fe-send-message
+        title: 전송/ACK 처리
+        description: clientTempId 생성, sent 시 pending 제거
+        category: websocket
+        implementation_notes:
+          - 전송 실패 시 재시도 버튼(P1)
+    dependencies:
+      - frontend-ws-client
+      - backend-message-core
+    completion_criteria:
+      - 텍스트 메시지 송수신 p95 ≤ 1s
+      - pending→sent 상태 전환 정상
+      - 메시지 과거 로딩 동작
+    risks:
+      - risk: 스테이트 동기화 문제
+        mitigation: 서버 시간 기준 createdAt 사용 및 클라이언트 정렬 규칙 고정
+    order: 21
+  - id: frontend-presence-typing
+    title: 타이핑/온라인 수 표시
+    priority: P1
+    description: TypingEvent/PersistenceEvent 구독 후 UI 반영(1초 내).
+    files:
+      - path: frontend/src/features/rooms/presenceSlice.ts
+        description: 온라인 카운트 상태
+        type: create
+      - path: frontend/src/features/messages/typingSlice.ts
+        description: 타이핑 사용자 상태
+        type: create
+    subtasks:
+      - id: fe-presence
+        title: Presence 표시
+        description: 상단 바에 인원 수 표시
+        category: ui
+        implementation_notes:
+          - 방 이동/구독 해제 시 초기화
+      - id: fe-typing
+        title: 타이핑 표시
+        description: 입력창 상단에 현재 타이핑 사용자 표시
+        category: ui
+        implementation_notes:
+          - 입력 중 2s 간격으로 typing true 송신
+    dependencies:
+      - frontend-chat-ui
+      - backend-presence-typing
+    completion_criteria:
+      - 타이핑/온라인 수 1초 내 반영
+      - 구독 해제 시 정리
+    risks:
+      - risk: 과도한 타이핑 이벤트
+        mitigation: 디바운스 및 TTL 기반 SET 사용으로 네트워크 절감
+    order: 22
+  - id: frontend-upload-ui
+    title: 업로드 UI/미리보기/전송
+    priority: P1
+    description: 이미지/GIF/비디오 파일 선택, 업로드 API 연동, 미리보기, 메시지 전송에 mediaUrl/썸네일 사용. 드래그앤드롭(P2).
+    files:
+      - path: frontend/src/features/messages/UploadButton.tsx
+        description: 업로드 버튼/미리보기 컴포넌트
+        type: create
+      - path: frontend/src/services/api/upload.ts
+        description: 업로드 API 클라이언트
+        type: create
+    subtasks:
+      - id: fe-upload-validate
+        title: 클라이언트 검증
+        description: 형식/크기 선검증 및 에러 토스트
+        category: ui
+        implementation_notes:
+          - progress 표시, 취소 버튼
+      - id: fe-upload-send
+        title: 업로드→메시지 전송
+        description: 업로드 성공 응답을 SendMessagePayload에 포함
+        category: websocket
+        implementation_notes:
+          - GIF/비디오 썸네일 표시
+    dependencies:
+      - backend-upload-api
+      - frontend-chat-ui
+    completion_criteria:
+      - 형식/크기 위반 시 토스트 안내
+      - 업로드 후 미리보기/전송 성공
+    risks:
+      - risk: 대용량 업로드로 UI 프리즈
+        mitigation: 웹 워커 불필요, 진행률/취소로 UX 유지
+    order: 23
+  - id: frontend-error-handling
+    title: 에러/레이트 제한/재시도 UX
+    priority: P1
+    description: RFC7807 에러 메시지 표준화 토스트, 메시지 전송 실패 재시도 버튼, 429 시 재시도 대기 안내.
+    files:
+      - path: frontend/src/components/Toaster.tsx
+        description: react-toastify 토스트 설정
+        type: create
+    subtasks:
+      - id: fe-429-handling
+        title: 429 처리
+        description: retryAfterSeconds 기반 대기 UI
+        category: ui
+        implementation_notes:
+          - 전송 버튼 비활성/타이머 표시
+    dependencies:
+      - frontend-chat-ui
+      - backend-message-core
+    completion_criteria:
+      - 429 수신 시 대기 UX 표시
+      - 전송 실패 재시도 작동
+    risks:
+      - risk: 사용자 혼란
+        mitigation: 명확한 메시지/카운트다운 제공
+    order: 24
+  - id: infra-nginx-config
+    title: Nginx 리버스 프록시/정적 서빙
+    priority: P0
+    description: / → 프론트 정적, /api → backend:8080, /ws → backend:8080(WebSocket 업그레이드), /uploads → 업로드 볼륨 매핑. 보안 헤더 적용.
+    files:
+      - path: infra/nginx/nginx.conf
+        description: 서버 블록/라웃팅/보안 헤더
+        type: modify
+    subtasks:
+      - id: nginx-ws
+        title: WebSocket 업그레이드
+        description: Upgrade/Connection 헤더 설정
+        category: deploy
+        implementation_notes:
+          - proxy_read_timeout 600s
+      - id: nginx-security-headers
+        title: 보안 헤더
+        description: X-Content-Type-Options, X-Frame-Options, Referrer-Policy
+        category: deploy
+        implementation_notes:
+          - CSP는 데모 기본
+    dependencies:
+      - infra-docker-compose
+    completion_criteria:
+      - /api 프록시 200
+      - /ws 연결 성공
+      - /uploads 정적 파일 200
+    risks:
+      - risk: 정적 캐시로 최신 자산 미반영
+        mitigation: cache-control 무효화 또는 해시 파일명 사용
+    order: 25
+  - id: docs-and-scripts
+    title: 문서/스크립트 완성(README/Swagger/WEBSOCKET/ERD/REPORTING)
+    priority: P0
+    description: Swagger 정리, Postman(P2) 옵션, README 실행법/시연 스크립트, WS 프로토콜 문서, ERD 설명, 신고 흐름 문서.
+    files:
+      - path: docs/API.md
+        description: REST 요약/샘플 페이로드
+        type: create
+      - path: docs/WEBSOCKET.md
+        description: 구독/송신 페이로드/재연결 전략
+        type: create
+      - path: docs/ERD.md
+        description: 테이블/인덱스/관계
+        type: create
+      - path: docs/REPORTING.md
+        description: 신고 사유/흐름/관리
+        type: create
+      - path: README.md
+        description: 완성 문서로 업데이트
+        type: modify
+    subtasks:
+      - id: swagger-finalize
+        title: Swagger 그룹/태그/예시
+        description: 모든 P0 엔드포인트 테스트 가능 상태
+        category: setup
+        implementation_notes:
+          - 에러 응답 예시 추가
+      - id: demo-script
+        title: 시연 스크립트
+        description: A/B/C/D 시나리오 절차서
+        category: setup
+        implementation_notes:
+          - 스크린샷/단축키/시간제한
+    dependencies:
+      - backend-message-core
+      - frontend-chat-ui
+    completion_criteria:
+      - Swagger에서 P0 엔드포인트 2xx
+      - README/문서 100%
+    risks:
+      - risk: 문서 미흡으로 데모 실패
+        mitigation: 체크리스트 기반 리허설
+    order: 26
+  - id: fe-darkmode-skeleton-404
+    title: 다크모드/스켈레톤/에러 화면
+    priority: P2
+    description: prefers-color-scheme + 토글(LocalStorage), 리스트 스켈레톤, 404/에러 페이지.
+    files:
+      - path: frontend/src/pages/NotFound.tsx
+        description: 404 페이지
+        type: create
+      - path: frontend/src/components/Skeleton.tsx
+        description: 스켈레톤 컴포넌트
+        type: create
+    subtasks:
+      - id: fe-darkmode
+        title: 다크모드 토글
+        description: 테마 상태 저장/적용
+        category: ui
+        implementation_notes:
+          - Tailwind 다크 프리셋
+    dependencies:
+      - frontend-setup
+    completion_criteria:
+      - 다크모드 토글 동작
+      - 404 라우팅 정상
+    risks:
+      - risk: 테마 플리커
+        mitigation: DOM 초기 로드 전에 클래스 적용 스크립트 배치
+    order: 27
+  - id: perf-optimizations
+    title: 성능 최적화(가상 스크롤/메모/백엔드 튜닝)
+    priority: P1
+    description: 메시지 렌더 가상화, React.memo/useMemo, 백엔드 커넥션 풀/Hikari 설정, Redis 캐시 태그/검색, WS 브로드캐스트 경로 최소화.
+    files:
+      - path: frontend/src/pages/Room.tsx
+        description: 리스트 가상화 적용
+        type: modify
+      - path: backend/src/main/resources/application.yml
+        description: HikariCP/Redis 캐시 설정
+        type: modify
+    subtasks:
+      - id: fe-virtualization
+        title: 리스트 가상화
+        description: 스크롤 성능 최적화
+        category: ui
+        implementation_notes:
+          - 시야 아이템만 렌더
+      - id: be-cache-tuning
+        title: 태그/검색 캐시
+        description: cache:* 키 TTL 설정 활성화
+        category: core
+        implementation_notes:
+          - 캐시 미스 로깅
+    dependencies:
+      - frontend-chat-ui
+      - backend-room-tag-api
+    completion_criteria:
+      - 100 동시 연결에서 p95 ≤ 1s(로컬) 지표 확보
+      - CPU ≤ 70% 가이드 충족(관찰)
+    risks:
+      - risk: 측정 편차 큼
+        mitigation: 여러 번 측정 평균/표준편차 기록
+    order: 28
+  - id: qa-scenario-tests
+    title: 시나리오(E2E 대체) 점검
+    priority: P0
+    description: "A: 닉네임→태그 검색→입장→텍스트 전송, B: 비공개 방 생성→초대 코드 입장, C: 업로드→미리보기→전송, D: 신고 3스텝. 수동/스크립트화 점검."
+    files:
+      - path: docs/DEMO_CHECKLIST.md
+        description: 시나리오 체크리스트
+        type: create
+    subtasks:
+      - id: scenario-run
+        title: 시나리오 실행
+        description: 각 플로우 성공/실패 케이스 확인
+        category: test
+        implementation_notes:
+          - 브라우저 2개 동시 검증
+    dependencies:
+      - docs-and-scripts
+      - frontend-upload-ui
+    completion_criteria:
+      - P0 플로우 전부 Green
+      - 초기 진입→첫 메시지 ≤ 60s
+    risks:
+      - risk: 사전 조건 누락
+        mitigation: 체크리스트에 초기화 절차 포함
+    order: 29
+implementation_guides:
+  - id: rest-error-handling
+    title: RFC7807 에러 응답 표준화
+    category: 아키텍처
+    content: 모든 4xx/5xx 응답은 application/problem+json 형식으로 반환한다. 필드 검증 오류 시 field, message 배열 포함. 클라이언트는 status/title/detail와
+      함께 toast에 표시한다.
+    related_tasks:
+      - backend-auth-guest
+      - backend-room-tag-api
+      - backend-message-core
+      - backend-report-api
+      - frontend-error-handling
+  - id: cursor-pagination
+    title: 커서 기반 페이지네이션 규약
+    category: 데이터처리
+    content: beforeId 커서를 사용한다. 쿼리는 created_at DESC, id < beforeId 조건으로 30개(최대 50). 응답은 오래된 항목이 앞서도록 클라이언트에서 역순 정렬한다.
+    related_tasks:
+      - backend-message-core
+      - frontend-chat-ui
+  - id: stomp-reconnect
+    title: STOMP 재연결/전송 큐 패턴
+    category: 성능
+    content: 연결 끊김 시 1s→2s→4s→... 최대 10s 백오프. 연결 전 전송 요청은 큐잉하여 연결 후 플러시. 구독은 재연결 시 재등록한다.
+    related_tasks:
+      - frontend-ws-client
+      - frontend-chat-ui
+  - id: redis-keys
+    title: Redis 키 네이밍/TTL
+    category: 데이터처리
+    content: presence:room:{roomId}:sessions, presence:session:{stompSessionId}(TTL 1h), typing:room:{roomId}(TTL 3s),
+      cache:tags:prefix:{q}(TTL 5m), cache:rooms:search:{tagsHash}(TTL 1m), rl:msg:{userId}:{roomId},
+      nickname:room:{roomId}.
+    related_tasks:
+      - backend-presence-typing
+      - backend-room-tag-api
+      - backend-message-core
+  - id: rate-limit-bucket4j
+    title: Bucket4j 레이트 제한 적용
+    category: 보안
+    content: 메시지 전송은 20/min, 버스트 10. 키는 userId+roomId 기준. 초과 시 429와 retryAfterSeconds를 problem+json으로 반환.
+    related_tasks:
+      - backend-message-core
+      - frontend-error-handling
+  - id: file-upload-safety
+    title: 파일 업로드 안전 규약
+    category: 보안
+    content: 확장자 불신, Tika로 MIME 확인. UUID 파일명 사용, /var/www/uploads 하위에만 저장. 이미지 썸네일은 512px, GIF는 첫 프레임, 비디오는 FFmpeg probe로 길이
+      확인 후 1초 포스터.
+    related_tasks:
+      - backend-upload-api
+      - infra-nginx-config
+      - frontend-upload-ui
+  - id: csrf-double-submit
+    title: CSRF 더블 서밋 전략(REST)
+    category: 보안
+    content: 서버는 CSRF 토큰을 쿠키에 설정하고 클라이언트는 동일 값을 헤더로 전송. WebSocket은 오리진 검증으로 보호.
+    related_tasks:
+      - backend-build-init
+      - frontend-setup
+  - id: dto-mapping-modelmapper
+    title: ModelMapper DTO 매핑 표준
+    category: 아키텍처
+    content: 단방향 DTO→Entity/Entity→DTO 매핑 규칙을 명시하고, N+1 방지를 위해 필요한 필드만 매핑한다. 사용자 노출 DTO에는 민감 정보 제외.
+    related_tasks:
+      - backend-room-tag-api
+      - backend-message-core
+execution_order:
+  summary: 7일 내 MVP 달성을 위해 Day1 인프라/데이터 기초 → Day2 도메인/REST → Day3 WS/실시간 → Day4~5 프론트 핵심 UX → Day6 업로드/보관/테스트 → Day7
+    문서/성능/데모 검증 순으로 진행한다. 모든 P0 기능은 Day5 이전에 통합 테스트 가능 상태를 목표로 한다.
+  phases:
+    - phase_name: Day 1 — 기반 설정/데이터
+      task_ids:
+        - setup-monorepo
+        - infra-docker-compose
+        - backend-build-init
+        - data-flyway-er
+        - backend-entity-repo
+      description: 모노레포/컴포즈/백엔드 보일러플레이트와 스키마/엔티티를 완료하여 빌드 및 기동이 가능하도록 한다.
+    - phase_name: Day 2 — 도메인 REST 구축
+      task_ids:
+        - backend-auth-guest
+        - backend-room-tag-api
+        - backend-join-room
+      description: 게스트 등록, 방 생성/조회/검색, 참가 API 구현. Swagger에서 기본 플로우 점검.
+    - phase_name: Day 3 — 실시간 채팅 백엔드
+      task_ids:
+        - backend-ws-config
+        - backend-presence-typing
+        - backend-message-core
+        - backend-report-api
+      description: WebSocket/STOMP, presence/typing, 메시지 저장/브로드캐스트, 신고까지 백엔드 실시간 기능 완성.
+    - phase_name: Day 4 — 프론트 기반/검색/입장
+      task_ids:
+        - frontend-setup
+        - frontend-rooms-search
+        - frontend-auth-guest-nickname
+        - frontend-room-create-join
+      description: 프론트 초기화와 홈/검색/방 생성/참여 UX 구현.
+    - phase_name: Day 5 — 채팅 UX/페이징
+      task_ids:
+        - frontend-ws-client
+        - frontend-chat-ui
+      description: WS 클라이언트, 채팅 리스트/입력/전송/페이징 및 pending→sent 상태 구현. 기본 P0 실시간 KPI 충족.
+    - phase_name: Day 6 — 업로드/보관/테스트
+      task_ids:
+        - backend-upload-api
+        - backend-scheduler-trim
+        - backend-tests
+        - frontend-upload-ui
+        - frontend-presence-typing
+        - frontend-error-handling
+      description: 업로드 백엔드/프론트, 메시지 보관 트림, 테스트 스위트, 타이핑/온라인/에러 UX 추가.
+    - phase_name: Day 7 — 문서/성능/데모
+      task_ids:
+        - infra-nginx-config
+        - docs-and-scripts
+        - perf-optimizations
+        - fe-darkmode-skeleton-404
+        - qa-scenario-tests
+      description: Nginx 최종화, 문서 완성, 성능 튜닝, 보조 UX(P2), 데모 시나리오 점검으로 마감.

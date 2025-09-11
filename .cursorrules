@@ -1,0 +1,291 @@
+# VibeChat Frontend Development Rules
+
+## 🚨 MANDATORY COMPONENT USAGE RULES
+
+### ⚠️ CRITICAL: COMPONENT LIBRARY ENFORCEMENT
+
+**ALL FRONTEND DEVELOPMENT MUST USE THE ESTABLISHED COMPONENT LIBRARY. CREATING NEW COMPONENTS WITHOUT EXPLICIT APPROVAL IS STRICTLY PROHIBITED.**
+
+## 📋 Component Usage Hierarchy
+
+### 1. **UI Components (Foundation Layer)** - `/components/ui/`
+**MUST USE THESE FOR ALL BASIC UI ELEMENTS:**
+
+- `Button` - All buttons, links, and interactive elements
+- `Card` - All card layouts and containers
+- `Input` - All form inputs and text fields
+- `Modal` - All popups, dialogs, and overlays
+- `Avatar` - All user profile images and placeholders
+- `Badge` - All status indicators and labels
+- `Toast` & `ToastContainer` - All notifications and alerts
+- `Spinner` - All loading states
+- `Progress` - All progress indicators
+- `Tooltip` - All hover help and information
+- `Carousel` - All image/content carousels
+- `ImageCard` - All image-based cards
+
+### 2. **Demo Components (VibeChat-Specific)** - `/components/demo/`
+**USE THESE FOR VIBECHAT FUNCTIONALITY:**
+
+- `ChatMessage` - All chat message displays
+- `MessageInput` - All message input fields
+- `RoomCard` - All room listing cards
+- `TagInput` - All tag input fields
+- `FeatureShowcase` - All feature highlight sections
+
+### 3. **Layout Components** - `/components/layout/`
+**USE THESE FOR PAGE STRUCTURE:**
+
+- `Navbar` - All navigation bars
+- `Footer` - All page footers
+- `Hero` - All hero sections
+- `Layout` - Main page layout wrapper
+
+## 🎨 Design System Rules
+
+### **MANDATORY: Use Linear Theme System**
+- **ALWAYS** use colors from `tailwind.config.js` theme
+- **NEVER** use arbitrary color values
+- **ALWAYS** use semantic color names: `foreground-primary`, `background-secondary`, etc.
+- **ALWAYS** use the `cn` utility for class merging
+
+### **MANDATORY: Styling Guidelines**
+```typescript
+// ✅ CORRECT - Use theme colors
+className="bg-background-primary text-foreground-primary"
+
+// ❌ WRONG - Don't use arbitrary colors
+className="bg-gray-900 text-white"
+
+// ✅ CORRECT - Use cn utility
+className={cn("base-class", condition && "conditional-class")}
+
+// ❌ WRONG - Don't concatenate strings
+className={"base-class " + (condition ? "conditional-class" : "")}
+```
+
+## 🚫 Prohibited Actions
+
+### **NEVER DO THESE:**
+1. Create new UI components without approval
+2. Use arbitrary Tailwind colors
+3. Create custom styling that conflicts with the theme
+4. Duplicate existing component functionality
+5. Use inline styles instead of Tailwind classes
+6. Create components that don't follow the established patterns
+
+## ✅ Required Actions
+
+### **ALWAYS DO THESE:**
+1. Check existing components before creating anything new
+2. Use TypeScript interfaces for all props
+3. Follow the established naming conventions
+4. Implement proper error handling and loading states
+5. Use the Linear theme system consistently
+6. Follow accessibility guidelines (ARIA labels, keyboard navigation)
+
+## 🔍 Component Discovery Process
+
+### **Before Creating ANY New Component:**
+
+1. **Search the existing library first:**
+   - Check `/components/ui/` for basic UI elements
+   - Check `/components/demo/` for VibeChat-specific components
+   - Check `/components/layout/` for layout components
+
+2. **If component doesn't exist:**
+   - **STOP** - Do not create it
+   - **ASK** for explicit approval with justification
+   - **EXPLAIN** why existing components can't be used
+   - **WAIT** for approval before proceeding
+
+3. **If component exists:**
+   - **USE** the existing component
+   - **EXTEND** it if needed (with approval)
+   - **CUSTOMIZE** it using props and variants
+
+## 📝 Approval Request Template
+
+### **When requesting new component creation, include:**
+
+```markdown
+## New Component Request
+
+**Component Name:** [Name]
+**Purpose:** [What it does]
+**Why existing components can't be used:** [Detailed explanation]
+**Props Interface:** [TypeScript interface]
+**Usage Examples:** [Code examples]
+**Design Justification:** [Why it's needed]
+```
+
+## 🎯 Component Usage Examples
+
+### **Button Usage:**
+```typescript
+// ✅ CORRECT
+import { Button } from '../components/ui/Button';
+<Button variant="primary" size="md" onClick={handleClick}>
+  Click me
+</Button>
+
+// ❌ WRONG - Don't create custom buttons
+<button className="bg-blue-500 text-white px-4 py-2">
+  Click me
+</button>
+```
+
+### **Card Usage:**
+```typescript
+// ✅ CORRECT
+import { Card } from '../components/ui/Card';
+<Card>
+  <Card.Header>
+    <Card.Title>Title</Card.Title>
+  </Card.Header>
+  <Card.Content>Content</Card.Content>
+</Card>
+
+// ❌ WRONG - Don't create custom cards
+<div className="bg-gray-800 p-4 rounded-lg">
+  <h3>Title</h3>
+  <p>Content</p>
+</div>
+```
+
+### **Chat Message Usage:**
+```typescript
+// ✅ CORRECT
+import { ChatMessage } from '../components/demo/ChatMessage';
+<ChatMessage message={message} isOwn={isOwn} isPending={isPending} />
+
+// ❌ WRONG - Don't create custom chat messages
+<div className="flex gap-3 p-4">
+  <img src={avatar} alt="User" />
+  <div>{message.content}</div>
+</div>
+```
+
+## 🔧 Development Workflow
+
+### **Step 1: Component Check**
+- Search existing components
+- Identify the right component to use
+- Check component documentation in GEMINI.md
+
+### **Step 2: Implementation**
+- Import the component
+- Use proper props and variants
+- Apply consistent styling with theme
+
+### **Step 3: Validation**
+- Ensure component follows patterns
+- Verify TypeScript types
+- Test responsive behavior
+- Check accessibility
+
+## 📚 Reference Resources
+
+- **Component Library:** `/components/` directory
+- **Theme System:** `tailwind.config.js`
+- **Documentation:** `GEMINI.md`
+- **Utility Functions:** `utils/cn.ts`
+
+## 🚨 Enforcement
+
+**These rules are MANDATORY and will be enforced during code review. Any violation will result in:**
+1. Code rejection
+2. Required refactoring
+3. Re-education on component usage
+
+## 📞 Questions?
+
+**If you're unsure about component usage:**
+1. Check GEMINI.md first
+2. Review existing component implementations
+3. Ask for clarification before proceeding
+4. Request approval for any new components
+
+---
+
+## 📝 **Git 커밋 메시지 전략**
+
+### **🎯 커밋 워크플로우:**
+1. `git diff` 또는 `git status`로 변경 내역 확인
+2. AI에게 변경 내역 분석 요청
+3. 아래 포맷으로 커밋 메시지 생성
+4. 사용자 승인 후 커밋 실행
+5. 문제없으면 push 진행
+
+### **📋 커밋 메시지 포맷:**
+```
+<type>(#<number>): <한국어 요약>
+
+<상세 변경 내역>
+- 변경사항 1
+- 변경사항 2
+- 변경사항 3
+
+<기술적 세부사항>
+- 파일: path/to/file.ext
+- 함수/클래스: FunctionName, ClassName
+- API: METHOD /api/endpoint
+
+<영향도>
+- Frontend: 영향받는 컴포넌트들
+- Backend: 영향받는 서비스들
+- Database: 스키마 변경사항 (있는 경우)
+```
+
+### **🏷️ 커밋 타입:**
+- **feat(#n)**: 새로운 기능 추가
+- **fix(#n)**: 버그 수정
+- **hotfix(#n)**: 긴급 수정 (프로덕션 문제)
+- **refactor(#n)**: 코드 리팩토링 (기능 변경 없음)
+- **docs(#n)**: 문서 업데이트
+- **style(#n)**: 코드 스타일 변경 (포맷팅, 세미콜론 등)
+- **test(#n)**: 테스트 추가 또는 수정
+- **chore(#n)**: 빌드 설정, 의존성 업데이트 등
+
+### **📊 브랜치 전략 (Git Flow):**
+- **main**: 프로덕션 릴리즈
+- **develop**: 개발 통합 브랜치
+- **feature/**: 새 기능 개발
+- **hotfix/**: 긴급 수정
+- **(release/ 생략 - 토이 프로젝트)**
+
+### **🔢 넘버링 규칙:**
+- 브랜치별로 독립적 넘버링
+- develop: #001, #002, #003...
+- feature/auth: #001, #002...
+- hotfix/: #001, #002...
+
+### **⚠️ 커밋 전 보안 검증:**
+**커밋하기 전에 반드시 다음을 확인하고, 문제가 있으면 커밋을 중단해야 합니다:**
+
+1. **하드코딩된 민감 정보 검사:**
+   - `application.yml`에 API 키, 비밀번호, 토큰 등이 하드코딩되어 있는지 확인
+   - `.env` 파일이 Git에 포함되지 않는지 확인
+   - 데이터베이스 연결 정보, OAuth 시크릿 등이 노출되지 않는지 검증
+
+2. **보안 위험 요소:**
+   - Service Role Key, Client Secret 등 민감한 키가 코드에 포함되었는지 확인
+   - 프로덕션 환경 정보가 개발 코드에 혼입되지 않았는지 검증
+   - 사용자 개인정보나 테스트 데이터가 포함되지 않았는지 확인
+
+3. **경고 및 중단 조건:**
+   - 위 문제가 발견되면 즉시 사용자에게 경고
+   - 문제 해결 전까지 커밋 진행 금지
+   - 대안 해결책 제시 (환경 변수 사용, .gitignore 추가 등)
+
+**예시 경고 메시지:**
+```
+🚨 커밋 중단! 보안 위험 발견:
+- application.yml에 하드코딩된 API 키 발견
+- 해결책: 환경 변수 ${VARIABLE_NAME} 사용 권장
+- 커밋 전 민감 정보 제거 필요
+```
+
+---
+
+**Remember: Consistency, maintainability, and adherence to the Linear design system are our top priorities. The component library exists to ensure these goals are met.**

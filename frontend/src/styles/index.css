@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border-default;
+  }
+  
+  body {
+    @apply bg-background-primary text-foreground-primary font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1 {
+    @apply text-4xl font-medium leading-extra-loose text-foreground-primary;
+  }
+  
+  h2 {
+    @apply text-3xl font-semibold leading-loose text-foreground-primary;
+  }
+  
+  h3 {
+    @apply text-xl font-medium leading-7 text-foreground-primary;
+  }
+  
+  h4 {
+    @apply text-sm font-medium leading-tight text-foreground-secondary;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-foreground-primary text-background-primary border-0 rounded-base px-6 py-3 text-sm font-medium transition-all duration-100 ease-out hover:opacity-90 active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent text-foreground-muted border border-border-default rounded-base px-3 py-0 text-xs font-medium transition-all duration-100 ease-out hover:bg-background-tertiary hover:text-foreground-secondary;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent text-foreground-primary border-0 rounded-none p-0 text-base font-normal hover:opacity-80;
+  }
+  
+  .card-primary {
+    @apply bg-background-secondary border-0 rounded-lg p-8 w-84 h-90 shadow-none;
+  }
+  
+  .card-secondary {
+    @apply bg-transparent border-2 border-border-default rounded-full px-4 py-0 shadow-none;
+  }
+  
+  .input-textbox {
+    @apply bg-background-tertiary border border-border-focus rounded-base px-4 py-3 text-foreground-primary text-sm placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-border-focus;
+  }
+  
+  .avatar {
+    @apply rounded-full object-cover w-6 h-6;
+  }
+  
+  .feature-image {
+    @apply rounded-3xl object-cover;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-foreground-primary to-foreground-secondary bg-clip-text text-transparent;
+  }
+  
+  .glass {
+    @apply bg-background-tertiary backdrop-blur-sm border border-border-default;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .animate-scroll {
+    animation: scroll 30s linear infinite;
+  }
+  
+  @keyframes scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+}
