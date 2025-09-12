@@ -94,7 +94,8 @@ export const useSupabaseAuth = () => {
       if (backendUser) {
         dispatch(setUser({ 
           id: backendUser.userId.toString(), 
-          nickname: backendUser.nickname 
+          nickname: backendUser.nickname, 
+          avatarUrl: backendUser.avatarUrl 
         }))
         console.log('Redux에 사용자 정보 저장:', backendUser)
       }
@@ -113,33 +114,15 @@ export const useSupabaseAuth = () => {
 
   // 초기 세션 확인 및 인증 상태 리스너 설정
   useEffect(() => {
-    // 초기 세션 확인
-    const initializeAuth = async () => {
-      try {
-        const session = await authService.getCurrentSession()
-        const user = await authService.getCurrentUser()
-        
-        if (session && user) {
-          setAuthState(prev => ({ ...prev, session, user }))
-          // 백엔드 인증 시도
-          await authenticateWithBackend(session)
-        } else {
-          setAuthState(prev => ({ ...prev, loading: false }))
-        }
-      } catch (error) {
-        console.error('초기 인증 확인 실패:', error)
-        setAuthState(prev => ({ ...prev, loading: false }))
-      }
-    }
-
-    initializeAuth()
-
     // 인증 상태 변경 리스너
     const { data: { subscription } } = authService.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event, session)
         
-        if (event === 'SIGNED_IN' && session) {
+        if (event === 'INITIAL_SESSION' && session) {
+            setAuthState(prev => ({ ...prev, session, user: session.user, loading: true }));
+            await authenticateWithBackend(session);
+        } else if (event === 'SIGNED_IN' && session) {
           setAuthState(prev => ({ 
             ...prev, 
             session, 
@@ -164,6 +147,8 @@ export const useSupabaseAuth = () => {
             session, 
             user: session.user 
           }))
+        } else if (event === 'USER_UPDATED' && session) {
+            setAuthState(prev => ({ ...prev, user: session.user }));
         }
       }
     )

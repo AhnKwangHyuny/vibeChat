@@ -22,6 +22,12 @@ export const useSessionAuth = () => {
 
   // 세션 기반 사용자 정보 확인 및 Redux 동기화
   const checkSessionAuth = useCallback(async () => {
+    // [수정] Redux 스토어에 이미 사용자 정보가 있으면 API 호출 방지
+    if (user.id) {
+      setAuthState(prev => ({ ...prev, isCheckingAuth: false }));
+      return true;
+    }
+
     try {
       setAuthState(prev => ({ ...prev, isCheckingAuth: true }));
       const userData = await getMe();
@@ -30,7 +36,8 @@ export const useSessionAuth = () => {
         // Redux store에 사용자 정보 저장
         dispatch(setUser({ 
           id: userData.userId.toString(), 
-          nickname: userData.nickname 
+          nickname: userData.nickname,
+          avatarUrl: userData.avatarUrl
         }));
         
         console.log('세션 인증 성공:', userData);
@@ -50,7 +57,7 @@ export const useSessionAuth = () => {
     } finally {
       setAuthState(prev => ({ ...prev, isCheckingAuth: false }));
     }
-  }, [dispatch]);
+  }, [dispatch, user.id]); // [수정] user.id를 의존성 배열에 추가
 
   // 초기 마운트 시 세션 확인
   useEffect(() => {

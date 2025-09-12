@@ -20,6 +20,8 @@ import NotificationBadge from '../components/ui/NotificationBadge';
 import LoadingDots from '../components/ui/LoadingDots';
 import { useSessionAuth } from '../hooks/useSessionAuth';
 import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 const searchSchema = z.object({
   tags: z.array(z.string()).min(1, "Please enter at least one tag"),
@@ -41,9 +43,10 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'participants'>('newest');
   
   // 인증 훅 사용
-  const { user, isAuthenticated, signOut: sessionSignOut } = useSessionAuth();
+  const { signOut: sessionSignOut } = useSessionAuth();
   const { signOut: supabaseSignOut } = useSupabaseAuth();
-
+  const user = useSelector((state: RootState) => state.user);
+  const isAuthenticated = !!user.id;
   // Mock data for development
   const mockRooms = [
     {
@@ -161,7 +164,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background-primary">
       <Navbar 
-        user={isAuthenticated && user.id ? { id: user.id, nickname: user.nickname || '' } : undefined}
+        user={isAuthenticated ? user : undefined}
         onLogin={handleLogin}
         onLogout={handleLogout}
       />
