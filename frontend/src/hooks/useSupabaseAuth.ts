@@ -117,22 +117,21 @@ export const useSupabaseAuth = () => {
     // 인증 상태 변경 리스너
     const { data: { subscription } } = authService.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event, session)
-        
+
         if (event === 'INITIAL_SESSION' && session) {
             setAuthState(prev => ({ ...prev, session, user: session.user, loading: true }));
             await authenticateWithBackend(session);
         } else if (event === 'SIGNED_IN' && session) {
-          setAuthState(prev => ({ 
-            ...prev, 
-            session, 
+          setAuthState(prev => ({
+            ...prev,
+            session,
             user: session.user,
-            loading: true 
+            loading: true
           }))
-          
+
           // 백엔드 인증 처리
           await authenticateWithBackend(session)
-          
+
         } else if (event === 'SIGNED_OUT') {
           setAuthState({
             session: null,
@@ -142,10 +141,10 @@ export const useSupabaseAuth = () => {
             error: null
           })
         } else if (event === 'TOKEN_REFRESHED' && session) {
-          setAuthState(prev => ({ 
-            ...prev, 
-            session, 
-            user: session.user 
+          setAuthState(prev => ({
+            ...prev,
+            session,
+            user: session.user
           }))
         } else if (event === 'USER_UPDATED' && session) {
             setAuthState(prev => ({ ...prev, user: session.user }));
