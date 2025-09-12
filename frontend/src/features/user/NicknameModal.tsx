@@ -108,13 +108,13 @@
 // }
 
 // 임시로 빈 컴포넌트로 대체
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../utils/cn';
-import { createGuestUser, getMe } from '../../services/api/auth';
 import { useSupabaseAuth } from '../../hooks/useSupabaseAuth';
+import { useSessionAuth } from '../../hooks/useSessionAuth';
 import { toast } from 'react-toastify';
 
 interface LoginModalProps {
@@ -125,31 +125,15 @@ interface LoginModalProps {
 export default function NicknameModal({ isOpen, onClose }: LoginModalProps) {
   const [tab, setTab] = useState<'guest' | 'google'>('guest');
   const [nickname, setNickname] = useState('');
-  const [loading, setLoading] = useState(false);
   const { signInWithGoogle, loading: authLoading } = useSupabaseAuth();
+  const { signInAsGuest, loading: guestLoading } = useSessionAuth();
 
   const handleGuest = async () => {
-    if (!nickname.trim()) {
-      toast.error('닉네임을 입력하세요');
-      return;
-    }
-    try {
-      setLoading(true);
-      const created = await createGuestUser({ nickname: nickname.trim() });
-      // 서버 세션은 생성되고, 응답의 닉네임/아바타로 즉시 피드백
-      // 필요 시 전역 상태 저장 로직으로 확장
-      toast.success('게스트로 로그인되었습니다');
+    const result = await signInAsGuest(nickname);
+    if (result === true) {
       onClose();
-    } catch (e: any) {
-      const suggested = e?.response?.data?.suggestedNickname;
-      if (suggested) {
-        toast.info(`이미 사용 중입니다. 제안: ${suggested}`);
-        setNickname(suggested);
-      } else {
-        toast.error('로그인에 실패했습니다');
-      }
-    } finally {
-      setLoading(false);
+    } else if (result && typeof result === 'object' && 'suggested' in result) {
+      setNickname(result.suggested);
     }
   };
 
@@ -185,8 +169,8 @@ export default function NicknameModal({ isOpen, onClose }: LoginModalProps) {
               placeholder="닉네임을 입력하세요"
               className="w-full"
             />
-            <Button onClick={handleGuest} disabled={loading} className="w-full" variant="primary">
-              {loading ? '처리 중...' : '게스트로 시작'}
+            <Button onClick={handleGuest} disabled={guestLoading} className="w-full" variant="primary">
+              {guestLoading ? '처리 중...' : '게스트로 시작'}
             </Button>
           </div>
         ) : (

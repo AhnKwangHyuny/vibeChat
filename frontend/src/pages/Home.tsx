@@ -8,7 +8,6 @@ import { toast } from 'react-toastify';
 // Import components from our component library
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
-import { Spinner } from '../components/ui/Spinner';
 import { Tooltip } from '../components/ui/Tooltip';
 import { RoomCard } from '../components/demo/RoomCard';
 import { TagInput } from '../components/demo/TagInput';
@@ -19,6 +18,8 @@ import { Footer } from '../components/layout/Footer';
 import SearchBar from '../components/ui/SearchBar';
 import NotificationBadge from '../components/ui/NotificationBadge';
 import LoadingDots from '../components/ui/LoadingDots';
+import { useSessionAuth } from '../hooks/useSessionAuth';
+import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
 
 const searchSchema = z.object({
   tags: z.array(z.string()).min(1, "Please enter at least one tag"),
@@ -36,10 +37,12 @@ export default function Home() {
 
   const [searchQuery, setSearchQuery] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const [user, setUser] = useState({ id: '1', nickname: 'Guest User', avatarUrl: '' });
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'participants'>('newest');
+  
+  // 인증 훅 사용
+  const { user, isAuthenticated, signOut: sessionSignOut } = useSessionAuth();
+  const { signOut: supabaseSignOut } = useSupabaseAuth();
 
   // Mock data for development
   const mockRooms = [
@@ -121,10 +124,20 @@ export default function Home() {
     setShowLogin(true);
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUser({ id: '1', nickname: 'Guest User', avatarUrl: '' });
-    toast.success("Successfully logged out!");
+  const handleLogout = async () => {
+    try {
+      // 세션 기반 로그아웃 시도
+      await sessionSignOut();
+    } catch (error) {
+      console.error('세션 로그아웃 실패:', error);
+    }
+    
+    try {
+      // Supabase 로그아웃도 시도 (Google 로그인 사용자의 경우)
+      await supabaseSignOut();
+    } catch (error) {
+      console.error('Supabase 로그아웃 실패:', error);
+    }
   };
 
   const currentTags = watch('tags') || [];
@@ -148,7 +161,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background-primary">
       <Navbar 
-        user={isLoggedIn ? user : undefined}
+        user={isAuthenticated && user.id ? { id: user.id, nickname: user.nickname || '' } : undefined}
         onLogin={handleLogin}
         onLogout={handleLogout}
       />

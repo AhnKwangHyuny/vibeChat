@@ -43,7 +43,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
                 .csrfTokenRepository(customCsrfTokenRepository())
-                .ignoringRequestMatchers("/ws/**", "/api/users/guest", "/api/auth/google")
+                .ignoringRequestMatchers("/ws/**", "/api/users/guest", "/api/auth/google" , "/api/auth/me")
             )
             // API 요청은 인증 필요 시 401을 반환(리다이렉트 방지)
             .exceptionHandling(ex -> ex

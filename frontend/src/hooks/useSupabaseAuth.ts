@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import { Session, User } from '@supabase/supabase-js'
 import { authService, BackendUserResponse } from '../services/supabase/authService'
 import { toast } from 'react-toastify'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '../store'
+import { setUser } from '../store/userSlice'
 
 interface AuthState {
   session: Session | null
@@ -12,6 +15,7 @@ interface AuthState {
 }
 
 export const useSupabaseAuth = () => {
+  const dispatch = useDispatch<AppDispatch>()
   const [authState, setAuthState] = useState<AuthState>({
     session: null,
     user: null,
@@ -85,6 +89,16 @@ export const useSupabaseAuth = () => {
         loading: false,
         error: null 
       }))
+      
+      // Redux store에 사용자 정보 저장
+      if (backendUser) {
+        dispatch(setUser({ 
+          id: backendUser.userId.toString(), 
+          nickname: backendUser.nickname 
+        }))
+        console.log('Redux에 사용자 정보 저장:', backendUser)
+      }
+      
       // 토스트는 AuthCallback에서 표시
       return backendUser
     } catch (error) {
