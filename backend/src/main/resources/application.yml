@@ -20,7 +20,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
     defer-datasource-initialization: true
 
   servlet: # 파일 업로드(멀티파트)
@@ -107,15 +106,50 @@ management:
     health:
       show-details: when_authorized
 
-# CORS/WS 허용 오리진 (환경변수 SECURITY_ALLOWED_ORIGINS로 덮어쓰기 가능)
+# CORS/WS 허용 오리진 (개발환경용 - localhost와 IP 모두 허용)
 app:
   cors:
-    allowed-origins: ${SECURITY_ALLOWED_ORIGINS:http://localhost:5173}
+    allowed-origins: http://localhost:5173,http://127.0.0.1:5173,http://172.30.1.42:5173
   user:
-    default-guest-avatar-url: ${DEFAULT_GUEST_AVATAR_URL:/static/avatars/guest.png}
+    default-guest-avatar-url: /static/avatars/guest.png
 
 # Supabase Configuration
 supabase:
   url: ${SUPABASE_URL}
   service-role-key: ${SUPABASE_SERVICE_ROLE_KEY}
   anon-key: ${SUPABASE_ANON_KEY}
+
+# 서버 설정 (개발환경 전용)
+server:
+  servlet:
+    session:
+      cookie:
+        # 개발환경에서는 none으로 설정하여 cross-origin 요청에서도 쿠키 전송 허용
+        # none: 모든 cross-origin 요청에서 쿠키 전송 허용
+        same-site: none
+
+        # HTTP 연결에서도 쿠키 전송 허용 (개발환경 전용)
+        # 운영환경에서는 true로 설정 필요
+        secure: false
+        
+        # 쿠키 도메인 설정 (개발환경에서 localhost 문제 해결)
+        domain: localhost
+
+        # JavaScript에서 쿠키 접근 차단 (XSS 방어)
+        http-only: true
+
+        # 쿠키 유효 경로
+        path: /
+
+        # 쿠키 최대 생명주기 (30분 = 1800초)
+        max-age: 1800
+
+      # 세션 타임아웃 (30분 = 1800초)
+      timeout: 1800
+
+  # 톰캣 설정
+  tomcat:
+    # URI 인코딩
+    uri-encoding: UTF-8
+    # 최대 HTTP 헤더 크기
+    max-http-header-size: 8KB

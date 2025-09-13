@@ -52,15 +52,15 @@ export const useSupabaseAuth = () => {
   const signOut = async () => {
     try {
       setAuthState(prev => ({ ...prev, loading: true }))
-      
+
       const { error } = await authService.signOut()
-      
+
       if (error) {
-        toast.error(`로그아웃 실패: ${error.message}`)
-      } else {
-        toast.success('로그아웃되었습니다')
+        console.error('Supabase 로그아웃 실패:', error.message)
+        throw error // 에러를 상위로 전파
       }
-      
+
+      // 로컬 상태 초기화
       setAuthState({
         session: null,
         user: null,
@@ -68,10 +68,17 @@ export const useSupabaseAuth = () => {
         loading: false,
         error: null
       })
+
+      // Redux 상태도 클리어 (중요!)
+      dispatch(clearUser())
+
+      console.log('Supabase 세션 종료 완료')
+
     } catch (error) {
       const message = error instanceof Error ? error.message : '알 수 없는 오류'
       setAuthState(prev => ({ ...prev, error: message, loading: false }))
-      toast.error(`로그아웃 오류: ${message}`)
+      // 에러를 상위로 다시 던져서 Home 컴포넌트에서 처리하도록
+      throw error
     }
   }
 
@@ -92,10 +99,11 @@ export const useSupabaseAuth = () => {
       
       // Redux store에 사용자 정보 저장
       if (backendUser) {
-        dispatch(setUser({ 
-          id: backendUser.userId.toString(), 
-          nickname: backendUser.nickname, 
-          avatarUrl: backendUser.avatarUrl 
+        dispatch(setUser({
+          id: backendUser.userId.toString(),
+          nickname: backendUser.nickname,
+          avatarUrl: backendUser.avatarUrl,
+          provider: 'GOOGLE'
         }))
         console.log('Redux에 사용자 정보 저장:', backendUser)
       }

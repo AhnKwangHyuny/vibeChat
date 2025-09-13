@@ -4,12 +4,14 @@ interface UserState {
     id: string | null;
     nickname: string | null;
     avatarUrl: string | null;
+    provider: 'GUEST' | 'GOOGLE' | null;
 }
 
 const initialState: UserState = {
     id: null,
     nickname: null,
     avatarUrl: null,
+    provider: null,
 };
 
 const userSlice = createSlice({
@@ -23,6 +25,7 @@ const userSlice = createSlice({
             state.id = null;
             state.nickname = null;
             state.avatarUrl = null;
+            state.provider = null;
         },
     },
 });

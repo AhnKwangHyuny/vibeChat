@@ -39,27 +39,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .addFilterBefore(correlationIdFilter, UsernamePasswordAuthenticationFilter.class)
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf
-                .csrfTokenRepository(customCsrfTokenRepository())
-                .ignoringRequestMatchers("/ws/**", "/api/users/guest", "/api/auth/google" , "/api/auth/me")
-            )
-            // API 요청은 인증 필요 시 401을 반환(리다이렉트 방지)
-            .exceptionHandling(ex -> ex
-                .defaultAuthenticationEntryPointFor(
-                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                    new AntPathRequestMatcher("/api/**")
-                )
-            )
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/users/guest", "/api/auth/google", "/api/auth/me", "/api/auth/logout", "/actuator/health", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/ws/**").permitAll() // Allow WebSocket connections
-                .requestMatchers("/uploads/**").permitAll() // Allow static file access
-                .anyRequest().authenticated()
-            );
-            // Spring Security OAuth2 비활성화 - Supabase OAuth 사용
-            // .oauth2Login() 제거
+                .addFilterBefore(correlationIdFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // csrf 개발환경에서는 모든 url 허가
+                .csrf(csrf -> csrf.disable())
+
+                // 인가(Authorization) 설정 - 모든 요청 허용 (테스트용)
+                .authorizeHttpRequests(authz -> authz.anyRequest().permitAll())
+
+                // API 요청은 인증 필요 시 401을 반환(리다이렉트 방지)
+                .exceptionHandling(ex -> ex
+                        .defaultAuthenticationEntryPointFor(
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                new AntPathRequestMatcher("/api/**")
+                        )
+                );
         return http.build();
     }
 
@@ -85,4 +79,3 @@ public class SecurityConfig {
         return repo;
     }
 }
-

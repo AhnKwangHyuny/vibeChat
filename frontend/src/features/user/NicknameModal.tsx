@@ -125,8 +125,9 @@ interface LoginModalProps {
 export default function NicknameModal({ isOpen, onClose }: LoginModalProps) {
   const [tab, setTab] = useState<'guest' | 'google'>('guest');
   const [nickname, setNickname] = useState('');
-  const { signInWithGoogle, loading: authLoading } = useSupabaseAuth();
+  const { signInWithGoogle } = useSupabaseAuth();
   const { signInAsGuest, loading: guestLoading } = useSessionAuth();
+  const [isGoogleProcessing, setIsGoogleProcessing] = useState(false);
 
   const handleGuest = async () => {
     const result = await signInAsGuest(nickname);
@@ -138,26 +139,49 @@ export default function NicknameModal({ isOpen, onClose }: LoginModalProps) {
   };
 
   const handleGoogle = async () => {
-    const success = await signInWithGoogle();
-    if (success) {
-      // OAuth 리다이렉트가 발생하므로 모달을 닫지 않고 대기
-      toast.info('Google 로그인 중...');
+    setIsGoogleProcessing(true);
+    try {
+      const success = await signInWithGoogle();
+      if (success) {
+        toast.info('Google 로그인 페이지로 이동합니다...');
+      } else {
+        toast.error('Google 로그인에 실패했습니다. 다시 시도해 주세요.');
+        setIsGoogleProcessing(false);
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      toast.error('Google 로그인 중 오류가 발생했습니다.');
+      setIsGoogleProcessing(false);
     }
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="로그인" size="sm">
       <div className="w-full max-w-[420px] mx-auto">
-        <p className="text-sm text-foreground-muted mb-4">원하는 방법으로 로그인하세요. 게스트는 닉네임만 필요합니다.</p>
+        <p className="text-sm text-foreground-muted mb-4">
+          원하는 방법으로 로그인하세요. 게스트는 닉네임만 필요합니다.
+        </p>
         <div className="flex w-full rounded-full bg-background-tertiary p-1 mb-5 border border-border-default">
           <button
-            className={cn('flex-1 py-2 rounded-full text-sm text-foreground-secondary hover:text-foreground-primary transition-colors', tab==='guest' && 'bg-background-primary text-foreground-primary shadow-inner')}
+            className={cn(
+              'flex-1 py-2 rounded-full text-sm text-foreground-secondary hover:text-foreground-primary transition-colors',
+              tab === 'guest' &&
+                'bg-background-primary text-foreground-primary shadow-inner'
+            )}
             onClick={() => setTab('guest')}
-          >게스트</button>
+          >
+            게스트
+          </button>
           <button
-            className={cn('flex-1 py-2 rounded-full text-sm text-foreground-secondary hover:text-foreground-primary transition-colors', tab==='google' && 'bg-background-primary text-foreground-primary shadow-inner')}
+            className={cn(
+              'flex-1 py-2 rounded-full text-sm text-foreground-secondary hover:text-foreground-primary transition-colors',
+              tab === 'google' &&
+                'bg-background-primary text-foreground-primary shadow-inner'
+            )}
             onClick={() => setTab('google')}
-          >Google</button>
+          >
+            Google
+          </button>
         </div>
 
         {tab === 'guest' ? (
@@ -169,24 +193,32 @@ export default function NicknameModal({ isOpen, onClose }: LoginModalProps) {
               placeholder="닉네임을 입력하세요"
               className="w-full"
             />
-            <Button onClick={handleGuest} disabled={guestLoading} className="w-full" variant="primary">
+            <Button
+              onClick={handleGuest}
+              disabled={guestLoading}
+              className="w-full"
+              variant="primary"
+            >
               {guestLoading ? '처리 중...' : '게스트로 시작'}
             </Button>
           </div>
         ) : (
           <div className="space-y-4">
-            <Button 
-              onClick={handleGoogle} 
-              disabled={authLoading} 
-              variant="secondary" 
+            <Button
+              onClick={handleGoogle}
+              disabled={isGoogleProcessing}
+              variant="secondary"
               className="w-full"
             >
-              {authLoading ? '처리 중...' : 'Google로 계속'}
+              {isGoogleProcessing ? '처리 중...' : 'Google로 계속'}
             </Button>
-            <p className="text-xs text-foreground-muted text-center">최초 로그인 사용자는 자동으로 계정이 생성됩니다.</p>
+            <p className="text-xs text-foreground-muted text-center">
+              최초 로그인 사용자는 자동으로 계정이 생성됩니다.
+            </p>
           </div>
         )}
       </div>
     </Modal>
   );
 }
+

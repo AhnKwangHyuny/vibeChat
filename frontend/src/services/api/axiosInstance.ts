@@ -1,51 +1,95 @@
 import axios from 'axios';
 import { ApiErrorHandler } from './errorHandler';
 
-// Axios 인스턴스
-// - TRD에 따라 기본 Base URL은 "/api" (Nginx 프록시 전제)
-
 const resolveBaseURL = () => {
-
-  // 2) 별도 백엔드 호스트/포트가 주어졌으면 그것을 사용
+  // 개발환경에서는 강제로 localhost:8080 사용 (CORS 문제 해결)
+  if (import.meta.env.DEV) {
+    return 'http://localhost:8080/api';
+  }
+  
+  // 프로덕션에서는 환경변수 또는 현재 호스트 사용
   const backendHost = (import.meta.env.VITE_BACKEND_HOST as string | undefined) || window.location.hostname;
   const backendPort = (import.meta.env.VITE_BACKEND_PORT as string | undefined)
-    // 프론트 포트가 5173면 백엔드 기본 8080로 가정(개발 기본 매핑)
     || (window.location.port === '5173' ? '8080' : window.location.port);
-  
+
   const { protocol } = window.location;
   return `${protocol}//${backendHost}${backendPort ? `:${backendPort}` : ''}/api`;
 };
 
 const axiosInstance = axios.create({
   baseURL: resolveBaseURL(),
-  withCredentials: true,
+  withCredentials: true, // 쿠키 자동 전송
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
-// CSRF 토큰을 요청 헤더에 첨부(더블 서밋)
+// 요청 인터셉터 - CSRF만 처리 (세션은 자동으로 쿠키로 전송됨)
 axiosInstance.interceptors.request.use((config) => {
-  // 서버가 쿠키로 설정한 CSRF 토큰 값을 메타 태그 또는 쿠키에서 읽어 헤더로 전달
+  // CSRF 토큰 처리
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
     || (document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]+)/)?.[1] && decodeURIComponent(document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]+)/)![1]));
+
   if (csrfToken) {
     config.headers['X-CSRF-TOKEN'] = csrfToken;
   }
+
+  // 상세한 디버깅 정보
+  console.log('🔍 API Request Debug:');
+  console.log('  URL:', config.url);
+  console.log('  Base URL:', config.baseURL);
+  console.log('  With credentials:', config.withCredentials);
+  console.log('  All cookies:', document.cookie);
+  
+  // 세션 쿠키만 추출
+  const sessionCookie = document.cookie.split('; ').find(row => row.startsWith('SESSION='));
+  console.log('  Session cookie:', sessionCookie || 'NOT FOUND');
+  
+  // 쿠키 존재 여부 상세 확인
+  if (!document.cookie) {
+    console.warn('⚠️ NO COOKIES FOUND AT ALL!');
+  } else {
+    console.log('✅ Cookies exist:', document.cookie.split('; '));
+  }
+  
+  // 브라우저 보안 정책 확인
+  console.log('  Document domain:', document.domain);
+  console.log('  Document origin:', window.location.origin);
+  console.log('  Target origin:', config.baseURL);
+
   return config;
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('Response headers:', response.headers);
+    return response;
+  },
   (error) => {
-    // 중앙 에러 핸들러로 표준화(RFC7807 호환 메시지 처리)
-    const apiError = ApiErrorHandler.handle(error);
-    
-    // For authentication errors, optionally redirect to login
-    if (apiError.status === 401) {
-      // Could redirect to login page or refresh token
-      // window.location.href = '/login';
+    if (error.response?.status === 401) {
+      console.error('401 Unauthorized:');
+      console.error('Request headers:', error.config?.headers);
+      console.error('Response data:', error.response?.data);
+
+      // 쿠키 상태 확인
+      const cookies = document.cookie.split('; ');
+      const sessionCookie = cookies.find(cookie => cookie.startsWith('SESSION='));
+      console.error('Session cookie:', sessionCookie || 'NOT FOUND');
     }
-    
+
+    const apiError = ApiErrorHandler.handle(error);
     return Promise.reject(apiError);
   }
 );
+
+export const checkSessionCookie = () => {
+  const sessionCookie = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('SESSION='));
+
+  console.log('🔍 Session cookie check:', sessionCookie);
+  return !!sessionCookie;
+};
 
 export default axiosInstance;

@@ -49,7 +49,7 @@ export class ApiErrorHandler {
             toast.error(`잘못된 요청: ${message}`);
             break;
           case 401:
-            toast.error(`인증 오류: ${message}`);
+//             toast.error(`인증 오류: ${message}`);
             break;
           case 403:
             toast.error(`접근 권한이 없습니다: ${message}`);

@@ -20,8 +20,8 @@ import NotificationBadge from '../components/ui/NotificationBadge';
 import LoadingDots from '../components/ui/LoadingDots';
 import { useSessionAuth } from '../hooks/useSessionAuth';
 import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
+import { clearUser } from '../store/userSlice';
+import { useDispatch } from 'react-redux';
 
 const searchSchema = z.object({
   tags: z.array(z.string()).min(1, "Please enter at least one tag"),
@@ -42,11 +42,11 @@ export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'participants'>('newest');
   
+  const dispatch = useDispatch();
+
   // 인증 훅 사용
-  const { signOut: sessionSignOut } = useSessionAuth();
+  const { user, isAuthenticated, signOut: sessionSignOut } = useSessionAuth();
   const { signOut: supabaseSignOut } = useSupabaseAuth();
-  const user = useSelector((state: RootState) => state.user);
-  const isAuthenticated = !!user.id;
   // Mock data for development
   const mockRooms = [
     {
@@ -128,18 +128,27 @@ export default function Home() {
   };
 
   const handleLogout = async () => {
+    console.log("로그아웃을 시작합니다...");
     try {
-      // 세션 기반 로그아웃 시도
+      if (user.provider === 'GOOGLE') {
+        await supabaseSignOut();
+        console.log("Supabase 세션이 종료되었습니다.");
+      }
+
+      // 2. (모든 사용자 공통) VibeChat 백엔드 세션 종료
       await sessionSignOut();
+      console.log("VibeChat 백엔드 세션이 종료되었습니다.");
+
+      // 3. 성공 알림 (Redux의 clearUser는 각 signOut 훅에서 이미 처리하고 있음)
+      toast.success("성공적으로 로그아웃되었습니다.");
+
     } catch (error) {
-      console.error('세션 로그아웃 실패:', error);
-    }
-    
-    try {
-      // Supabase 로그아웃도 시도 (Google 로그인 사용자의 경우)
-      await supabaseSignOut();
-    } catch (error) {
-      console.error('Supabase 로그아웃 실패:', error);
+      console.error("로그아웃 중 오류 발생:", error);
+      toast.error("로그아웃 중 문제가 발생했습니다. 페이지를 새로고침합니다.");
+
+      // 최악의 경우에도 UI를 초기화하고 새로고침하여 상태를 완전히 정리
+      dispatch(clearUser());
+      window.location.reload();
     }
   };
 
@@ -163,8 +172,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background-primary">
-      <Navbar 
-        user={isAuthenticated ? user : undefined}
+      <Navbar
+        user={isAuthenticated && user.id ? { id: user.id, nickname: user.nickname || '' } : undefined}
         onLogin={handleLogin}
         onLogout={handleLogout}
       />

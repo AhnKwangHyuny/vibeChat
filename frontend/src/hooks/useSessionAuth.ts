@@ -11,76 +11,75 @@ interface AuthState {
   isCheckingAuth: boolean;
 }
 
+let isAuthCheckInProgress = false;
+
 export const useSessionAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user);
   const [authState, setAuthState] = useState<AuthState>({
     loading: false,
     error: null,
-    isCheckingAuth: true
+    isCheckingAuth: true,
   });
 
-  // 세션 기반 사용자 정보 확인 및 Redux 동기화
   const checkSessionAuth = useCallback(async () => {
-    // [수정] Redux 스토어에 이미 사용자 정보가 있으면 API 호출 방지
-    if (user.id) {
+    if (user.id || isAuthCheckInProgress) {
       setAuthState(prev => ({ ...prev, isCheckingAuth: false }));
-      return true;
+      return;
     }
 
+    isAuthCheckInProgress = true;
+    setAuthState(prev => ({ ...prev, isCheckingAuth: true }));
+
     try {
-      setAuthState(prev => ({ ...prev, isCheckingAuth: true }));
       const userData = await getMe();
-      
       if (userData) {
-        // Redux store에 사용자 정보 저장
-        dispatch(setUser({ 
-          id: userData.userId.toString(), 
-          nickname: userData.nickname,
-          avatarUrl: userData.avatarUrl
-        }));
-        
-        console.log('세션 인증 성공:', userData);
+        dispatch(
+          setUser({
+            id: userData.userId.toString(),
+            nickname: userData.nickname,
+            avatarUrl: userData.avatarUrl,
+            provider: userData.provider,
+          })
+        );
         return true;
       }
-      
       return false;
-    } catch (error) {
-      // 401 에러는 정상 상태 (로그인하지 않은 사용자)
-      if (error instanceof Error && (error as any).response?.status === 401) {
-        console.log('로그인되지 않은 사용자');
+    } catch (error: any) {
+      if (error?.status === 401) {
+        console.log('로그인되지 않은 사용자 (401)');
       } else {
-        console.log(error)
         console.error('세션 확인 중 오류:', error);
       }
       return false;
     } finally {
+      isAuthCheckInProgress = false;
       setAuthState(prev => ({ ...prev, isCheckingAuth: false }));
     }
-  }, [dispatch, user.id]); // [수정] user.id를 의존성 배열에 추가
+  }, [dispatch, user.id]);
 
-  // 초기 마운트 시 세션 확인
   useEffect(() => {
     checkSessionAuth();
   }, [checkSessionAuth]);
 
-  // 게스트 로그인
-  const signInAsGuest = async (nickname: string): Promise<boolean | { suggested: string }> => {
+  const signInAsGuest = async (
+    nickname: string
+  ): Promise<boolean | { suggested: string }> => {
     if (!nickname.trim()) {
       toast.error('닉네임을 입력하세요');
       return false;
     }
 
+    setAuthState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      setAuthState(prev => ({ ...prev, loading: true, error: null }));
       const created = await createGuestUser({ nickname: nickname.trim() });
-      
-      // Redux store에 사용자 정보 저장
-      dispatch(setUser({ 
-        id: created.userId.toString(), 
-        nickname: created.nickname 
-      }));
-      
+      dispatch(
+        setUser({
+          id: created.userId.toString(),
+          nickname: created.nickname,
+          provider: 'GUEST',
+        })
+      );
       toast.success('게스트로 로그인되었습니다');
       return true;
     } catch (error: any) {
@@ -99,43 +98,36 @@ export const useSessionAuth = () => {
     }
   };
 
-  // 로그아웃
   const signOut = async () => {
+    setAuthState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      setAuthState(prev => ({ ...prev, loading: true, error: null }));
       await logout();
-      
-      // Redux 상태 클리어
       dispatch(clearUser());
-      
-      toast.success('로그아웃되었습니다');
+      console.log('백엔드 세션 종료 완료');
     } catch (error) {
-      console.error('로그아웃 오류:', error);
-      // 로그아웃 실패해도 로컬 상태는 클리어
+      console.error('백엔드 로그아웃 오류:', error);
       dispatch(clearUser());
-      toast.error('로그아웃 중 오류가 발생했습니다');
+      throw error;
     } finally {
       setAuthState(prev => ({ ...prev, loading: false }));
     }
   };
 
-  // 수동으로 사용자 정보 새로고침
   const refreshUser = async () => {
     return await checkSessionAuth();
   };
 
   return {
-    // 상태
     user,
     isAuthenticated: !!user.id,
     loading: authState.loading,
     error: authState.error,
     isCheckingAuth: authState.isCheckingAuth,
-    
-    // 액션
     signInAsGuest,
     signOut,
     refreshUser,
-    checkSessionAuth
+    checkSessionAuth,
   };
 };
+
+
