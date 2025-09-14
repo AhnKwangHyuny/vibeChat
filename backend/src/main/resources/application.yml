@@ -61,6 +61,10 @@ spring:
             jwk-set-uri: https://www.googleapis.com/oauth2/v3/certs
 
 # 애플리케이션 전용 설정
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost}
+
 media:
   upload-dir: ${MEDIA_UPLOAD_DIR:./uploads}
   max-video-seconds: ${MEDIA_MAX_VIDEO_SECONDS:10}
@@ -106,13 +110,6 @@ management:
     health:
       show-details: when_authorized
 
-# CORS/WS 허용 오리진 (개발환경용 - localhost와 IP 모두 허용)
-app:
-  cors:
-    allowed-origins: http://localhost:5173,http://127.0.0.1:5173,http://172.30.1.42:5173
-  user:
-    default-guest-avatar-url: /static/avatars/guest.png
-
 # Supabase Configuration
 supabase:
   url: ${SUPABASE_URL}
@@ -124,19 +121,18 @@ server:
   servlet:
     session:
       cookie:
-        # 개발환경에서는 none으로 설정하여 cross-origin 요청에서도 쿠키 전송 허용
-        # none: 모든 cross-origin 요청에서 쿠키 전송 허용
-        same-site: none
+        # lax: 같은 사이트와 top-level navigation에서 쿠키 전송 허용
+        same-site: lax
 
         # HTTP 연결에서도 쿠키 전송 허용 (개발환경 전용)
         # 운영환경에서는 true로 설정 필요
         secure: false
         
         # 쿠키 도메인 설정 (개발환경에서 localhost 문제 해결)
-        domain: localhost
+        # domain: localhost  # 주석 처리 - 브라우저가 자동으로 도메인 처리하도록 함
 
         # JavaScript에서 쿠키 접근 차단 (XSS 방어)
-        http-only: true
+        http-only: false
 
         # 쿠키 유효 경로
         path: /
@@ -153,3 +149,4 @@ server:
     uri-encoding: UTF-8
     # 최대 HTTP 헤더 크기
     max-http-header-size: 8KB
+

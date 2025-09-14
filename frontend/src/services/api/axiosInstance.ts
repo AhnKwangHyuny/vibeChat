@@ -2,11 +2,10 @@ import axios from 'axios';
 import { ApiErrorHandler } from './errorHandler';
 
 const resolveBaseURL = () => {
-  // 개발환경에서는 강제로 localhost:8080 사용 (CORS 문제 해결)
   if (import.meta.env.DEV) {
     return 'http://localhost:8080/api';
   }
-  
+
   // 프로덕션에서는 환경변수 또는 현재 호스트 사용
   const backendHost = (import.meta.env.VITE_BACKEND_HOST as string | undefined) || window.location.hostname;
   const backendPort = (import.meta.env.VITE_BACKEND_PORT as string | undefined)
@@ -18,14 +17,13 @@ const resolveBaseURL = () => {
 
 const axiosInstance = axios.create({
   baseURL: resolveBaseURL(),
-  withCredentials: true, // 쿠키 자동 전송
+  withCredentials: true,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   }
 });
 
-// 요청 인터셉터 - CSRF만 처리 (세션은 자동으로 쿠키로 전송됨)
 axiosInstance.interceptors.request.use((config) => {
   // CSRF 토큰 처리
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
@@ -36,7 +34,7 @@ axiosInstance.interceptors.request.use((config) => {
   }
 
   // 상세한 디버깅 정보
-  console.log('🔍 API Request Debug:');
+  console.log('  API Request Debug:');
   console.log('  URL:', config.url);
   console.log('  Base URL:', config.baseURL);
   console.log('  With credentials:', config.withCredentials);
@@ -48,9 +46,9 @@ axiosInstance.interceptors.request.use((config) => {
   
   // 쿠키 존재 여부 상세 확인
   if (!document.cookie) {
-    console.warn('⚠️ NO COOKIES FOUND AT ALL!');
+    console.warn('NO COOKIES FOUND AT ALL!');
   } else {
-    console.log('✅ Cookies exist:', document.cookie.split('; '));
+    console.log('Cookies exist:', document.cookie.split('; '));
   }
   
   // 브라우저 보안 정책 확인

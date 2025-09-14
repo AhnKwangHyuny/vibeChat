@@ -1,7 +1,7 @@
 package com.vibechat.controller;
 
 import com.vibechat.dto.TagResponse;
-import com.vibechat.service.tag.TagServiceImpl;
+import com.vibechat.service.tag.chatRoomTagService.ChatRoomTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +14,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tags")
 @RequiredArgsConstructor
-public class TagController {
+public class ChatRoomTagController {
 
-    private final TagServiceImpl tagService;
+    private final ChatRoomTagService tagService;
 
     @GetMapping("/autocomplete")
     public ResponseEntity<List<TagResponse>> autocompleteTags(@RequestParam String q) {

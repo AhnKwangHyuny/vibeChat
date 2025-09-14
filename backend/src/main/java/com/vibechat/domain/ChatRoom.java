@@ -17,7 +17,7 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 80)
+    @Column(nullable = false, length = 50)
     private String title;
 
     @Column(length = 255)
@@ -39,8 +39,8 @@ public class ChatRoom {
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoomTag> roomTags = new ArrayList<>();
+//    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<RoomTag> roomTags = new ArrayList<>();
 
     @PreUpdate
     protected void onUpdate() {

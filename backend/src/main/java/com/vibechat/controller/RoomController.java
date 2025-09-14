@@ -4,13 +4,15 @@ import com.vibechat.dto.RoomCreateRequest;
 import com.vibechat.dto.RoomJoinRequest;
 import com.vibechat.dto.RoomResponse;
 import com.vibechat.service.room.RoomService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -19,14 +21,14 @@ public class RoomController {
 
     private final RoomService roomService;
 
+    /**
+     * 방 개설 api
+     * */
     @PostMapping
-    public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody RoomCreateRequest request, HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            // Or handle via Spring Security exception handling
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-        RoomResponse roomResponse = roomService.createRoom(request, userId);
+    public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody RoomCreateRequest roomCreateRequest, HttpServletRequest request) {
+
+        RoomResponse roomResponse = roomService.createRoom(roomCreateRequest,request);
+
         return new ResponseEntity<>(roomResponse, HttpStatus.CREATED);
     }
 

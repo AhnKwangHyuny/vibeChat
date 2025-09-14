@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
-// Import components from our component library
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Badge } from '../components/ui/Badge';
 import { Spinner } from '../components/ui/Spinner';
-import { Modal } from '../components/ui/Modal';
 import { TagInput } from '../components/demo/TagInput';
 import { Navbar } from '../components/layout/Navbar';
-import { cn } from '../utils/cn';
+import { useSessionAuth } from '../hooks/useSessionAuth';
+import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
+import { CreateRoomRequest } from '../types';
+import { createRoom } from '../services/api/rooms';
 
 const createRoomSchema = z.object({
-  title: z.string().min(1, "Title is required").max(80, "Title cannot exceed 80 characters"),
-  description: z.string().max(255, "Description cannot exceed 255 characters").optional(),
-  isPrivate: z.boolean(),
-  tags: z.array(z.string().min(1, "Tag cannot be empty")).min(1, "At least one tag is required").max(5, "Cannot exceed 5 tags"),
+  title: z.string().min(1, "제목은 무조건 입력되어야 합니다.").max(50, "최대 50자를 넘길 수 없습니다."),
+  description: z.string().max(100, "설명은 최대 100글자 이하로만 작성 가능합니다.").optional(),
+  isPrivate: z.string(),
+  tags: z.array(z.string().min(1, "태그가 입력되지 않았습니다.")).min(1, "적어도 1개 이상의 태그가 필요합니다.").max(5, "최대 5개의 태그 입력이 가능합니다."),
 });
 
 type CreateRoomFormInputs = z.infer<typeof createRoomSchema>;
@@ -29,62 +32,100 @@ export default function CreateRoom() {
   const navigate = useNavigate();
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<CreateRoomFormInputs>({
     resolver: zodResolver(createRoomSchema),
-    defaultValues: { isPrivate: false, tags: [] },
+    defaultValues: { isPrivate: "false", tags: [] },
+    mode: 'onChange', // 실시간 검증으로 폼 상태를 더 정확하게 추적
   });
+
+  // 컴포넌트 마운트 시 isPrivate 값을 명시적으로 설정
+  useEffect(() => {
+    setValue('isPrivate', "false");
+  }, [setValue]);
 
   const [isCreating, setIsCreating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [user, setUser] = useState({ id: '1', nickname: 'John Doe', avatarUrl: '' });
-
-  // Mock autocomplete data
-  const mockAutocompleteResults = [
-    { name: "react", popularity: 95 },
-    { name: "typescript", popularity: 88 },
-    { name: "javascript", popularity: 92 },
-    { name: "design", popularity: 75 },
-    { name: "ui", popularity: 80 },
-    { name: "programming", popularity: 85 },
-    { name: "web", popularity: 90 },
-    { name: "development", popularity: 87 }
-  ];
+  
+  // Redux에서 사용자 정보 가져오기
+  const user = useSelector((state: RootState) => state.user);
+  const isAuthenticated = !!user.id;
+  
+  // 인증 훅 사용
+  const { signOut: sessionSignOut } = useSessionAuth();
+  const { signOut: supabaseSignOut } = useSupabaseAuth();
 
   const onSubmit = async (data: CreateRoomFormInputs) => {
+    if (!isAuthenticated) {
+      toast.error('로그인이 필요합니다.');
+      return;
+    }
+
     setIsCreating(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const newRoom = {
-      id: Date.now(),
-      ...data,
-      participantsCount: 1,
-      createdAt: new Date().toISOString()
-    };
-    
-    toast.success(`Room '${newRoom.title}' created successfully!`);
-    navigate(`/rooms/${newRoom.id}`);
+    try {
+      // 방 생성 요청 데이터 구성
+      const createRoomData: CreateRoomRequest = {
+        title: data.title.trim(),
+        description: data.description?.trim(),
+        isPrivate: data.isPrivate === "true",
+        tags: data.tags
+      };
+
+      // 실제 API 호출
+      const newRoom = await createRoom(createRoomData);
+      
+      toast.success(`방 '${newRoom.title}'이 성공적으로 개설되었습니다!`);
+      navigate(`/rooms/${newRoom.roomId}`);
+    } catch (error: any) {
+      console.error('방 생성 오류:', error);
+      
+      // 에러 메시지 처리
+      const errorMessage = error?.response?.data?.message || 
+                          error?.message || 
+                          '방 생성 중 오류가 발생했습니다.';
+      
+      toast.error(errorMessage);
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
-    setUser({ id: '1', nickname: 'John Doe', avatarUrl: '' });
-    toast.success("Successfully logged in!");
+    navigate('/');
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUser({ id: '1', nickname: 'Guest User', avatarUrl: '' });
-    toast.success("Successfully logged out!");
+  const handleLogout = async () => {
+    console.log("로그아웃을 시작합니다...");
+    try {
+      // 1. (소셜 로그인 사용자만) Supabase 클라이언트 세션 종료
+      if (user.provider === 'GOOGLE') {
+        await supabaseSignOut();
+        console.log("Supabase 세션이 종료되었습니다.");
+      }
+
+      // 2. (모든 사용자 공통) VibeChat 백엔드 세션 종료
+      await sessionSignOut();
+      console.log("VibeChat 백엔드 세션이 종료되었습니다.");
+
+      // 3. 성공 알림
+      toast.success("성공적으로 로그아웃되었습니다.");
+
+    } catch (error) {
+      console.error("로그아웃 중 오류 발생:", error);
+      toast.error("로그아웃 중 문제가 발생했습니다.");
+    }
   };
 
   const currentTags = watch('tags') || [];
   const formData = watch();
 
+  // TagInput의 onTagsChange 함수를 useCallback으로 최적화
+  const handleTagsChange = useCallback((tags: string[]) => {
+    setValue('tags', tags);
+  }, [setValue]);
+
   return (
     <div className="min-h-screen bg-background-primary">
       <Navbar 
-        user={isLoggedIn ? user : undefined}
+        user={isAuthenticated && user.id ? { id: user.id, nickname: user.nickname || '' } : undefined}
         onLogin={handleLogin}
         onLogout={handleLogout}
       />
@@ -99,11 +140,35 @@ export default function CreateRoom() {
             <p className="text-lg text-foreground-muted">
               대화를 시작하고 같은 관심사를 가진 사람들과 연결하세요
             </p>
+            {isAuthenticated && (
+              <p className="text-sm text-foreground-muted mt-2">
+                안녕하세요, {user.nickname}님! 방을 만들어보세요.
+              </p>
+            )}
           </div>
 
-          {/* Form */}
-          <Card className="p-8">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* 로그인하지 않은 사용자 처리 */}
+          {!isAuthenticated && (
+            <Card className="p-8 mb-8 text-center">
+              <div className="space-y-4">
+                <div className="text-6xl">🔒</div>
+                <h2 className="text-xl font-semibold text-foreground-primary">
+                  로그인이 필요합니다
+                </h2>
+                <p className="text-foreground-muted">
+                  방을 만들려면 먼저 로그인해주세요.
+                </p>
+                <Button onClick={handleLogin} variant="primary">
+                  로그인하러 가기
+                </Button>
+              </div>
+            </Card>
+          )}
+
+          {/* Form - 로그인한 사용자에게만 표시 */}
+          {isAuthenticated && (
+            <Card className="p-8">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Room Title */}
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-foreground-primary mb-2">
@@ -148,8 +213,9 @@ export default function CreateRoom() {
                     <input
                       type="radio"
                       value="false"
-                      {...register("isPrivate")}
+                      {...register("isPrivate" as any)}
                       className="mr-3"
+                      defaultChecked
                     />
                     <div>
                       <div className="font-medium text-foreground-primary">공개 방</div>
@@ -163,7 +229,7 @@ export default function CreateRoom() {
                     <input
                       type="radio"
                       value="true"
-                      {...register("isPrivate")}
+                      {...register("isPrivate" as any)}
                       className="mr-3"
                     />
                     <div>
@@ -183,7 +249,7 @@ export default function CreateRoom() {
                 </label>
                 <TagInput
                   tags={currentTags}
-                  onTagsChange={(tags) => setValue('tags', tags)}
+                  onTagsChange={handleTagsChange}
                   placeholder="사람들이 방을 찾을 수 있도록 태그를 추가하세요..."
                   maxTags={5}
                 />
@@ -237,7 +303,7 @@ export default function CreateRoom() {
                           1 online
                         </span>
                         <span>
-                          {formData.isPrivate ? 'Private Room' : 'Public Room'}
+                          {formData.isPrivate === "true" ? 'Private Room' : 'Public Room'}
                         </span>
                       </div>
                     </div>
@@ -271,11 +337,13 @@ export default function CreateRoom() {
                   )}
                 </Button>
               </div>
-            </form>
-          </Card>
+              </form>
+            </Card>
+          )}
 
-          {/* Tips Section */}
-          <Card className="p-6 mt-8 bg-semantic-info/5 border-semantic-info/20">
+          {/* Tips Section - 로그인한 사용자에게만 표시 */}
+          {isAuthenticated && (
+            <Card className="p-6 mt-8 bg-semantic-info/5 border-semantic-info/20">
             <div className="flex items-start gap-3">
               <div className="w-6 h-6 bg-semantic-info/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg className="w-3 h-3 text-semantic-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,7 +360,8 @@ export default function CreateRoom() {
                 </ul>
               </div>
             </div>
-          </Card>
+            </Card>
+          )}
         </div>
       </main>
     </div>

@@ -23,6 +23,6 @@ public class RoomCreateRequest {
     private Boolean isPrivate;
 
     @NotNull
-    @Size(min = 1, max = 5, message = "A room must have between 1 and 5 tags.")
+    @Size(min = 1, max = 5, message = "반드시 1개 이상 5개 이하의 태그가 채팅방에 존재해야 합니다.")
     private List<String> tags;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Badge } from '../ui/Badge';
 import { cn } from '../../utils/cn';
 
@@ -23,30 +23,30 @@ const TagInput: React.FC<TagInputProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [isComposing, setIsComposing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (inputValue.trim()) {
-      const filtered = suggestions.filter(
-        suggestion => 
-          suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
-          !tags.includes(suggestion)
-      );
-      setFilteredSuggestions(filtered);
-      setShowSuggestions(filtered.length > 0);
-    } else {
-      setShowSuggestions(false);
-    }
+  // useMemo를 사용하여 필터링 로직 최적화
+  const filteredSuggestions = useMemo(() => {
+    if (!inputValue.trim()) return [];
+    
+    return suggestions.filter(
+      suggestion => 
+        suggestion.toLowerCase().includes(inputValue.toLowerCase()) &&
+        !tags.includes(suggestion)
+    );
   }, [inputValue, suggestions, tags]);
+
+  // 필터링된 제안이 변경될 때만 showSuggestions 업데이트
+  useEffect(() => {
+    setShowSuggestions(filteredSuggestions.length > 0 && inputValue.trim() !== '');
+  }, [filteredSuggestions, inputValue]);
 
   const addTag = (tag: string) => {
     const trimmedTag = tag.trim();
     if (trimmedTag && !tags.includes(trimmedTag) && tags.length < maxTags) {
       onTagsChange([...tags, trimmedTag]);
       setInputValue('');
-      setShowSuggestions(false);
     }
   };
 
@@ -87,7 +87,11 @@ const TagInput: React.FC<TagInputProps> = ({
 
   const handleBlur = () => {
     // Delay hiding suggestions to allow clicking on them
-    setTimeout(() => setShowSuggestions(false), 150);
+    setTimeout(() => {
+      if (inputValue.trim() === '') {
+        setShowSuggestions(false);
+      }
+    }, 150);
   };
 
   return (
@@ -124,7 +128,11 @@ const TagInput: React.FC<TagInputProps> = ({
             onCompositionStart={handleCompositionStart}
             onCompositionEnd={handleCompositionEnd}
             onBlur={handleBlur}
-            onFocus={() => setShowSuggestions(true)}
+            onFocus={() => {
+              if (inputValue.trim() && filteredSuggestions.length > 0) {
+                setShowSuggestions(true);
+              }
+            }}
             placeholder={tags.length === 0 ? placeholder : ''}
             className="flex-1 min-w-[120px] bg-transparent text-foreground-primary placeholder:text-foreground-muted focus:outline-none text-sm"
           />

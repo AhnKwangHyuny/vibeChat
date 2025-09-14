@@ -11,5 +11,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TagResponse {
     private String name;
-    private int popularity;
 }

@@ -3,6 +3,9 @@ package com.vibechat.exception;
 import com.vibechat.exception.auth.LogoutProcessException;
 import com.vibechat.exception.auth.NoActiveSessionException;
 import com.vibechat.exception.auth.UserNotLoggedInException;
+import com.vibechat.exception.tag.TagNotFoundException;
+import com.vibechat.exception.tag.TagCreationException;
+import com.vibechat.exception.tag.InvalidTagNameException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -11,7 +14,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -25,7 +27,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleNoActiveSession(NoActiveSessionException ex, HttpServletRequest request) {
         log.warn("세션 없음 오류 at {}: {}", request.getRequestURI(), ex.getMessage());
 
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
         problemDetail.setTitle("활성 세션 없음");
         problemDetail.setType(URI.create("https://vibechat.com/problems/no-active-session"));
         problemDetail.setProperty("timestamp", Instant.now());
@@ -123,6 +125,42 @@ public class GlobalExceptionHandler {
         problemDetail.setProperty("timestamp", Instant.now());
         problemDetail.setProperty("path", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
+    }
+
+    @ExceptionHandler(TagNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleTagNotFound(TagNotFoundException ex, HttpServletRequest request) {
+        log.warn("태그를 찾을 수 없음 at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setTitle("태그를 찾을 수 없음");
+        problemDetail.setType(URI.create("https://vibechat.com/problems/tag-not-found"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    @ExceptionHandler(TagCreationException.class)
+    public ResponseEntity<ProblemDetail> handleTagCreationException(TagCreationException ex, HttpServletRequest request) {
+        log.error("태그 생성 오류 at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        problemDetail.setTitle("태그 생성 오류");
+        problemDetail.setType(URI.create("https://vibechat.com/problems/tag-creation-error"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getRequestURI());
+        return ResponseEntity.internalServerError().body(problemDetail);
+    }
+
+    @ExceptionHandler(InvalidTagNameException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidTagName(InvalidTagNameException ex, HttpServletRequest request) {
+        log.warn("잘못된 태그 이름 at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setTitle("잘못된 태그 이름");
+        problemDetail.setType(URI.create("https://vibechat.com/problems/invalid-tag-name"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getRequestURI());
+        return ResponseEntity.badRequest().body(problemDetail);
     }
 
     @ExceptionHandler(RuntimeException.class)

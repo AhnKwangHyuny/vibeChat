@@ -2,23 +2,20 @@ package com.vibechat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.vibechat.domain.ChatRoom;
-import com.vibechat.domain.User;
-import com.vibechat.dto.RoomCreateRequest;
-import com.vibechat.dto.RoomResponse;
 import com.vibechat.exception.NicknameConflictException;
 import com.vibechat.repository.ChatRoomRepository;
 import com.vibechat.repository.MessageRepository;
 import com.vibechat.repository.RoomTagRepository;
 import com.vibechat.repository.UserRepository;
-import java.util.List;
+
 import java.util.Optional;
 
 import com.vibechat.service.room.RoomService;
 import com.vibechat.service.tag.TagServiceImpl;
+import com.vibechat.service.tag.chatRoomTagService.ChatRoomTagServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +31,7 @@ class RoomServiceTest {
 
     @Mock ChatRoomRepository roomRepository;
     @Mock MessageRepository messageRepository;
-    @Mock TagServiceImpl tagService;
+    @Mock ChatRoomTagServiceImpl tagService;
     @Mock RoomTagRepository roomTagRepository;
     @Mock UserRepository userRepository;
     @Mock ModelMapper modelMapper;
