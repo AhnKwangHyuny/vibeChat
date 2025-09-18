@@ -1,6 +1,6 @@
 package com.vibechat.scheduler;
 
-import com.vibechat.repository.ChatRoomRepository;
+import com.vibechat.repository.chatRoom.ChatRoomRepository;
 import com.vibechat.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

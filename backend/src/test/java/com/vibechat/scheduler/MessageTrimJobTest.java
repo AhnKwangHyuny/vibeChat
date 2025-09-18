@@ -2,7 +2,7 @@ package com.vibechat.scheduler;
 
 import static org.mockito.Mockito.*;
 
-import com.vibechat.repository.ChatRoomRepository;
+import com.vibechat.repository.chatRoom.ChatRoomRepository;
 import com.vibechat.repository.MessageRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;

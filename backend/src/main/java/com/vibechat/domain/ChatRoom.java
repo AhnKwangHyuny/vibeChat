@@ -1,5 +1,6 @@
 package com.vibechat.domain;
 
+import com.vibechat.domain.tags.RoomTag;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chat_rooms")
+@Table(name = "chat_rooms", uniqueConstraints = {
+    @UniqueConstraint(name = "uk_chatroom_invite_code", columnNames = "inviteCode")
+})
 @Getter
 @Setter
 public class ChatRoom {
@@ -26,7 +29,7 @@ public class ChatRoom {
     @Column(nullable = false)
     private boolean isPrivate;
 
-    @Column(unique = true, length = 36)
+    @Column(length = 36)
     private String inviteCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,8 +42,8 @@ public class ChatRoom {
     @Column(nullable = false)
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-//    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<RoomTag> roomTags = new ArrayList<>();
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<RoomTag> roomTags = new ArrayList<>();
 
     @PreUpdate
     protected void onUpdate() {

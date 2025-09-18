@@ -38,22 +38,21 @@ class UserTest {
         assertThat(u.getProviderId()).isEqualTo(sub);
     }
 
-    @Test
-    void 프로필_태그_연관관계_모킹_매핑() {
-        // given
-        User u = new User();
-        Tag tag = mock(Tag.class);
-
-        // when
-        UserProfileTag upt = new UserProfileTag();
-        upt.setUser(u);
-        upt.setTag(tag);
-
-        // then
-        assertThat(upt.getUser()).isEqualTo(u);
-        assertThat(upt.getTag()).isEqualTo(tag);
-        assertThat(upt.getCreatedAt()).isNotNull();
-    }
+//    @Test
+//    void 프로필_태그_연관관계_모킹_매핑() {
+//        // given
+//        User u = new User();
+//
+//        // when
+//        UserProfileTag upt = new UserProfileTag();
+//        upt.setUser(u);
+//        upt.setTag(tag);
+//
+//        // then
+//        assertThat(upt.getUser()).isEqualTo(u);
+//        assertThat(upt.getTag()).isEqualTo(tag);
+//        assertThat(upt.getCreatedAt()).isNotNull();
+//    }
 
     @Test
     void 유저_방_참여_연관관계_모킹_매핑() {

@@ -32,13 +32,12 @@ axiosInstance.interceptors.request.use((config) => {
   if (csrfToken) {
     config.headers['X-CSRF-TOKEN'] = csrfToken;
   }
-
-  // 상세한 디버깅 정보
-  console.log('  API Request Debug:');
-  console.log('  URL:', config.url);
-  console.log('  Base URL:', config.baseURL);
-  console.log('  With credentials:', config.withCredentials);
-  console.log('  All cookies:', document.cookie);
+// debug 용
+//   console.log('  API Request Debug:');
+//   console.log('  URL:', config.url);
+//   console.log('  Base URL:', config.baseURL);
+//   console.log('  With credentials:', config.withCredentials);
+//   console.log('  All cookies:', document.cookie);
   
   // 세션 쿠키만 추출
   const sessionCookie = document.cookie.split('; ').find(row => row.startsWith('SESSION='));

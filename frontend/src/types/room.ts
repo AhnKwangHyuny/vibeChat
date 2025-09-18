@@ -19,17 +19,14 @@ export interface CreateRoomRequest {
 
 // 방 생성 응답 데이터
 export interface CreateRoomResponse {
-  roomId: number;
+  id: number;
   title: string;
   description?: string;
   isPrivate: boolean;
   tags: string[];
-  creatorId: string;
-  creatorNickname: string;
   participantsCount: number;
-  createdAt: string;
-  updatedAt: string;
-  status: RoomStatus;
+  lastMessageAt?: string;
+  inviteCode?: string;
 }
 
 // 방 정보 (상세)
@@ -87,7 +84,7 @@ export interface RoomSearchFilter {
 
 // 방 참여 요청
 export interface JoinRoomRequest {
-  roomId: number;
+  id: number;
   inviteCode?: string; // 비공개 방의 경우
 }
 
@@ -100,7 +97,7 @@ export interface JoinRoomResponse {
 
 // 방 나가기 요청
 export interface LeaveRoomRequest {
-  roomId: number;
+  id: number;
 }
 
 // 방 나가기 응답
@@ -111,7 +108,7 @@ export interface LeaveRoomResponse {
 
 // 방 업데이트 요청
 export interface UpdateRoomRequest {
-  roomId: number;
+  id: number;
   title?: string;
   description?: string;
   tags?: string[];
@@ -127,7 +124,7 @@ export interface UpdateRoomResponse {
 
 // 방 삭제 요청
 export interface DeleteRoomRequest {
-  roomId: number;
+  id: number;
 }
 
 // 방 삭제 응답

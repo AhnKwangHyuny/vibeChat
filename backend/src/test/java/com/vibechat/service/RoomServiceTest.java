@@ -1,20 +1,12 @@
 package com.vibechat.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
-
 import com.vibechat.domain.ChatRoom;
 import com.vibechat.exception.NicknameConflictException;
-import com.vibechat.repository.ChatRoomRepository;
+import com.vibechat.repository.chatRoom.ChatRoomRepository;
 import com.vibechat.repository.MessageRepository;
-import com.vibechat.repository.RoomTagRepository;
+import com.vibechat.repository.tags.RoomTagRepository;
 import com.vibechat.repository.UserRepository;
-
-import java.util.Optional;
-
 import com.vibechat.service.room.RoomService;
-import com.vibechat.service.tag.TagServiceImpl;
 import com.vibechat.service.tag.chatRoomTagService.ChatRoomTagServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceTest {

@@ -1,4 +1,4 @@
-package com.vibechat.repository;
+package com.vibechat.repository.chatRoom;
 
 import com.vibechat.domain.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,8 +8,10 @@ import java.util.List;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+
     List<ChatRoom> findByRoomTags_Tag_NameIn(List<String> tagNames);
 
     @Query("select c.id from ChatRoom c")
     List<Long> findAllIds();
 }
+

@@ -16,7 +16,7 @@ export default defineConfig({
           changeOrigin: true
         }
       }
-    }
+    },
 
   define: {
     'global': 'window',
@@ -30,4 +30,4 @@ export default defineConfig({
       }
     }
   }
-})
+});

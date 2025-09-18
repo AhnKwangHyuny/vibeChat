@@ -1,4 +1,4 @@
-package com.vibechat.dto;
+package com.vibechat.dto.room;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

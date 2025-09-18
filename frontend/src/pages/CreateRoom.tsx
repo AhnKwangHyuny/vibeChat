@@ -69,11 +69,10 @@ export default function CreateRoom() {
         tags: data.tags
       };
 
-      // 실제 API 호출
       const newRoom = await createRoom(createRoomData);
-      
+
       toast.success(`방 '${newRoom.title}'이 성공적으로 개설되었습니다!`);
-      navigate(`/rooms/${newRoom.roomId}`);
+      navigate(`/rooms/${newRoom.id}`);
     } catch (error: any) {
       console.error('방 생성 오류:', error);
       

@@ -1,8 +1,8 @@
 package com.vibechat.controller;
 
-import com.vibechat.dto.RoomCreateRequest;
 import com.vibechat.dto.RoomJoinRequest;
-import com.vibechat.dto.RoomResponse;
+import com.vibechat.dto.room.RoomCreateRequest;
+import com.vibechat.dto.room.RoomResponse;
 import com.vibechat.service.room.RoomService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -32,17 +32,17 @@ public class RoomController {
         return new ResponseEntity<>(roomResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<RoomResponse>> searchRooms(@RequestParam List<String> tags) {
-        List<RoomResponse> rooms = roomService.searchRooms(tags);
-        return ResponseEntity.ok(rooms);
-    }
-
-    @GetMapping("/{roomId}")
-    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) {
-        RoomResponse roomResponse = roomService.getRoomById(roomId);
-        return ResponseEntity.ok(roomResponse);
-    }
+//    @GetMapping("/search")
+//    public ResponseEntity<List<RoomResponse>> searchRooms(@RequestParam List<String> tags) {
+//        List<RoomResponse> rooms = roomService.searchRooms(tags);
+//        return ResponseEntity.ok(rooms);
+//    }
+//
+//    @GetMapping("/{roomId}")
+//    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) {
+//        RoomResponse roomResponse = roomService.getRoomById(roomId);
+//        return ResponseEntity.ok(roomResponse);
+//    }
 
     @PostMapping("/{roomId}/join")
     public ResponseEntity<Void> joinRoom(@PathVariable Long roomId, @RequestBody(required = false) RoomJoinRequest request, HttpSession session) {

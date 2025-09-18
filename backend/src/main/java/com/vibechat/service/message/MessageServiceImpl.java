@@ -6,7 +6,7 @@ import com.vibechat.domain.User;
 import com.vibechat.dto.SendMessagePayload;
 import com.vibechat.dto.UserSummaryDto;
 import com.vibechat.dto.WebSocketMessageResponse;
-import com.vibechat.repository.ChatRoomRepository;
+import com.vibechat.repository.chatRoom.ChatRoomRepository;
 import com.vibechat.repository.MessageRepository;
 import com.vibechat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

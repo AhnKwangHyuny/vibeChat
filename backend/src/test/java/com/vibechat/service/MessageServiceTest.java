@@ -1,26 +1,6 @@
 package com.vibechat.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import com.vibechat.domain.ChatRoom;
-import com.vibechat.domain.Message;
-import com.vibechat.domain.User;
-import com.vibechat.dto.SendMessagePayload;
-import com.vibechat.dto.UserSummaryDto;
-import com.vibechat.dto.WebSocketMessageResponse;
-import com.vibechat.repository.ChatRoomRepository;
-import com.vibechat.repository.MessageRepository;
-import com.vibechat.repository.UserRepository;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.IntStream;
-import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 class MessageServiceTest {
 

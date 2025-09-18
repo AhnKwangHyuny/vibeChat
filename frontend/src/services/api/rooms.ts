@@ -19,8 +19,24 @@ import {
  * 방 생성
  */
 export const createRoom = async (data: CreateRoomRequest): Promise<CreateRoomResponse> => {
-  const response = await axiosInstance.post<CreateRoomResponse>('/rooms', data);
-  return response.data;
+  // 백엔드 응답은 'private' 필드를 포함하므로, 응답 타입을 any로 지정합니다.
+  const response = await axiosInstance.post<any>('/rooms', data);
+  
+  // 백엔드 응답(private)과 프론트엔드 모델(isPrivate) 간의 불일치를 수동으로 해결합니다.
+  const responseData = response.data;
+  
+  const newRoom: CreateRoomResponse = {
+    id: responseData.id,
+    title: responseData.title,
+    description: responseData.description,
+    isPrivate: responseData.private, // 'private'을 'isPrivate'으로 매핑합니다.
+    tags: responseData.tags,
+    participantsCount: responseData.participantsCount,
+    lastMessageAt: responseData.lastMessageAt,
+    inviteCode: responseData.inviteCode,
+  };
+  
+  return newRoom;
 };
 
 /**
