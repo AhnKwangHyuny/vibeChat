@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store';
+import { clearUser } from '../store/userSlice';
 import { useRooms } from '../hooks/useRooms';
 import { useMessages } from '../hooks/useMessages';
+import { useSessionAuth } from '../hooks/useSessionAuth';
+import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
 import { stompClient } from '../services/ws/stompClient';
 
 // Import components from our component library
@@ -80,8 +85,15 @@ export default function Room() {
 
   const [messageInput, setMessageInput] = useState('');
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [user, setUser] = useState({ id: '1', nickname: 'John Doe', avatarUrl: '' });
+
+  // Redux에서 사용자 정보 가져오기 (CreateRoom 패턴과 동일)
+  const user = useSelector((state: RootState) => state.user);
+  const isAuthenticated = !!user.id;
+  const dispatch = useDispatch();
+
+  // 인증 훅 사용 (Home/CreateRoom 패턴과 동일)
+  const { signOut: sessionSignOut } = useSessionAuth();
+  const { signOut: supabaseSignOut } = useSupabaseAuth();
 
   // New states for enhanced features
   const [showUserList, setShowUserList] = useState(false);
@@ -164,15 +176,33 @@ export default function Room() {
   };
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
-    setUser({ id: '1', nickname: 'John Doe', avatarUrl: '' });
-    toast.success("Successfully logged in!");
+    navigate('/');
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUser({ id: '1', nickname: 'Guest User', avatarUrl: '' });
-    toast.success("Successfully logged out!");
+  const handleLogout = async () => {
+    console.log("로그아웃을 시작합니다...");
+    try {
+      // 1. (소셜 로그인 사용자만) Supabase 클라이언트 세션 종료
+      if (user.provider === 'GOOGLE') {
+        await supabaseSignOut();
+        console.log("Supabase 세션이 종료되었습니다.");
+      }
+
+      // 2. (모든 사용자 공통) VibeChat 백엔드 세션 종료
+      await sessionSignOut();
+      console.log("VibeChat 백엔드 세션이 종료되었습니다.");
+
+      // 3. 성공 알림 (Redux의 clearUser는 각 signOut 훅에서 이미 처리하고 있음)
+      toast.success("성공적으로 로그아웃되었습니다.");
+
+    } catch (error) {
+      console.error("로그아웃 중 오류 발생:", error);
+      toast.error("로그아웃 중 문제가 발생했습니다. 페이지를 새로고침합니다.");
+
+      // 최악의 경우에도 UI를 초기화하고 새로고침하여 상태를 완전히 정리
+      dispatch(clearUser());
+      window.location.reload();
+    }
   };
 
   if (isLoadingRoom) {
@@ -199,8 +229,8 @@ export default function Room() {
 
   return (
     <div className="min-h-screen bg-background-primary flex flex-col">
-      <Navbar 
-        user={isLoggedIn ? user : undefined}
+      <Navbar
+        user={isAuthenticated && user.id ? { id: user.id, nickname: user.nickname || '' } : undefined}
         onLogin={handleLogin}
         onLogout={handleLogout}
       />
@@ -300,7 +330,7 @@ export default function Room() {
                 mediaThumbUrl={message.mediaThumbUrl}
                 durationSec={message.mediaDurationSec}
                 createdAt={message.createdAt}
-                isOwn={message.user.id === parseInt(user.id)}
+                isOwn={message.user.id === parseInt(user.id || '0')}
                 isPending={!!message.clientTempId}
               />
                   
@@ -348,7 +378,7 @@ export default function Room() {
                           }
                         });
                       }}
-                      isOwn={message.user.id === parseInt(user.id)}
+                      isOwn={message.user.id === parseInt(user.id || '0')}
                     />
                   </div>
 
@@ -384,7 +414,7 @@ export default function Room() {
                           [message.id]: (prev[message.id] || []).filter(r => r.emoji !== emoji)
                         }));
                       }}
-                      currentUserId={user.id}
+                      currentUserId={user.id || ''}
                     />
                   )}
                 </div>
@@ -412,7 +442,7 @@ export default function Room() {
             onFileUpload={handleFileUpload}
               onEmojiClick={() => setShowEmojiPicker(!showEmojiPicker)}
               placeholder="메시지를 입력하세요..."
-            disabled={!isLoggedIn}
+            disabled={!isAuthenticated}
               onTypingChange={(typing) => {
                 if (parsedRoomId) stompClient.sendTyping(parsedRoomId, !!typing);
               }}
@@ -514,7 +544,7 @@ export default function Room() {
                 toast.success('메시지가 클립보드에 복사되었습니다.');
               }
             },
-            ...(selectedMessage.user.id === parseInt(user.id) ? [
+            ...(selectedMessage.user.id === parseInt(user.id || '0') ? [
               {
                 id: 'edit',
                 label: '수정',
@@ -555,7 +585,7 @@ export default function Room() {
             toast.success('답글이 전송되었습니다!');
           }}
           onClose={() => setShowThreadView(false)}
-          currentUserId={user.id}
+          currentUserId={user.id || ''}
         />
       )}
     </div>

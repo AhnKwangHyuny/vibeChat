@@ -42,6 +42,8 @@ public class SocialAuthController {
                 UserProvider.GOOGLE
             );
 
+            System.out.println("google principal.toString() = " + principal.toString());
+            
             session.setAttribute(AuthUserArgumentResolver.USER_PRINCIPAL_ATTRIBUTE, principal);
             session.setAttribute("userId", principal.id());
             session.setAttribute("nickname", principal.nickname());
