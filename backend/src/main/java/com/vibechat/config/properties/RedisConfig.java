@@ -1,4 +1,4 @@
-package com.vibechat.config;
+package com.vibechat.config.properties;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,18 +1,17 @@
 package com.vibechat.controller;
 
+import com.vibechat.config.AuthUser;
+import com.vibechat.domain.auth.UserPrincipal;
 import com.vibechat.dto.RoomJoinRequest;
 import com.vibechat.dto.room.RoomCreateRequest;
 import com.vibechat.dto.room.RoomResponse;
 import com.vibechat.service.room.RoomService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -25,24 +24,21 @@ public class RoomController {
      * 방 개설 api
      * */
     @PostMapping
-    public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody RoomCreateRequest roomCreateRequest, HttpServletRequest request) {
+    public ResponseEntity<RoomResponse> createRoom(@Valid @RequestBody RoomCreateRequest roomCreateRequest,
+                                                   @AuthUser(required = true) UserPrincipal principal) {
 
-        RoomResponse roomResponse = roomService.createRoom(roomCreateRequest,request);
+        RoomResponse roomResponse = roomService.createRoom(roomCreateRequest , principal);
 
         return new ResponseEntity<>(roomResponse, HttpStatus.CREATED);
     }
 
-//    @GetMapping("/search")
-//    public ResponseEntity<List<RoomResponse>> searchRooms(@RequestParam List<String> tags) {
-//        List<RoomResponse> rooms = roomService.searchRooms(tags);
-//        return ResponseEntity.ok(rooms);
-//    }
-//
-//    @GetMapping("/{roomId}")
-//    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) {
-//        RoomResponse roomResponse = roomService.getRoomById(roomId);
-//        return ResponseEntity.ok(roomResponse);
-//    }
+    @GetMapping("/{roomId}")
+    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) {
+
+        RoomResponse roomResponse = roomService.getRoomById(roomId);
+
+        return ResponseEntity.ok(roomResponse);
+    }
 
     @PostMapping("/{roomId}/join")
     public ResponseEntity<Void> joinRoom(@PathVariable Long roomId, @RequestBody(required = false) RoomJoinRequest request, HttpSession session) {

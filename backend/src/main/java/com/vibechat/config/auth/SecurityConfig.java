@@ -1,4 +1,4 @@
-package com.vibechat.config;
+package com.vibechat.config.auth;
 
 import com.vibechat.service.CustomOAuth2UserService;
 import com.vibechat.domain.CustomOAuth2User;

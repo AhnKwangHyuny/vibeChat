@@ -1,4 +1,4 @@
-package com.vibechat.config;
+package com.vibechat.config.app;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

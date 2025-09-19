@@ -1,5 +1,8 @@
 package com.vibechat.controller;
 
+import com.vibechat.config.auth.AuthUser;
+import com.vibechat.domain.auth.UserPrincipal;
+import com.vibechat.dto.UserResponse;
 import com.vibechat.dto.logout.LogoutResultDto;
 import com.vibechat.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,48 +23,36 @@ public class AuthQueryController {
 
     private final AuthService authService;
 
-    /**
-     * 사용자 정보 로그인(세션)에서 파싱 (아이디, 프로필 사진, 닉네임)
-     * */
-
     @GetMapping("/me")
-    public ResponseEntity<Map<String, Object>> getCurrentUser(HttpServletRequest request) {
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthUser(required = false) UserPrincipal principal) {
+        if (principal == null) {
+            return ResponseEntity.ok(null); // 로그인하지 않은 경우, 200 OK와 null body 반환
+        }
 
-        Map<String, Object> userInfo = authService.getUserInfoFromSession(request);
+        // 로그인한 경우, UserPrincipal 정보를 UserResponse DTO로 변환하여 반환
+        UserResponse userResponse = new UserResponse();
+        userResponse.setUserId(principal.id());
+        userResponse.setNickname(principal.nickname());
 
-        return ResponseEntity.ok(userInfo);
+        // userResponse.setAvatarUrl(principal.avatarUrl());
+
+        return ResponseEntity.ok(userResponse);
     }
 
-    /**
-     * 사용자 로그아웃
-     * @param request HTTP 요청
-     * @param response HTTP 응답
-     * @return 로그아웃 결과
-     */
     @PostMapping("/logout")
     public ResponseEntity<LogoutResultDto> logout(HttpServletRequest request,
                                                   HttpServletResponse response) {
         LogoutResultDto result = authService.logout(request, response);
-
-        System.out.println("logout = " + request.getRequestURI());
         return ResponseEntity.ok(result);
     }
 
-    /**
-     * 현재 로그인 상태 확인
-     * @param request HTTP 요청
-     * @return 로그인 상태 정보
-     */
     @GetMapping("/check")
-    public ResponseEntity<Map<String, Object>> checkLoginStatus(HttpServletRequest request) {
-        boolean isLoggedIn = authService.isLoggedIn(request);
-        String userId = authService.getCurrentUserId(request);
-
+    public ResponseEntity<Map<String, Object>> checkLoginStatus(@AuthUser(required = false) UserPrincipal principal) {
+        boolean isLoggedIn = (principal != null);
         Map<String, Object> responseData = Map.of(
                 "isLoggedIn", isLoggedIn,
-                "userId", userId != null ? userId : ""
+                "userId", isLoggedIn ? principal.id().toString() : ""
         );
-
         return ResponseEntity.ok(responseData);
     }
 }

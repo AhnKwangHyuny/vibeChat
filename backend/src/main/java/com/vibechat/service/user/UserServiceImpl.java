@@ -7,12 +7,14 @@ import com.vibechat.dto.UserResponse;
 import com.vibechat.exception.NicknameConflictException;
 import com.vibechat.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -61,21 +63,34 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse createOrUpdateGoogleUser(String providerId, String nickname, String avatarUrl, String email) {
-        // Google 사용자 조회
-        Optional<User> existingUser = userRepository.findByProviderAndProviderId(UserProvider.GOOGLE, providerId);
-        
-        User user;
-        if (existingUser.isPresent()) {
-            // 기존 사용자 업데이트
-            user = existingUser.get();
-            user.updateProfileFromOAuth(nickname, avatarUrl);
-        } else {
-            // 새 사용자 생성
-            user = User.createOAuth(UserProvider.GOOGLE, providerId, nickname, avatarUrl);
+        try {
+            // Google 사용자 조회
+            Optional<User> existingUser = userRepository.findByProviderAndProviderId(UserProvider.GOOGLE, providerId);
+
+            User user;
+            if (existingUser.isPresent()) {
+                // 기존 사용자 업데이트
+                user = existingUser.get();
+                user.updateProfileFromOAuth(nickname, avatarUrl);
+            } else {
+                // 새 사용자 생성
+                user = User.createOAuth(UserProvider.GOOGLE, providerId, nickname, avatarUrl);
+            }
+
+            User saved = userRepository.save(user);
+            return createUserResponse(saved.getId(), saved.getNickname(), saved.getAvatarUrl());
+
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+
+            Optional<User> existingUser = userRepository.findByProviderAndProviderId(UserProvider.GOOGLE, providerId);
+            if (existingUser.isPresent()) {
+                User user = existingUser.get();
+                return createUserResponse(user.getId(), user.getNickname(), user.getAvatarUrl());
+            }
+
+            // 그래도 없으면 예외 재발생
+            throw new RuntimeException("사용자 생성/조회 실패: " + e.getMessage(), e);
         }
-        
-        User saved = userRepository.save(user);
-        return createUserResponse(saved.getId(), saved.getNickname(), saved.getAvatarUrl());
     }
 }
 
