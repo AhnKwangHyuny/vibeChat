@@ -38,3 +38,7 @@ pids/
 
 # Uploads
 uploads/
+
+# Local-specific configuration files
+/api-server/src/main/resources/application-local.yml
+/chat-server/src/main/resources/application-local.yml

@@ -10,14 +10,15 @@ services:
       - frontend-dist:/var/www/html
       - uploads:/var/www/uploads
     depends_on:
-      - backend
+      - api-server
+      - chat-server
       - frontend
     networks:
       - vibechat
 
-  backend:
+  api-server:
     build:
-      context: ../backend
+      context: ../api-server
     env_file:
       - ../.env
     depends_on:
@@ -25,6 +26,17 @@ services:
       - redis
     volumes:
       - uploads:/var/www/uploads
+    networks:
+      - vibechat
+
+  chat-server:
+    build:
+      context: ../chat-server
+    env_file:
+      - ../.env
+    depends_on:
+      - mysql
+      - redis
     networks:
       - vibechat
 
