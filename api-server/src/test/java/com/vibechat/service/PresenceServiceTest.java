@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 class PresenceServiceTest {
 

@@ -53,6 +53,11 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
+    path: '/test-room',
+    element: <Room />,
+    errorElement: <ErrorPage />,
+  },
+  {
     path: '/room/:roomId',
     element: <Room />,
     errorElement: <ErrorPage />,

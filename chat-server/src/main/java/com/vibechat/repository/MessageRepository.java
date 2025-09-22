@@ -4,7 +4,6 @@ import com.vibechat.domain.ChatRoom;
 import com.vibechat.domain.Message;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.Optional;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,11 +14,6 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    // For cursor-based pagination: find messages in a room older than a given message id
-    List<Message> findByChatRoomIdAndIdLessThanOrderByIdDesc(Long chatRoomId, Long id, Pageable pageable);
-
-    // For fetching the initial batch of messages
-    List<Message> findByChatRoomIdOrderByIdDesc(Long chatRoomId, Pageable pageable);
 
     Optional<Message> findTopByChatRoomOrderByIdDesc(ChatRoom chatRoom);
 

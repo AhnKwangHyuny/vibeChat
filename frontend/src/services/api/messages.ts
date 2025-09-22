@@ -20,7 +20,7 @@ interface WebSocketMessageResponse {
 }
 
 export const getMessages = async (roomId: number, beforeId?: number, limit: number = 30): Promise<WebSocketMessageResponse[]> => {
-  const response = await axiosInstance.get<WebSocketMessageResponse[]>(`/rooms/${roomId}/messages`, {
+  const response = await axiosInstance.get<WebSocketMessageResponse[]>(`/messages/${roomId}`, {
     params: { beforeId, limit },
   });
 

@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rooms/{roomId}/messages")
+@RequestMapping("/api/messages")
 @RequiredArgsConstructor
 public class MessageController {
 
     private final MessageService messageService;
 
-    @GetMapping
+    @GetMapping("/{roomId}")
     public ResponseEntity<List<Message>> getMessages(
             @PathVariable Long roomId,
             @RequestParam(required = false) Long beforeId,

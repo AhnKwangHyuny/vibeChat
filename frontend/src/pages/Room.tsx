@@ -63,22 +63,32 @@ export default function Room() {
   // State for room data
   const [room, setRoom] = useState<Room | null>(null);
 
-  // Load room data
+  // Load room data - 임시로 Mock 데이터 사용
   useEffect(() => {
-    const loadRoom = async () => {
-      if (parsedRoomId) {
-        try {
-          const roomData = await getRoomById(parsedRoomId);
-          setRoom(roomData);
-        } catch (error) {
-          console.error('Failed to load room:', error);
-          toast.error('방을 불러오는데 실패했습니다.');
-        }
-      }
-    };
-    
-    loadRoom();
-  }, [parsedRoomId, getRoomById]);
+    // const loadRoom = async () => {
+    //   if (parsedRoomId) {
+    //     try {
+    //       const roomData = await getRoomById(parsedRoomId);
+    //       setRoom(roomData);
+    //     } catch (error) {
+    //       console.error('Failed to load room:', error);
+    //       toast.error('방을 불러오는데 실패했습니다.');
+    //     }
+    //   }
+    // };
+    // loadRoom();
+
+    // 임시: Mock 방 데이터로 설정
+    setRoom({
+      id: parsedRoomId || 1,
+      title: '🚀 테스트 채팅방',
+      description: '임시 테스트용 채팅방입니다',
+      isPrivate: false,
+      tags: ['테스트', '개발'],
+      participantsCount: 2,
+      lastMessageAt: new Date().toISOString()
+    });
+  }, [parsedRoomId]);
 
   // 실제 데이터 훅 사용: 메시지/타이핑/온라인 수
   const { messages, isLoading, sendMessage, typingUsers, onlineCount } = useMessages(parsedRoomId || 0);
@@ -86,10 +96,17 @@ export default function Room() {
   const [messageInput, setMessageInput] = useState('');
   const [showLeaveModal, setShowLeaveModal] = useState(false);
 
-  // Redux에서 사용자 정보 가져오기 (CreateRoom 패턴과 동일)
+  // Redux에서 사용자 정보 가져오기 (CreateRoom 패턴과 동일) - 임시로 Mock 사용자
   const user = useSelector((state: RootState) => state.user);
-  const isAuthenticated = !!user.id;
+  const isAuthenticated = true; // 임시로 항상 인증됨으로 설정
   const dispatch = useDispatch();
+
+  // 임시 Mock 사용자 데이터
+  const mockUser = {
+    id: 1,
+    nickname: '테스트유저',
+    email: 'test@example.com'
+  };
 
   // 인증 훅 사용 (Home/CreateRoom 패턴과 동일)
   const { signOut: sessionSignOut } = useSessionAuth();
@@ -230,7 +247,7 @@ export default function Room() {
   return (
     <div className="min-h-screen bg-background-primary flex flex-col">
       <Navbar
-        user={isAuthenticated && user.id ? { id: user.id, nickname: user.nickname || '' } : undefined}
+        user={isAuthenticated ? mockUser : undefined}
         onLogin={handleLogin}
         onLogout={handleLogout}
       />

@@ -14,13 +14,8 @@
 
     <properties>
         <lombok.version>1.18.32</lombok.version>
-        <springdoc.version>2.5.0</springdoc.version>
         <modelmapper.version>3.2.0</modelmapper.version>
-        <tika.version>2.9.2</tika.version>
-        <thumbnailator.version>0.4.20</thumbnailator.version>
-        <ffmpeg.wrapper.version>0.8.0</ffmpeg.wrapper.version>
         <owasp.sanitizer.version>20220608.1</owasp.sanitizer.version>
-        <bucket4j.version>8.10.1</bucket4j.version>
     </properties>
 
     <dependencies>
@@ -36,10 +31,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -64,27 +55,8 @@
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-mysql</artifactId>
-        </dependency>
 
-        <!-- Spring Session -->
-        <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session-data-redis</artifactId>
-        </dependency>
 
-        <!-- API Documentation -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>${springdoc.version}</version>
-        </dependency>
 
         <!-- Utilities -->
         <dependency>
@@ -99,22 +71,6 @@
             <version>${modelmapper.version}</version>
         </dependency>
 
-        <!-- Media Handling -->
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>${tika.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.coobird</groupId>
-            <artifactId>thumbnailator</artifactId>
-            <version>${thumbnailator.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.bramp.ffmpeg</groupId>
-            <artifactId>ffmpeg</artifactId>
-            <version>${ffmpeg.wrapper.version}</version>
-        </dependency>
 
         <!-- Security -->
         <dependency>

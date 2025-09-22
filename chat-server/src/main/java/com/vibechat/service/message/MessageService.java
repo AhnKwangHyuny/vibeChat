@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface MessageService {
     void saveAndBroadcastMessage(Long roomId, Long userId, SendMessagePayload payload);
-    List<WebSocketMessageResponse> getMessagesForRoom(Long roomId, Long beforeId, int limit);
     Message saveMessage(ChatRoom room, User user, SendMessagePayload payload);
 }
 

@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -93,28 +91,6 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
-    @Override
-    public List<WebSocketMessageResponse> getMessagesForRoom(Long roomId, Long beforeId, int limit) {
-        try {
-            int capped = Math.min(limit, 50);
-            Pageable pageable = PageRequest.of(0, capped);
-            List<Message> messages = (beforeId == null)
-                    ? messageRepository.findByChatRoomIdOrderByIdDesc(roomId, pageable)
-                    : messageRepository.findByChatRoomIdAndIdLessThanOrderByIdDesc(roomId, beforeId, pageable);
-
-            return messages.stream()
-                    .map(message -> {
-                        WebSocketMessageResponse response = modelMapper.map(message, WebSocketMessageResponse.class);
-                        response.setUser(modelMapper.map(message.getUser(), UserSummaryDto.class));
-                        response.setRoomId(message.getChatRoom().getId());
-                        return response;
-                    })
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Error fetching messages for room: {}", roomId, e);
-            throw e;
-        }
-    }
 
     @Override
     @Transactional
