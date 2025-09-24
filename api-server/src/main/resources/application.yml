@@ -132,7 +132,7 @@ server:
         # domain: localhost  # 주석 처리 - 브라우저가 자동으로 도메인 처리하도록 함
 
         # JavaScript에서 쿠키 접근 차단 (XSS 방어)
-        http-only: false
+        http-only: true
 
         # 쿠키 유효 경로
         path: /

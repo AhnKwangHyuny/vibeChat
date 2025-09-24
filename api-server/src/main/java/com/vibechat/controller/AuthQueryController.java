@@ -1,6 +1,6 @@
 package com.vibechat.controller;
 
-import com.vibechat.config.auth.AuthUser;
+import com.vibechat.config.AuthUser;
 import com.vibechat.domain.auth.UserPrincipal;
 import com.vibechat.dto.UserResponse;
 import com.vibechat.dto.logout.LogoutResultDto;
@@ -8,6 +8,7 @@ import com.vibechat.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,15 +20,19 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthQueryController {
 
     private final AuthService authService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser(@AuthUser(required = false) UserPrincipal principal) {
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthUser(required = true) UserPrincipal principal) {
+
         if (principal == null) {
-            return ResponseEntity.ok(null); // 로그인하지 않은 경우, 200 OK와 null body 반환
+            log.error("CRITICAL: Principal is null despite @AuthUser(required = true) - ArgumentResolver malfunction!");
+            return ResponseEntity.ok(null);
         }
+
 
         // 로그인한 경우, UserPrincipal 정보를 UserResponse DTO로 변환하여 반환
         UserResponse userResponse = new UserResponse();

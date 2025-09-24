@@ -1,39 +1,49 @@
 package com.vibechat.config.auth;
 
+import com.vibechat.filter.CorrelationIdFilter;
 import com.vibechat.service.CustomOAuth2UserService;
-import com.vibechat.domain.CustomOAuth2User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
-import com.vibechat.filter.CorrelationIdFilter;
-import org.springframework.http.HttpStatus;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
 
     @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CorrelationIdFilter correlationIdFilter;
+    private final AuthUserArgumentResolver authUserArgumentResolver; // 의존성 주입
 
-    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CorrelationIdFilter correlationIdFilter, @Value("${app.cors.allowed-origins}") String allowedOrigins) {
+    public SecurityConfig(CustomOAuth2UserService customOAuth2UserService, CorrelationIdFilter correlationIdFilter, AuthUserArgumentResolver authUserArgumentResolver, @Value("${app.cors.allowed-origins}") String allowedOrigins) {
         this.customOAuth2UserService = customOAuth2UserService;
         this.correlationIdFilter = correlationIdFilter;
+        this.authUserArgumentResolver = authUserArgumentResolver;
         this.allowedOrigins = allowedOrigins;
+    }
+
+    // ArgumentResolver 등록
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(authUserArgumentResolver);
     }
 
     @Bean
