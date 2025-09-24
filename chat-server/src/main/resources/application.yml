@@ -28,10 +28,13 @@ spring:
       max-file-size: ${MEDIA_MAX_UPLOAD_MB:20}MB
       max-request-size: ${MEDIA_MAX_UPLOAD_MB:20}MB
 
-  data:                        # Redis 설정
+  data:                        # Redis 및 MongoDB 설정
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
+    mongodb:
+      uri: ${SPRING_MONGODB_URI:mongodb://localhost:27017/vibechat_messages}
+      database: ${SPRING_MONGODB_DATABASE:vibechat_messages}
 
   session:                     # Spring Session (Redis)
     store-type: redis

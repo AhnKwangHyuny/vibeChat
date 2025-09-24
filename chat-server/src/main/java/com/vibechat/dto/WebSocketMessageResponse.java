@@ -1,7 +1,7 @@
 package com.vibechat.dto;
 
 import com.vibechat.domain.Message;
-import com.vibechat.dto.UserSummaryDto;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@Builder
 public class WebSocketMessageResponse {
 
     private Long id;

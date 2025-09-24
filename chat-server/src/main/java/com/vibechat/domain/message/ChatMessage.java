@@ -59,6 +59,7 @@ public class ChatMessage {
     @Builder
     public static class UserInfo {
         private String nickname;
+        private Long userId;
         private String avatarUrl;
     }
 

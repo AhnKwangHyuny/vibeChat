@@ -1,15 +1,14 @@
 package com.vibechat.service.message;
 
-import com.vibechat.domain.ChatRoom;
-import com.vibechat.domain.User;
 import com.vibechat.dto.SendMessagePayload;
-import com.vibechat.dto.WebSocketMessageResponse;
-import com.vibechat.domain.Message;
-import java.util.List;
 
+/**
+ * Chat-Server의 메시지 서비스
+ * - 실시간 브로드캐스트만 담당
+ * - DB 저장은 API-Server의 책임
+ */
 public interface MessageService {
-    void saveAndBroadcastMessage(Long roomId, Long userId, SendMessagePayload payload);
-    Message saveMessage(ChatRoom room, User user, SendMessagePayload payload);
+    void broadcastMessage(Long roomId, String nickname, String avatarUrl, SendMessagePayload payload);
 }
 
 

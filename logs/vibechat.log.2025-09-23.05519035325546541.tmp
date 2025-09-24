@@ -1,0 +1,49 @@
+2025-09-24 00:27:48.430 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.id,
+        m1_0.room_id,
+        m1_0.client_temp_id,
+        m1_0.content_text,
+        m1_0.created_at,
+        m1_0.is_deleted,
+        m1_0.media_duration_sec,
+        m1_0.media_thumb_url,
+        m1_0.media_url,
+        m1_0.type,
+        m1_0.user_id 
+    from
+        messages m1_0 
+    where
+        m1_0.room_id=? 
+    order by
+        m1_0.id desc 
+    limit
+        ?
+2025-09-24 00:27:48.533 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:BIGINT) <- [1]
+2025-09-24 00:27:48.534 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:INTEGER) <- [30]
+2025-09-24 00:27:48.618 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        m1_0.id,
+        m1_0.room_id,
+        m1_0.client_temp_id,
+        m1_0.content_text,
+        m1_0.created_at,
+        m1_0.is_deleted,
+        m1_0.media_duration_sec,
+        m1_0.media_thumb_url,
+        m1_0.media_url,
+        m1_0.type,
+        m1_0.user_id 
+    from
+        messages m1_0 
+    where
+        m1_0.room_id=? 
+    order by
+        m1_0.id desc 
+    limit
+        ?
+2025-09-24 00:27:48.618 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:BIGINT) <- [1]
+2025-09-24 00:27:48.618 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:INTEGER) <- [30]
+2025-09-24 00:29:06.528 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-24 00:29:06.561 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-24 00:29:06.571 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

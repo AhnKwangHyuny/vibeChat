@@ -9,6 +9,8 @@ export default defineConfig({
           target: 'http://localhost:8080',
           changeOrigin: true,
           secure: false,
+          cookieDomainRewrite: 'localhost',
+          cookiePathRewrite: '/',
         },
         '/ws': {
           target: 'http://localhost:8080',

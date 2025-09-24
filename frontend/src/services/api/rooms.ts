@@ -43,8 +43,22 @@ export const createRoom = async (data: CreateRoomRequest): Promise<CreateRoomRes
  * 방 상세 정보 조회
  */
 export const getRoomById = async (roomId: number): Promise<Room> => {
-  const response = await axiosInstance.get<Room>(`/rooms/${roomId}`);
-  return response.data;
+  const response = await axiosInstance.get<any>(`/rooms/${roomId}`);
+
+  // 백엔드 응답과 프론트엔드 타입 매핑
+  const responseData = response.data;
+  const room: Room = {
+    id: responseData.id,
+    title: responseData.title,
+    description: responseData.description,
+    isPrivate: responseData.private, // 'private'을 'isPrivate'으로 매핑
+    tags: responseData.tags,
+    participantsCount: responseData.participantsCount,
+    lastMessageAt: responseData.lastMessageAt,
+    inviteCode: responseData.inviteCode,
+  };
+
+  return room;
 };
 
 /**

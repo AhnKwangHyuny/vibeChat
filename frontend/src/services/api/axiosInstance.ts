@@ -38,7 +38,7 @@ axiosInstance.interceptors.request.use((config) => {
 //   console.log('  Base URL:', config.baseURL);
 //   console.log('  With credentials:', config.withCredentials);
 //   console.log('  All cookies:', document.cookie);
-  
+
   // 세션 쿠키만 추출
   const sessionCookie = document.cookie.split('; ').find(row => row.startsWith('SESSION='));
   console.log('  Session cookie:', sessionCookie || 'NOT FOUND');

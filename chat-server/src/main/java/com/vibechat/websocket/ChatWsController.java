@@ -1,8 +1,9 @@
 package com.vibechat.websocket;
 
 import com.vibechat.dto.SendMessagePayload;
-import com.vibechat.service.message.MessageService;
+import com.vibechat.dto.StreamMessageDto;
 import com.vibechat.service.RateLimitService;
+import com.vibechat.service.messagequeue.MessageStreamProducer;
 import com.vibechat.service.presence.PresenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -19,42 +20,50 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ChatWsController {
 
-    private final MessageService messageService;
+    private final MessageStreamProducer messageStreamProducer;
     private final PresenceService presenceService;
     private final RateLimitService rateLimitService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/rooms/{roomId}/send")
-    public void sendMessage(@DestinationVariable Long roomId, 
-                            @Payload SendMessagePayload payload, 
+    public void sendMessage(@DestinationVariable Long roomId,
+                            @Payload SendMessagePayload payload,
                             SimpMessageHeaderAccessor headerAccessor) {
-        
-        Long userId = (Long) Objects.requireNonNull(headerAccessor.getSessionAttributes()).get("userId");
-        if (userId == null) {
+
+        Map<String, Object> sessionAttrs = Objects.requireNonNull(headerAccessor.getSessionAttributes());
+        Long userId = (Long) sessionAttrs.get("userId");
+        String nickname = (String) sessionAttrs.get("nickname");
+        String avatarUrl = (String) sessionAttrs.get("avatarUrl");
+
+        if (userId == null || nickname == null) {
             messagingTemplate.convertAndSendToUser(headerAccessor.getSessionId(), "/queue/errors",
-                    java.util.Map.of(
-                            "type", "UNAUTHORIZED",
-                            "title", "Unauthorized",
-                            "detail", "User not authenticated."
-                    ));
+                    Map.of("type", "UNAUTHORIZED", "title", "Unauthorized", "detail", "User not authenticated."));
             return;
         }
 
-        // 사용자+방 단위 레이트 제한 검사
         if (!rateLimitService.tryConsume(userId, roomId)) {
             long waitNanos = rateLimitService.nanosToWait(userId, roomId);
             long waitSeconds = Math.max(1, waitNanos / 1_000_000_000);
             messagingTemplate.convertAndSendToUser(headerAccessor.getSessionId(), "/queue/errors",
-                    java.util.Map.of(
-                            "type", "RATE_LIMIT",
-                            "title", "Rate limit exceeded",
-                            "detail", "Too many messages. Please retry after a short delay.",
-                            "retryAfterSeconds", waitSeconds
-                    ));
+                    Map.of("type", "RATE_LIMIT", "title", "Rate limit exceeded",
+                            "detail", "Too many messages. Please retry after a short delay.", "retryAfterSeconds", waitSeconds));
             return;
         }
 
-        messageService.saveAndBroadcastMessage(roomId, userId, payload);
+        // 1. Stream에 발행할 DTO 생성
+        StreamMessageDto streamDto = StreamMessageDto.builder()
+                .clientTempId(payload.getClientTempId())
+                .roomId(roomId)
+                .userId(userId)
+                .nickname(nickname)
+                .avatarUrl(avatarUrl)
+                .type(payload.getType())
+                .contentText(payload.getContentText())
+                .mediaUrl(payload.getMediaUrl())
+                .build();
+
+        // 2. MessageStreamProducer를 통해 Redis Stream에 메시지 발행
+        messageStreamProducer.publishMessage(streamDto);
     }
 
     @MessageMapping("/rooms/{roomId}/typing")

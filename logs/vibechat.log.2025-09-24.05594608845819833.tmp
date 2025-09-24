@@ -1,0 +1,298 @@
+2025-09-25 00:17:37.256 [main] INFO  com.vibechat.ApiServerApplication - Starting ApiServerApplication using Java 21.0.8 with PID 19121 (/Users/ahnkwanghyun/Desktop/vibeChat/api-server/target/classes started by ahnkwanghyun in /Users/ahnkwanghyun/Desktop/vibeChat)
+2025-09-25 00:17:37.261 [main] INFO  com.vibechat.ApiServerApplication - The following 1 profile is active: "local"
+2025-09-25 00:17:38.522 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-09-25 00:17:38.523 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-09-25 00:17:38.613 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 86 ms. Found 7 JPA repository interfaces.
+2025-09-25 00:17:38.628 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-09-25 00:17:38.629 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-09-25 00:17:38.640 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.vibechat.repository.MessageReportRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-09-25 00:17:38.640 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.vibechat.repository.MessageRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-09-25 00:17:38.640 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.vibechat.repository.UserRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-09-25 00:17:38.641 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.vibechat.repository.chatRoom.ChatRoomRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-09-25 00:17:38.641 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.vibechat.repository.tags.RoomTagRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-09-25 00:17:38.641 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.vibechat.repository.tags.TagRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-09-25 00:17:38.641 [main] INFO  o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data Redis - Could not safely identify store assignment for repository candidate interface com.vibechat.repository.tags.UserProfileTagRepository; If you want this repository to be a Redis repository, consider annotating your entities with one of these annotations: org.springframework.data.redis.core.RedisHash (preferred), or consider extending one of the following types with your repository: org.springframework.data.keyvalue.repository.KeyValueRepository
+2025-09-25 00:17:38.641 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 6 ms. Found 0 Redis repository interfaces.
+2025-09-25 00:17:39.128 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-09-25 00:17:39.135 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-09-25 00:17:39.135 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.30]
+2025-09-25 00:17:39.164 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-09-25 00:17:39.164 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1867 ms
+2025-09-25 00:17:39.481 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-09-25 00:17:39.515 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.5.3.Final
+2025-09-25 00:17:39.531 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2025-09-25 00:17:39.668 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-09-25 00:17:39.682 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-09-25 00:17:39.780 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@729c98
+2025-09-25 00:17:39.781 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-09-25 00:17:40.397 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-09-25 00:17:40.403 [main] DEBUG org.hibernate.SQL - 
+    alter table chat_room_participants 
+       drop 
+       foreign key FKkrenof4in9x16he7adf6g058f
+2025-09-25 00:17:40.474 [main] DEBUG org.hibernate.SQL - 
+    alter table chat_room_participants 
+       drop 
+       foreign key FKiqfwuqd8c8i7hrkukc0rii5pg
+2025-09-25 00:17:40.482 [main] DEBUG org.hibernate.SQL - 
+    alter table chat_rooms 
+       drop 
+       foreign key FKin9277aywbjursj2b4e3bmw3s
+2025-09-25 00:17:40.497 [main] DEBUG org.hibernate.SQL - 
+    alter table message_reports 
+       drop 
+       foreign key FK77va9lugu5ei09uruv55nq5t9
+2025-09-25 00:17:40.504 [main] DEBUG org.hibernate.SQL - 
+    alter table message_reports 
+       drop 
+       foreign key FKsir0m6j50wva8avwlw2q43t3h
+2025-09-25 00:17:40.509 [main] DEBUG org.hibernate.SQL - 
+    alter table messages 
+       drop 
+       foreign key FKj9tydtks7eq8dy1jq67yv5icx
+2025-09-25 00:17:40.517 [main] DEBUG org.hibernate.SQL - 
+    alter table messages 
+       drop 
+       foreign key FKpsmh6clh3csorw43eaodlqvkn
+2025-09-25 00:17:40.524 [main] DEBUG org.hibernate.SQL - 
+    alter table room_tags 
+       drop 
+       foreign key FK8sae5uhxfniuce3trn582ekt3
+2025-09-25 00:17:40.529 [main] DEBUG org.hibernate.SQL - 
+    alter table room_tags 
+       drop 
+       foreign key FK2j4dcu7mou0gddfevl04suig3
+2025-09-25 00:17:40.533 [main] DEBUG org.hibernate.SQL - 
+    alter table user_profile_tags 
+       drop 
+       foreign key FKf6axfbnd4l1m10lxe9drmfuni
+2025-09-25 00:17:40.536 [main] DEBUG org.hibernate.SQL - 
+    alter table user_profile_tags 
+       drop 
+       foreign key FK6m0xfyqa0ddkarvoq9k799191
+2025-09-25 00:17:40.545 [main] DEBUG org.hibernate.SQL - 
+    alter table user_rooms 
+       drop 
+       foreign key FKt8mcc649a51cbglx7ahik9h9v
+2025-09-25 00:17:40.557 [main] DEBUG org.hibernate.SQL - 
+    alter table user_rooms 
+       drop 
+       foreign key FKlp3u9gpy3sne8ibijkmvnukin
+2025-09-25 00:17:40.566 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists chat_room_participants
+2025-09-25 00:17:40.591 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists chat_rooms
+2025-09-25 00:17:40.600 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists message_reports
+2025-09-25 00:17:40.604 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists messages
+2025-09-25 00:17:40.611 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists room_tags
+2025-09-25 00:17:40.616 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists tags
+2025-09-25 00:17:40.620 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists user_profile_tags
+2025-09-25 00:17:40.625 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists user_rooms
+2025-09-25 00:17:40.630 [main] DEBUG org.hibernate.SQL - 
+    drop table if exists users
+2025-09-25 00:17:40.638 [main] DEBUG org.hibernate.SQL - 
+    create table chat_room_participants (
+        chat_room_id bigint,
+        id bigint not null auto_increment,
+        joined_at datetime(6) not null,
+        user_id bigint,
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.650 [main] DEBUG org.hibernate.SQL - 
+    create table chat_rooms (
+        is_private bit not null,
+        created_at datetime(6) not null,
+        created_by bigint,
+        id bigint not null auto_increment,
+        updated_at datetime(6) not null,
+        invite_code varchar(36),
+        title varchar(50) not null,
+        description varchar(255),
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.660 [main] DEBUG org.hibernate.SQL - 
+    create table message_reports (
+        created_at datetime(6) not null,
+        id bigint not null auto_increment,
+        message_id bigint not null,
+        reporter_user_id bigint,
+        reason varchar(64) not null,
+        details varchar(255),
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.666 [main] DEBUG org.hibernate.SQL - 
+    create table messages (
+        is_deleted bit not null,
+        media_duration_sec smallint,
+        created_at datetime(6) not null,
+        id bigint not null auto_increment,
+        room_id bigint not null,
+        user_id bigint not null,
+        client_temp_id varchar(36),
+        media_thumb_url varchar(255),
+        media_url varchar(255),
+        content_text longtext,
+        type enum ('GIF','IMAGE','TEXT','VIDEO') not null,
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.670 [main] DEBUG org.hibernate.SQL - 
+    create table room_tags (
+        created_at datetime(6) not null,
+        id bigint not null auto_increment,
+        room_id bigint not null,
+        tag_id bigint not null,
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.675 [main] DEBUG org.hibernate.SQL - 
+    create table tags (
+        total_usage_count integer not null,
+        created_at datetime(6),
+        id bigint not null auto_increment,
+        updated_at datetime(6),
+        name varchar(32) not null,
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.679 [main] DEBUG org.hibernate.SQL - 
+    create table user_profile_tags (
+        created_at datetime(6) not null,
+        id bigint not null auto_increment,
+        tag_id bigint not null,
+        user_id bigint not null,
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.684 [main] DEBUG org.hibernate.SQL - 
+    create table user_rooms (
+        bookmarked bit not null,
+        id bigint not null auto_increment,
+        joined_at datetime(6) not null,
+        room_id bigint not null,
+        user_id bigint not null,
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.688 [main] DEBUG org.hibernate.SQL - 
+    create table users (
+        created_at datetime(6) not null,
+        id bigint not null auto_increment,
+        updated_at datetime(6) not null,
+        nickname varchar(32) not null,
+        provider_id varchar(128),
+        greeting varchar(160),
+        avatar_url varchar(255),
+        provider enum ('GOOGLE','GUEST') not null,
+        primary key (id)
+    ) engine=InnoDB
+2025-09-25 00:17:40.692 [main] DEBUG org.hibernate.SQL - 
+    alter table chat_rooms 
+       add constraint uk_chatroom_invite_code unique (invite_code)
+2025-09-25 00:17:40.699 [main] DEBUG org.hibernate.SQL - 
+    alter table room_tags 
+       add constraint UKq3q013xg4xy9rxk8fwdbk7nse unique (room_id, tag_id)
+2025-09-25 00:17:40.705 [main] DEBUG org.hibernate.SQL - 
+    alter table tags 
+       add constraint UKt48xdq560gs3gap9g7jg36kgc unique (name)
+2025-09-25 00:17:40.709 [main] DEBUG org.hibernate.SQL - 
+    alter table user_profile_tags 
+       add constraint UKriioumfgb48po2g62tnrlsr3s unique (user_id, tag_id)
+2025-09-25 00:17:40.712 [main] DEBUG org.hibernate.SQL - 
+    alter table user_rooms 
+       add constraint UKaqnsprjnin7d5ajfmfy318lxr unique (user_id, room_id)
+2025-09-25 00:17:40.716 [main] DEBUG org.hibernate.SQL - 
+    alter table users 
+       add constraint UK2ty1xmrrgtn89xt7kyxx6ta7h unique (nickname)
+2025-09-25 00:17:40.720 [main] DEBUG org.hibernate.SQL - 
+    alter table chat_room_participants 
+       add constraint FKkrenof4in9x16he7adf6g058f 
+       foreign key (chat_room_id) 
+       references chat_rooms (id)
+2025-09-25 00:17:40.732 [main] DEBUG org.hibernate.SQL - 
+    alter table chat_room_participants 
+       add constraint FKiqfwuqd8c8i7hrkukc0rii5pg 
+       foreign key (user_id) 
+       references users (id)
+2025-09-25 00:17:40.743 [main] DEBUG org.hibernate.SQL - 
+    alter table chat_rooms 
+       add constraint FKin9277aywbjursj2b4e3bmw3s 
+       foreign key (created_by) 
+       references users (id)
+2025-09-25 00:17:40.759 [main] DEBUG org.hibernate.SQL - 
+    alter table message_reports 
+       add constraint FK77va9lugu5ei09uruv55nq5t9 
+       foreign key (message_id) 
+       references messages (id)
+2025-09-25 00:17:40.772 [main] DEBUG org.hibernate.SQL - 
+    alter table message_reports 
+       add constraint FKsir0m6j50wva8avwlw2q43t3h 
+       foreign key (reporter_user_id) 
+       references users (id)
+2025-09-25 00:17:40.786 [main] DEBUG org.hibernate.SQL - 
+    alter table messages 
+       add constraint FKj9tydtks7eq8dy1jq67yv5icx 
+       foreign key (room_id) 
+       references chat_rooms (id)
+2025-09-25 00:17:40.802 [main] DEBUG org.hibernate.SQL - 
+    alter table messages 
+       add constraint FKpsmh6clh3csorw43eaodlqvkn 
+       foreign key (user_id) 
+       references users (id)
+2025-09-25 00:17:40.823 [main] DEBUG org.hibernate.SQL - 
+    alter table room_tags 
+       add constraint FK8sae5uhxfniuce3trn582ekt3 
+       foreign key (room_id) 
+       references chat_rooms (id)
+2025-09-25 00:17:40.836 [main] DEBUG org.hibernate.SQL - 
+    alter table room_tags 
+       add constraint FK2j4dcu7mou0gddfevl04suig3 
+       foreign key (tag_id) 
+       references tags (id)
+2025-09-25 00:17:40.851 [main] DEBUG org.hibernate.SQL - 
+    alter table user_profile_tags 
+       add constraint FKf6axfbnd4l1m10lxe9drmfuni 
+       foreign key (tag_id) 
+       references tags (id)
+2025-09-25 00:17:40.866 [main] DEBUG org.hibernate.SQL - 
+    alter table user_profile_tags 
+       add constraint FK6m0xfyqa0ddkarvoq9k799191 
+       foreign key (user_id) 
+       references users (id)
+2025-09-25 00:17:40.882 [main] DEBUG org.hibernate.SQL - 
+    alter table user_rooms 
+       add constraint FKt8mcc649a51cbglx7ahik9h9v 
+       foreign key (room_id) 
+       references chat_rooms (id)
+2025-09-25 00:17:40.898 [main] DEBUG org.hibernate.SQL - 
+    alter table user_rooms 
+       add constraint FKlp3u9gpy3sne8ibijkmvnukin 
+       foreign key (user_id) 
+       references users (id)
+2025-09-25 00:17:40.929 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-09-25 00:17:41.347 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-09-25 00:17:42.688 [main] INFO  net.bramp.ffmpeg.RunProcessFunction - /opt/homebrew/bin/ffmpeg -version
+2025-09-25 00:17:43.952 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-09-25 00:17:44.629 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 3 endpoints beneath base path '/actuator'
+2025-09-25 00:17:47.208 [main] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2025-09-25 00:17:47.214 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-09-25 00:17:47.216 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-09-25 00:17:47.226 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-09-25 00:17:47.260 [main] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2025-09-25 00:17:47.279 [main] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+

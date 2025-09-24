@@ -3,6 +3,8 @@ import { toast } from 'react-toastify';
 import { stompClient } from '../services/ws/stompClient';
 import { v4 as uuidv4 } from 'uuid';
 import { getMessages } from '../services/api/messages';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 
 interface Message {
   id: number;
@@ -36,130 +38,179 @@ export function useMessages(roomId: number): UseMessagesReturn {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [onlineCount, setOnlineCount] = useState(0);
 
-  // 초기 메시지 로딩 (REST API) - 임시 비활성화
+  // Redux에서 사용자 정보 가져오기
+  const user = useSelector((state: RootState) => state.user);
+
+  // 초기 메시지 로딩 (REST API from API-Server)
   useEffect(() => {
-    // const loadInitialMessages = async () => {
-    //   if (!roomId) return;
-    //   setIsLoading(true);
-    //   try {
-    //     const data = await getMessages(roomId, undefined, 30);
-    //     setMessages(data);
-    //     setHasMore(data.length >= 30);
-    //   } catch (e) {
-    //     console.log('메시지 로딩 실패 (API-Server 연결 확인 필요):', e);
-    //     // toast.error('메시지 로딩에 실패했습니다.');
-    //     // 임시: 빈 메시지로 설정
-    //     setMessages([]);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-    // loadInitialMessages();
-
-    // 임시: API 호출 없이 빈 메시지로 설정
-    setMessages([]);
-    setIsLoading(false);
-    console.log('메시지 로딩 비활성화 - roomId:', roomId);
+    const loadInitialMessages = async () => {
+      if (!roomId) return;
+      setIsLoading(true);
+      try {
+        // TODO: [2025-09-22] 백엔드 메시지 조회 API 구현 후 주석 해제
+        console.log('Skipping initial message load: API not implemented yet.');
+        setMessages([]); // 메시지 목록을 빈 배열로 초기화
+        setHasMore(false); // 더 불러올 메시지가 없는 것으로 설정
+        
+        // const data = await getMessages(roomId, undefined, 30);
+        // setMessages(data);
+        // setHasMore(data.length >= 30);
+        // console.log('Messages loaded successfully:', data.length);
+      } catch (e) {
+        console.error('Failed to load messages from API-Server:', e);
+        toast.error('메시지 로딩에 실패했습니다.');
+        setMessages([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadInitialMessages();
   }, [roomId]);
 
-  // 메시지 전송: WS로 서버에 발행 + 낙관적 추가 - 임시 주석 처리
+  // 메시지 전송: WS로 Chat-Server에 발행 + 낙관적 UI 업데이트
   const sendMessage = useCallback(async (messageData: Omit<Message, 'id' | 'clientTempId' | 'roomId' | 'user' | 'createdAt'>): Promise<void> => {
-    // const clientTempId = uuidv4();
-    // const optimistic: Message = {
-    //   ...messageData,
-    //   id: Date.now(),
-    //   clientTempId,
-    //   roomId,
-    //   // TODO: 실제 사용자 정보는 전역 상태/세션에서 주입
-    //   user: { id: 0, nickname: '나', avatarUrl: '' },
-    //   createdAt: new Date().toISOString(),
-    // };
+    if (!user.id || !user.nickname) {
+      toast.error('사용자 인증이 필요합니다.');
+      return;
+    }
 
-    // // 낙관적 업데이트
-    // setMessages(prev => [...prev, optimistic]);
+    const clientTempId = uuidv4();
+    const optimistic: Message = {
+      ...messageData,
+      id: Date.now(), // 임시 ID
+      clientTempId,
+      roomId,
+      user: { id: parseInt(user.id), nickname: user.nickname, avatarUrl: user.avatarUrl || undefined },
+      createdAt: new Date().toISOString(),
+    };
 
-    // // WS 전송 (clientTempId 포함)
-    // stompClient.sendRoomMessage(roomId, {
-    //   clientTempId,
-    //   type: optimistic.type,
-    //   contentText: optimistic.contentText,
-    //   mediaUrl: optimistic.mediaUrl,
-    //   mediaThumbUrl: optimistic.mediaThumbUrl,
-    //   mediaDurationSec: optimistic.mediaDurationSec,
-    // });
+    // 낙관적 UI 업데이트
+    setMessages(prev => [...prev, optimistic]);
 
-    // 임시: 아무것도 안 함
-    console.log('메시지 전송 임시 비활성화:', messageData);
-  }, [roomId]);
+    try {
+      // WebSocket으로 Chat-Server에 메시지 전송
+      await stompClient.sendRoomMessage(roomId, {
+        clientTempId,
+        type: messageData.type,
+        contentText: messageData.contentText,
+        mediaUrl: messageData.mediaUrl,
+        mediaThumbUrl: messageData.mediaThumbUrl,
+        mediaDurationSec: messageData.mediaDurationSec,
+      });
+      console.log('Message sent via WebSocket:', { roomId, clientTempId });
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      // 실패 시 낙관적 업데이트 롤백
+      setMessages(prev => prev.filter(m => m.clientTempId !== clientTempId));
+      toast.error('메시지 전송에 실패했습니다.');
+    }
+  }, [roomId, user]);
 
-  // 과거 메시지 추가 로드 (REST API)
+  // 과거 메시지 추가 로드 (REST API from API-Server)
   const loadMoreMessages = useCallback(async (roomIdParam: number, beforeId?: number): Promise<void> => {
-    // if (isLoading) return;
-    // setIsLoading(true);
-    // try {
-    //   const older = await getMessages(roomIdParam, beforeId, 30);
-    //   setMessages(prev => [...older, ...prev]);
-    //   setHasMore(older.length >= 30);
-    // } catch (e) {
-    //   toast.error('이전 메시지를 불러오지 못했습니다.');
-    // } finally {
-    //   setIsLoading(false);
-    // }
-
-    // 임시: 아무것도 안 함
-    console.log('과거 메시지 로딩 임시 비활성화');
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      console.log('Loading more messages for room:', roomIdParam, 'before:', beforeId);
+      const older = await getMessages(roomIdParam, beforeId, 30);
+      setMessages(prev => [...older, ...prev]);
+      setHasMore(older.length >= 30);
+      console.log('Loaded more messages:', older.length);
+    } catch (e) {
+      console.error('Failed to load more messages:', e);
+      toast.error('이전 메시지를 불러오지 못했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
   }, [isLoading]);
 
-  // 타이핑/메시지/프레즌스 구독 설정 - 임시 주석 처리
+  // WebSocket 구독 설정 (메시지, 타이핑, 프레즌스)
   useEffect(() => {
-    // if (!roomId) return;
+    if (!roomId || !user.id) {
+      console.log('WebSocket 구독 스킵 - roomId 또는 user.id 없음:', { roomId, userId: user.id });
+      return;
+    }
 
-    // // 메시지 구독
-    // const msgSub = stompClient.subscribe(`/topic/rooms/${roomId}/messages`, (frame) => {
-    //   try {
-    //     const evt = JSON.parse(frame.body) as Message;
-    //     setMessages((prev) => {
-    //       if (evt.clientTempId) {
-    //         // clientTempId 일치 시 pending → 확정으로 치환
-    //         return prev.map((m) => m.clientTempId === evt.clientTempId ? { ...evt } : m);
-    //       }
-    //       return [...prev, evt];
-    //     });
-    //   } catch (e) {
-    //     console.error('Failed to parse message event', e);
-    //   }
-    // });
+    console.log('Setting up WebSocket subscriptions for room:', roomId);
 
-    // // 타이핑 구독
-    // const typingSub = stompClient.subscribe(`/topic/rooms/${roomId}/typing`, (frame) => {
-    //   try {
-    //     const evt = JSON.parse(frame.body) as { nickname: string; typing: boolean };
-    //     setTypingUsers((prev) => {
-    //       const exists = prev.includes(evt.nickname);
-    //       if (evt.typing && !exists) return [...prev, evt.nickname];
-    //       if (!evt.typing && exists) return prev.filter((n) => n !== evt.nickname);
-    //       return prev;
-    //     });
-    //   } catch {}
-    // });
+    const subscriptions: Array<{ unsubscribe: () => void }> = [];
 
-    // // 프레즌스 구독
-    // const presenceSub = stompClient.subscribe(`/topic/rooms/${roomId}/presence`, (frame) => {
-    //   try {
-    //     const evt = JSON.parse(frame.body) as { count: number };
-    //     setOnlineCount(evt.count);
-    //   } catch {}
-    // });
+    try {
+      // 메시지 구독
+      const msgSub = stompClient.subscribe(`/topic/rooms/${roomId}/messages`, (frame) => {
+        try {
+          const evt = JSON.parse(frame.body) as Message;
+          console.log('Received message via WebSocket:', evt);
 
-    // return () => {
-    //   if (msgSub) msgSub.unsubscribe();
-    //   if (typingSub) typingSub.unsubscribe();
-    //   if (presenceSub) presenceSub.unsubscribe();
-    // };
+          setMessages((prev) => {
+            if (evt.clientTempId) {
+              // clientTempId 일치 시 낙관적 업데이트를 서버 응답으로 치환
+              const hasOptimistic = prev.some(m => m.clientTempId === evt.clientTempId);
+              if (hasOptimistic) {
+                return prev.map((m) => m.clientTempId === evt.clientTempId ? { ...evt } : m);
+              }
+            }
+            // 새 메시지 추가 (중복 확인)
+            const exists = prev.some(m => m.id === evt.id);
+            if (!exists) {
+              return [...prev, evt];
+            }
+            return prev;
+          });
+        } catch (e) {
+          console.error('Failed to parse message event:', e);
+        }
+      });
+      if (msgSub) subscriptions.push(msgSub);
 
-    // 임시: WebSocket 구독 비활성화
-    console.log('WebSocket 구독 임시 비활성화 - roomId:', roomId);
-  }, [roomId]);
+      // 타이핑 구독
+      const typingSub = stompClient.subscribe(`/topic/rooms/${roomId}/typing`, (frame) => {
+        try {
+          const evt = JSON.parse(frame.body) as { nickname: string; typing: boolean };
+          console.log('Received typing event:', evt);
+
+          setTypingUsers((prev) => {
+            const exists = prev.includes(evt.nickname);
+            if (evt.typing && !exists) return [...prev, evt.nickname];
+            if (!evt.typing && exists) return prev.filter((n) => n !== evt.nickname);
+            return prev;
+          });
+        } catch (e) {
+          console.error('Failed to parse typing event:', e);
+        }
+      });
+      if (typingSub) subscriptions.push(typingSub);
+
+      // 프레즌스 구독
+      const presenceSub = stompClient.subscribe(`/topic/rooms/${roomId}/presence`, (frame) => {
+        try {
+          const evt = JSON.parse(frame.body) as { count: number };
+          console.log('Received presence event:', evt);
+          setOnlineCount(evt.count);
+        } catch (e) {
+          console.error('Failed to parse presence event:', e);
+        }
+      });
+      if (presenceSub) subscriptions.push(presenceSub);
+
+      console.log('WebSocket subscriptions established for room:', roomId);
+    } catch (error) {
+      console.error('Failed to set up WebSocket subscriptions:', error);
+    }
+
+    return () => {
+      console.log('Cleaning up WebSocket subscriptions for room:', roomId);
+      subscriptions.forEach(sub => {
+        try {
+          if (sub && typeof sub.unsubscribe === 'function') {
+            sub.unsubscribe();
+          }
+        } catch (e) {
+          console.error('Error unsubscribing:', e);
+        }
+      });
+    };
+  }, [roomId, user.id]);
 
   // 타이핑 상태 송신 헬퍼(옵션): 외부에서 호출하도록 노출하지 않음. 컴포넌트 단에서 stompClient.sendTyping 사용 가능
 

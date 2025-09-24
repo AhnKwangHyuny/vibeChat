@@ -5,129 +5,106 @@ import { setUser, clearUser } from '../store/userSlice';
 import { createGuestUser, getMe, logout } from '../services/api/auth';
 import { toast } from 'react-toastify';
 
-interface AuthState {
-  loading: boolean;
-  error: string | null;
-  isCheckingAuth: boolean;
-}
-
-let isAuthCheckInProgress = false;
-
+/**
+ * 세션 기반 인증을 관리하는 훅.
+ * 앱 로드 시 서버에 세션 유효성을 확인하고, 그 결과를 Redux store에 반영한다.
+ * 이 훅의 로직이 완료될 때까지 앱 렌더링은 AuthGate에 의해 보류된다.
+ */
 export const useSessionAuth = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user);
-  const [authState, setAuthState] = useState<AuthState>({
-    loading: false,
-    error: null,
-    isCheckingAuth: true,
-  });
 
-  const checkSessionAuth = useCallback(async () => {
-    if (user.id || isAuthCheckInProgress) {
-      setAuthState(prev => ({ ...prev, isCheckingAuth: false }));
-      return;
-    }
+  // 앱 로드 시 최초 인증 확인 중인지 여부
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  // 개별 액션(로그인, 로그아웃 등)의 로딩 상태
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    isAuthCheckInProgress = true;
-    setAuthState(prev => ({ ...prev, isCheckingAuth: true }));
-
+  // 서버에 세션 상태를 확인하고 Redux 상태를 업데이트하는 핵심 함수
+  const checkSession = useCallback(async () => {
+    console.log('[AUTH] Starting session check...');
+    setIsCheckingAuth(true);
     try {
       const userData = await getMe();
-      if (userData) {
-        dispatch(
-          setUser({
-            id: userData.userId.toString(),
-            nickname: userData.nickname,
-            avatarUrl: userData.avatarUrl,
-            provider: userData.provider,
-          })
-        );
-        return true;
-      }
-      return false;
-    } catch (error: any) {
-      if (error?.status === 401) {
-        console.log('로그인되지 않은 사용자 (401)');
+
+      if (userData && userData.userId) {
+        const userInfo = {
+          id: userData.userId.toString(),
+          nickname: userData.nickname,
+          avatarUrl: userData.avatarUrl,
+          provider: userData.provider,
+        };
+        dispatch(setUser(userInfo));
+        console.log('[AUTH] Session valid. User state hydrated.', userInfo);
       } else {
-        console.error('세션 확인 중 오류:', error);
+        // API는 성공했지만 유저 데이터가 없는 경우 (예: 세션 만료 직후)
+        console.log('[AUTH] No valid session found on server.');
+        dispatch(clearUser());
       }
-      return false;
+    } catch (err: any) {
+      // API 호출 자체가 실패한 경우 (예: 401 Unauthorized, 네트워크 에러)
+      console.error('[AUTH] Session check API failed. Clearing user state.', err);
+      dispatch(clearUser());
     } finally {
-      isAuthCheckInProgress = false;
-      setAuthState(prev => ({ ...prev, isCheckingAuth: false }));
+      setIsCheckingAuth(false);
+      console.log('[AUTH] Session check finished.');
     }
-  }, [dispatch, user.id]);
+  }, [dispatch]);
 
+  // 앱이 처음 마운트될 때만 세션 확인 로직을 실행
   useEffect(() => {
-    checkSessionAuth();
-  }, [checkSessionAuth]);
+    checkSession();
+  }, [checkSession]); // checkSession은 useCallback으로 메모이즈되어 있으므로 안전
 
-  const signInAsGuest = async (
-    nickname: string
-  ): Promise<boolean | { suggested: string }> => {
-    if (!nickname.trim()) {
-      toast.error('닉네임을 입력하세요');
-      return false;
-    }
-
-    setAuthState(prev => ({ ...prev, loading: true, error: null }));
+  const signInAsGuest = async (nickname: string): Promise<boolean | { suggested: string }> => {
+    setLoading(true);
+    setError(null);
     try {
       const created = await createGuestUser({ nickname: nickname.trim() });
-      dispatch(
-        setUser({
-          id: created.userId.toString(),
-          nickname: created.nickname,
-          provider: 'GUEST',
-        })
-      );
+      dispatch(setUser({
+        id: created.userId.toString(),
+        nickname: created.nickname,
+        provider: 'GUEST',
+      }));
       toast.success('게스트로 로그인되었습니다');
       return true;
-    } catch (error: any) {
-      const suggested = error?.response?.data?.suggestedNickname;
+    } catch (err: any) {
+      const suggested = err?.response?.data?.suggestedNickname;
       if (suggested) {
         toast.info(`이미 사용 중입니다. 제안: ${suggested}`);
         return { suggested };
       } else {
-        const message = error?.response?.data?.message || '로그인에 실패했습니다';
+        const message = err?.response?.data?.message || '로그인에 실패했습니다';
         toast.error(message);
-        setAuthState(prev => ({ ...prev, error: message }));
+        setError(message);
         return false;
       }
     } finally {
-      setAuthState(prev => ({ ...prev, loading: false }));
+      setLoading(false);
     }
   };
 
-  const signOut = async () => {
-    setAuthState(prev => ({ ...prev, loading: true, error: null }));
+  const signOut = async (): Promise<void> => {
+    setLoading(true);
     try {
       await logout();
-      dispatch(clearUser());
-      console.log('백엔드 세션 종료 완료');
-    } catch (error) {
-      console.error('백엔드 로그아웃 오류:', error);
-      dispatch(clearUser());
-      throw error;
+      toast.success('로그아웃되었습니다.');
+    } catch (err) {
+      console.error('[AUTH] Logout API failed, forcing local cleanup.', err);
     } finally {
-      setAuthState(prev => ({ ...prev, loading: false }));
+      dispatch(clearUser());
+      setLoading(false);
     }
-  };
-
-  const refreshUser = async () => {
-    return await checkSessionAuth();
   };
 
   return {
     user,
     isAuthenticated: !!user.id,
-    loading: authState.loading,
-    error: authState.error,
-    isCheckingAuth: authState.isCheckingAuth,
+    loading,
+    error,
+    isCheckingAuth,
     signInAsGuest,
     signOut,
-    refreshUser,
-    checkSessionAuth,
+    refreshUser: checkSession,
   };
 };
-
-

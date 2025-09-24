@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
+import { getRoomById as apiGetRoomById } from '../services/api/rooms';
 
 interface Room {
   id: number;
@@ -137,17 +138,22 @@ export function useRooms(): UseRoomsReturn {
     toast.success('Successfully joined room!');
   };
 
-  const getRoomById = async (roomId: number): Promise<Room | null> => {
+  const getRoomById = useCallback(async (roomId: number): Promise<Room | null> => {
     setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const room = mockRooms.find(r => r.id === roomId) || null;
-    
-    setIsLoading(false);
-    return room;
-  };
+
+    try {
+      const room = await apiGetRoomById(roomId);
+      setIsLoading(false);
+      return room;
+    } catch (error) {
+      console.error('Failed to fetch room:', error);
+      setIsLoading(false);
+
+      // API 실패 시 fallback으로 mock 데이터 사용
+      const room = mockRooms.find(r => r.id === roomId) || null;
+      return room;
+    }
+  }, []);
 
   return {
     rooms,

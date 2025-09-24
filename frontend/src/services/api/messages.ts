@@ -24,6 +24,6 @@ export const getMessages = async (roomId: number, beforeId?: number, limit: numb
     params: { beforeId, limit },
   });
 
-  console.log(response);
+  console.log('Messages fetched from API-Server:', response.data);
   return response.data;
 };
