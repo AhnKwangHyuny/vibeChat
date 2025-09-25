@@ -1,8 +1,9 @@
 package com.vibechat.exception;
 
 /**
- * 방 참가 시 닉네임 중복 충돌 예외
- * - 409로 매핑되며, 제안 닉네임(suggestedNickname)을 함께 제공한다.
+ * 닉네임 중복 충돌 예외
+ *
+ * 방에서 같은 닉네임을 사용하는 사용자가 있을 때 발생
  */
 public class NicknameConflictException extends RuntimeException {
 

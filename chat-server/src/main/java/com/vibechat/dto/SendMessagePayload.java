@@ -4,11 +4,9 @@ import com.vibechat.domain.Message;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class SendMessagePayload {
 
     @NotBlank
@@ -22,5 +20,6 @@ public class SendMessagePayload {
 
     private String mediaUrl;
     private String mediaThumbUrl;
+    private String filename;
     private Short durationSec;
 }

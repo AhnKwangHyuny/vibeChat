@@ -1,8 +1,9 @@
 package com.vibechat.exception;
 
 /**
- * 레이트 제한 초과 예외
- * - 429로 매핑되며, 재시도까지 남은 초(retryAfterSeconds)를 제공한다.
+ * 메시지 전송 제한 초과 예외
+ *
+ * 사용자가 너무 많은 메시지를 보낼 때 발생
  */
 public class RateLimitExceededException extends RuntimeException {
 

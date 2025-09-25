@@ -1,11 +1,11 @@
 package com.vibechat.websocket;
 
 import com.vibechat.dto.SendMessagePayload;
-import com.vibechat.dto.StreamMessageDto;
-import com.vibechat.service.RateLimitService;
-import com.vibechat.service.messagequeue.MessageStreamProducer;
+import com.vibechat.dto.coordinator.MessageProcessResult;
+import com.vibechat.service.coordinator.MessageCoordinatorService;
 import com.vibechat.service.presence.PresenceService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -18,11 +18,11 @@ import java.util.Objects;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class ChatWsController {
 
-    private final MessageStreamProducer messageStreamProducer;
+    private final MessageCoordinatorService messageCoordinatorService;
     private final PresenceService presenceService;
-    private final RateLimitService rateLimitService;
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/rooms/{roomId}/send")
@@ -33,7 +33,6 @@ public class ChatWsController {
         Map<String, Object> sessionAttrs = Objects.requireNonNull(headerAccessor.getSessionAttributes());
         Long userId = (Long) sessionAttrs.get("userId");
         String nickname = (String) sessionAttrs.get("nickname");
-        String avatarUrl = (String) sessionAttrs.get("avatarUrl");
 
         if (userId == null || nickname == null) {
             messagingTemplate.convertAndSendToUser(headerAccessor.getSessionId(), "/queue/errors",
@@ -41,29 +40,51 @@ public class ChatWsController {
             return;
         }
 
-        if (!rateLimitService.tryConsume(userId, roomId)) {
-            long waitNanos = rateLimitService.nanosToWait(userId, roomId);
-            long waitSeconds = Math.max(1, waitNanos / 1_000_000_000);
+        try {
+            log.debug("Processing message from WebSocket: roomId={}, userId={}, type={}",
+                roomId, userId, payload.getType());
+
+            // MessageCoordinatorService를 통한 완전한 메시지 처리 (검증, 강화, 발행)
+            MessageProcessResult result = messageCoordinatorService.processRoomMessage(roomId, userId, payload);
+
+            // 클라이언트에게 ACK 응답
+            if (result.isSuccess()) {
+                messagingTemplate.convertAndSendToUser(headerAccessor.getSessionId(), "/queue/ack",
+                    Map.of(
+                        "clientTempId", result.getClientTempId(),
+                        "messageId", result.getMessageId(),
+                        "status", "SUCCESS",
+                        "processingTimeMs", result.getProcessingTimeMs()
+                    ));
+
+                log.info("Message processed successfully: messageId={}, clientTempId={}",
+                    result.getMessageId(), result.getClientTempId());
+
+            } else {
+                messagingTemplate.convertAndSendToUser(headerAccessor.getSessionId(), "/queue/errors",
+                    Map.of(
+                        "clientTempId", payload.getClientTempId(),
+                        "type", "MESSAGE_PROCESSING_FAILED",
+                        "title", "Message Processing Failed",
+                        "detail", result.getErrorMessage()
+                    ));
+
+                log.warn("Message processing failed: error={}, clientTempId={}",
+                    result.getErrorMessage(), payload.getClientTempId());
+            }
+
+        } catch (Exception e) {
+            log.error("Unexpected error in WebSocket message handler: roomId={}, userId={}",
+                roomId, userId, e);
+
             messagingTemplate.convertAndSendToUser(headerAccessor.getSessionId(), "/queue/errors",
-                    Map.of("type", "RATE_LIMIT", "title", "Rate limit exceeded",
-                            "detail", "Too many messages. Please retry after a short delay.", "retryAfterSeconds", waitSeconds));
-            return;
+                Map.of(
+                    "clientTempId", payload.getClientTempId(),
+                    "type", "INTERNAL_ERROR",
+                    "title", "Internal Server Error",
+                    "detail", "An unexpected error occurred. Please try again."
+                ));
         }
-
-        // 1. Stream에 발행할 DTO 생성
-        StreamMessageDto streamDto = StreamMessageDto.builder()
-                .clientTempId(payload.getClientTempId())
-                .roomId(roomId)
-                .userId(userId)
-                .nickname(nickname)
-                .avatarUrl(avatarUrl)
-                .type(payload.getType())
-                .contentText(payload.getContentText())
-                .mediaUrl(payload.getMediaUrl())
-                .build();
-
-        // 2. MessageStreamProducer를 통해 Redis Stream에 메시지 발행
-        messageStreamProducer.publishMessage(streamDto);
     }
 
     @MessageMapping("/rooms/{roomId}/typing")

@@ -6,9 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-/**
- * WebSocket 메시징 관련 순환 의존성 해결을 위한 설정
- */
+
 @Configuration
 public class WebSocketMessagingConfig {
 

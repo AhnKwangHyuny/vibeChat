@@ -1,5 +1,7 @@
 package com.vibechat.service;
 
+import com.vibechat.exception.RateLimitExceededException;
+import lombok.extern.slf4j.Slf4j;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
  * - 버킷: 용량 20, 분당 20 토큰 보충, 초기 토큰 10
  */
 @Service
+@Slf4j
 public class RateLimitService {
 
     private static final String KEY_FORMAT = "rl:msg:%d:%d";
@@ -17,6 +20,26 @@ public class RateLimitService {
     private TokenBucket getBucket(long userId, long roomId) {
         String key = KEY_FORMAT.formatted(userId, roomId);
         return buckets.computeIfAbsent(key, k -> new TokenBucket(20, 20.0 / 60.0, 10));
+    }
+
+    /**
+     * 레이트 제한 체크 (예외 발생 방식)
+     *
+     * @param userId 사용자 ID
+     * @param roomId 방 ID
+     * @throws RateLimitExceededException 제한 초과 시
+     */
+    public void checkRateLimit(Long userId, Long roomId) {
+        if (!tryConsume(userId, roomId)) {
+            long waitNanos = nanosToWait(userId, roomId);
+            long waitSeconds = Math.max(1, waitNanos / 1_000_000_000);
+
+            log.warn("레이트 제한 초과: userId={}, roomId={}, waitSeconds={}", userId, roomId, waitSeconds);
+            throw new RateLimitExceededException(
+                "메시지 전송 제한을 초과했습니다. " + waitSeconds + "초 후 다시 시도해주세요.",
+                waitSeconds
+            );
+        }
     }
 
     public boolean tryConsume(long userId, long roomId) {
