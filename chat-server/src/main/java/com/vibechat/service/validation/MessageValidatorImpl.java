@@ -67,7 +67,7 @@ public class MessageValidatorImpl implements MessageValidator {
             return;
         }
 
-        if (!StringUtils.hasText(payload.getType())) {
+        if (!StringUtils.hasText(String.valueOf(payload.getType()))) {
             errors.add("Message type is required");
         }
 
@@ -78,7 +78,7 @@ public class MessageValidatorImpl implements MessageValidator {
 
     private void validateMessageType(SendMessagePayload payload, List<String> errors) {
         try {
-            MessageType.fromString(payload.getType());
+            MessageType.fromString(String.valueOf(payload.getType()));
         } catch (IllegalArgumentException e) {
             errors.add("Invalid message type: " + payload.getType());
         }
@@ -87,7 +87,7 @@ public class MessageValidatorImpl implements MessageValidator {
     private void validateContentByType(SendMessagePayload payload, List<String> errors) {
         MessageType messageType;
         try {
-            messageType = MessageType.fromString(payload.getType());
+            messageType = MessageType.fromString(String.valueOf(payload.getType()));
         } catch (IllegalArgumentException e) {
             return; // 이미 타입 검증에서 에러 추가됨
         }
@@ -111,7 +111,7 @@ public class MessageValidatorImpl implements MessageValidator {
     }
 
     private void validateTextContent(SendMessagePayload payload, List<String> errors) {
-        String content = payload.getContent();
+        String content = payload.getContentText();
 
         if (!StringUtils.hasText(content)) {
             errors.add("Text content is required for text messages");
@@ -124,46 +124,46 @@ public class MessageValidatorImpl implements MessageValidator {
     }
 
     private void validateMediaContent(SendMessagePayload payload, List<String> errors) {
-        if (!StringUtils.hasText(payload.getFileUrl())) {
+        if (!StringUtils.hasText(payload.getMediaUrl())) {
             errors.add("File URL is required for media messages");
         }
 
-        if (StringUtils.hasText(payload.getFileName()) &&
-            payload.getFileName().length() > MAX_FILENAME_LENGTH) {
+        if (StringUtils.hasText(payload.getFilename()) &&
+            payload.getFilename().length() > MAX_FILENAME_LENGTH) {
             errors.add("Filename too long. Maximum " + MAX_FILENAME_LENGTH + " characters allowed");
         }
 
         // 썸네일 URL 검증 (선택적)
-        if (StringUtils.hasText(payload.getThumbnailUrl()) &&
-            !isValidUrl(payload.getThumbnailUrl())) {
+        if (StringUtils.hasText(payload.getMediaThumbUrl()) &&
+            !isValidUrl(payload.getMediaThumbUrl())) {
             errors.add("Invalid thumbnail URL format");
         }
     }
 
     private void validateFileContent(SendMessagePayload payload, List<String> errors) {
-        if (!StringUtils.hasText(payload.getFileUrl())) {
+        if (!StringUtils.hasText(payload.getFilename())) {
             errors.add("File URL is required for file messages");
         }
 
-        if (!StringUtils.hasText(payload.getFileName())) {
+        if (!StringUtils.hasText(payload.getFilename())) {
             errors.add("Filename is required for file messages");
-        } else if (payload.getFileName().length() > MAX_FILENAME_LENGTH) {
+        } else if (payload.getFilename().length() > MAX_FILENAME_LENGTH) {
             errors.add("Filename too long. Maximum " + MAX_FILENAME_LENGTH + " characters allowed");
         }
     }
 
     private void validateSystemContent(SendMessagePayload payload, List<String> errors) {
-        if (!StringUtils.hasText(payload.getContent())) {
+        if (!StringUtils.hasText(payload.getContentText())) {
             errors.add("System message content is required");
         }
     }
 
     private void validateXSS(SendMessagePayload payload, List<String> errors) {
-        if (!StringUtils.hasText(payload.getContent())) {
+        if (!StringUtils.hasText(payload.getContentText())) {
             return;
         }
 
-        String originalContent = payload.getContent();
+        String originalContent = payload.getContentText();
         String sanitizedContent = POLICY.sanitize(originalContent);
 
         if (!originalContent.equals(sanitizedContent)) {
@@ -179,6 +179,6 @@ public class MessageValidatorImpl implements MessageValidator {
     }
 
     private int getContentLength(SendMessagePayload payload) {
-        return StringUtils.hasText(payload.getContent()) ? payload.getContent().length() : 0;
+        return StringUtils.hasText(payload.getContentText()) ? payload.getContentText().length() : 0;
     }
 }

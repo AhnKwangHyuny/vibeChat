@@ -1,6 +1,6 @@
 package com.vibechat.dto;
 
-import com.vibechat.domain.Message;
+import com.vibechat.domain.MessageType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,7 +13,7 @@ public class SendMessagePayload {
     private String clientTempId;
 
     @NotNull
-    private Message.MessageType type;
+    private MessageType type;
 
     @Size(max = 2000)
     private String contentText;

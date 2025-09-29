@@ -1,6 +1,6 @@
 package com.vibechat.dto;
 
-import com.vibechat.domain.Message;
+import com.vibechat.domain.MessageType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +25,7 @@ public class StreamMessageDto {
 
     private String avatarUrl;
 
-    private Message.MessageType type;
+    private MessageType type;
 
     private String contentText;
 

@@ -1,6 +1,6 @@
 package com.vibechat.dto;
 
-import com.vibechat.domain.Message;
+import com.vibechat.domain.MessageType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ public class WebSocketMessageResponse {
     private String clientTempId;
     private Long roomId;
     private UserSummaryDto user;
-    private Message.MessageType type;
+    private MessageType type;
     private String contentText;
     private String mediaUrl;
     private String mediaThumbUrl;

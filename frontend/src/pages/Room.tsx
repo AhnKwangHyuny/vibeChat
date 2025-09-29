@@ -124,6 +124,17 @@ export default function Room() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // 전역 에러 핸들러
+  const handleFatalError = useCallback((error: Error, context: string) => {
+    console.error(`[ROOM] Fatal error in ${context}:`, error);
+    toast.error(`오류가 발생했습니다: ${error.message}`);
+
+    // 3초 후 자동으로 홈으로 리다이렉트
+    setTimeout(() => {
+      navigate('/', { replace: true });
+    }, 3000);
+  }, [navigate]);
+
   // === 디버깅용 로그 ===
   useEffect(() => {
     console.log('[ROOM] User state:', {
@@ -168,41 +179,49 @@ export default function Room() {
     loadRoom();
   }, [parsedRoomId, isAuthenticated, getRoomById, navigate]);
 
-  // === WebSocket 연결 관리 ===
+  // === 통합 방 입장 워크플로우 ===
   useEffect(() => {
-    if (!isAuthenticated) {
-      return; // 인증되지 않으면 연결하지 않음
+    if (!isAuthenticated || !parsedRoomId) {
+      return; // 인증되지 않거나 방 ID가 없으면 연결하지 않음
     }
 
-    if (stompClient.connected) {
-      setIsWebSocketConnected(true);
-      return;
-    }
-
-    const connectWebSocket = async () => {
+    const enterRoomWorkflow = async () => {
       try {
-        await stompClient.connectWithUser(user.id, user.nickname, user.avatarUrl || undefined);
-        setIsWebSocketConnected(true);
+        console.log('[ROOM] Starting unified room entry workflow', {
+          roomId: parsedRoomId,
+          userId: user.id,
+          nickname: user.nickname
+        });
 
-        if (parsedRoomId) {
-          stompClient.joinRoom(parsedRoomId);
-        }
+        // 통합 방 입장 워크플로우 실행
+        await stompClient.enterRoom(parsedRoomId, user.id, user.nickname, user.avatarUrl || undefined);
+
+        setIsWebSocketConnected(true);
         toast.success('실시간 채팅에 연결되었습니다.');
+
+        console.log('[ROOM] Room entry workflow completed successfully');
       } catch (error) {
-        console.error('[ROOM] WebSocket connection failed', error);
-        toast.error('실시간 채팅 연결에 실패했습니다.');
+        console.error('[ROOM] Room entry workflow failed', error);
+        toast.error('방 입장에 실패했습니다.');
+        setIsWebSocketConnected(false);
       }
     };
 
-    connectWebSocket();
+    enterRoomWorkflow();
 
     return () => {
-      if (stompClient.connected) {
-        if (parsedRoomId) {
-          stompClient.leaveRoom(parsedRoomId);
-        }
-        stompClient.disconnect();
-        setIsWebSocketConnected(false);
+      // 컴포넌트 언마운트 시 방 퇴장 워크플로우 실행
+      if (parsedRoomId) {
+        console.log('[ROOM] Starting room exit workflow', { roomId: parsedRoomId });
+        // 타임아웃 처리와 함께 방 퇴장
+        Promise.race([
+          stompClient.exitRoom(parsedRoomId),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Exit timeout')), 3000))
+        ]).catch((error) => {
+          console.error('[ROOM] Room exit workflow failed', error);
+          // 타임아웃이나 오류 발생 시에도 상태 정리
+          setIsWebSocketConnected(false);
+        });
       }
     };
   }, [isAuthenticated, user.id, user.nickname, user.avatarUrl, parsedRoomId]);
@@ -276,22 +295,23 @@ export default function Room() {
 
   // === 이벤트 핸들러: 방 관리 ===
   /**
-   * 방 나가기 핸들러 (WebSocket 연결 해제 포함)
+   * 방 나가기 핸들러 (통합 워크플로우 사용)
    */
-  const handleLeaveRoom = () => {
+  const handleLeaveRoom = async () => {
     console.log('[ROOM] User leaving room');
 
     try {
-      // WebSocket 연결 해제
+      // 통합 방 퇴장 워크플로우 실행
       if (parsedRoomId) {
-        console.log('[ROOM] Disconnecting from WebSocket');
-        stompClient.disconnect();
+        console.log('[ROOM] Executing room exit workflow');
+        await stompClient.exitRoom(parsedRoomId);
       }
 
       toast.success("방에서 나왔습니다.");
       navigate('/');
     } catch (error) {
       console.error('[ROOM] Error during room leave:', error);
+      toast.error("방 나가기 중 오류가 발생했습니다.");
       // 에러가 발생해도 페이지는 이동
       navigate('/');
     }
@@ -459,7 +479,14 @@ export default function Room() {
               </div>
             ) : (
               /* 실제 메시지 목록 */
-              messages.map((message) => (
+              messages.filter(message => message && message.user).map((message) => {
+                // 메시지 유효성 검사
+                if (!message.user?.id) {
+                  console.warn('[ROOM] Invalid message user data:', message);
+                  return null;
+                }
+
+                return (
                 <div
                   key={message.id || message.clientTempId}
                   className="relative"
@@ -473,7 +500,11 @@ export default function Room() {
                 >
                   <ChatMessage
                     id={(message.id || message.clientTempId || '').toString()}
-                    user={{ id: String(message.user.id), nickname: message.user.nickname, avatarUrl: message.user.avatarUrl }}
+                    user={{
+                      id: String(message.user?.id || '0'),
+                      nickname: message.user?.nickname || 'Unknown User',
+                      avatarUrl: message.user?.avatarUrl || null
+                    }}
                     content={message.contentText || ''}
                     type={message.type}
                     mediaUrl={message.mediaUrl}
@@ -567,7 +598,8 @@ export default function Room() {
                     />
                   )}
                 </div>
-              ))
+                );
+              })
             )}
             <div ref={messagesEndRef} />
           </div>

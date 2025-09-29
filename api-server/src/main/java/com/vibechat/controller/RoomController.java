@@ -42,6 +42,7 @@ public class RoomController {
 
     @PostMapping("/{roomId}/join")
     public ResponseEntity<Void> joinRoom(@PathVariable Long roomId, @RequestBody(required = false) RoomJoinRequest request, HttpSession session) {
+
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

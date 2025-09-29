@@ -227,14 +227,221 @@ class StompClient {
     this.publish(`/app/rooms/${roomId}/typing`, JSON.stringify({ typing }));
   }
 
-  public joinRoom(roomId: number) {
+  public joinRoom(roomId: number): Promise<void> {
     console.log(`🏠 방 입장 요청: ${roomId}`);
-    this.publish(`/app/rooms/${roomId}/join`, JSON.stringify({}));
+    return new Promise((resolve, reject) => {
+      let isResolved = false;
+
+      // 성공 응답 구독
+      const responseSubscription = this.subscribe('/queue/room-join-response', (message) => {
+        if (isResolved) return;
+
+        try {
+          const response = JSON.parse(message.body);
+          console.log(`📨 방 입장 응답 수신:`, response);
+
+          if (response.type === 'ROOM_JOIN_SUCCESS' && response.roomId === roomId) {
+            console.log(`✅ 방 입장 성공: ${roomId}`, response);
+            isResolved = true;
+            responseSubscription?.unsubscribe();
+            errorSubscription?.unsubscribe();
+            resolve();
+          }
+        } catch (e) {
+          console.error('방 입장 응답 파싱 실패:', e);
+        }
+      });
+
+      // 에러 응답 구독
+      const errorSubscription = this.subscribe('/queue/errors', (message) => {
+        if (isResolved) return;
+
+        try {
+          const error = JSON.parse(message.body);
+          if (error.type === 'ROOM_JOIN_FAILED') {
+            console.error(`❌ 방 입장 에러: ${roomId}`, error);
+            isResolved = true;
+            responseSubscription?.unsubscribe();
+            errorSubscription?.unsubscribe();
+            reject(new Error(error.detail || '방 입장에 실패했습니다'));
+          }
+        } catch (e) {
+          console.error('에러 응답 파싱 실패:', e);
+        }
+      });
+
+      // 타임아웃 설정 (15초로 연장)
+      const timeoutId = setTimeout(() => {
+        if (!isResolved) {
+          console.warn(`⏰ 방 입장 타임아웃: ${roomId}`);
+          isResolved = true;
+          responseSubscription?.unsubscribe();
+          errorSubscription?.unsubscribe();
+          reject(new Error('방 입장 요청 시간 초과'));
+        }
+      }, 15000);
+
+      // 실제 방 입장 요청 전송
+      try {
+        this.publish(`/app/rooms/${roomId}/join`, JSON.stringify({
+          roomId: roomId,
+          timestamp: new Date().toISOString()
+        }));
+        console.log(`📤 방 입장 요청 전송 완료: ${roomId}`);
+      } catch (error) {
+        console.error(`❌ 방 입장 요청 전송 실패: ${roomId}`, error);
+        clearTimeout(timeoutId);
+        responseSubscription?.unsubscribe();
+        errorSubscription?.unsubscribe();
+        reject(error);
+      }
+    });
   }
 
-  public leaveRoom(roomId: number) {
+  public leaveRoom(roomId: number): Promise<void> {
     console.log(`🚪 방 퇴장 요청: ${roomId}`);
-    this.publish(`/app/rooms/${roomId}/leave`, JSON.stringify({}));
+    return new Promise((resolve, reject) => {
+      let isResolved = false;
+
+      // 성공 응답 구독
+      const responseSubscription = this.subscribe('/queue/room-leave-response', (message) => {
+        if (isResolved) return;
+
+        try {
+          const response = JSON.parse(message.body);
+          console.log(`📨 방 퇴장 응답 수신:`, response);
+
+          if (response.type === 'ROOM_LEAVE_SUCCESS' && response.roomId === roomId) {
+            console.log(`✅ 방 퇴장 성공: ${roomId}`, response);
+            isResolved = true;
+            responseSubscription?.unsubscribe();
+            errorSubscription?.unsubscribe();
+            resolve();
+          }
+        } catch (e) {
+          console.error('방 퇴장 응답 파싱 실패:', e);
+        }
+      });
+
+      // 에러 응답 구독
+      const errorSubscription = this.subscribe('/queue/errors', (message) => {
+        if (isResolved) return;
+
+        try {
+          const error = JSON.parse(message.body);
+          if (error.type === 'ROOM_LEAVE_FAILED') {
+            console.error(`❌ 방 퇴장 에러: ${roomId}`, error);
+            isResolved = true;
+            responseSubscription?.unsubscribe();
+            errorSubscription?.unsubscribe();
+            reject(new Error(error.detail || '방 퇴장에 실패했습니다'));
+          }
+        } catch (e) {
+          console.error('에러 응답 파싱 실패:', e);
+        }
+      });
+
+      // 타임아웃 설정 (5초로 단축)
+      const timeoutId = setTimeout(() => {
+        if (!isResolved) {
+          console.warn(`⏰ 방 퇴장 타임아웃: ${roomId}`);
+          isResolved = true;
+          responseSubscription?.unsubscribe();
+          errorSubscription?.unsubscribe();
+          reject(new Error('방 퇴장 요청 시간 초과'));
+        }
+      }, 5000);
+
+      // 실제 방 퇴장 요청 전송
+      try {
+        this.publish(`/app/rooms/${roomId}/leave`, JSON.stringify({
+          roomId: roomId,
+          timestamp: new Date().toISOString()
+        }));
+        console.log(`📤 방 퇴장 요청 전송 완료: ${roomId}`);
+      } catch (error) {
+        console.error(`❌ 방 퇴장 요청 전송 실패: ${roomId}`, error);
+        clearTimeout(timeoutId);
+        responseSubscription?.unsubscribe();
+        errorSubscription?.unsubscribe();
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * 통합 방 입장 워크플로우
+   * WebSocket 연결 + 방 입장 + 자동 구독을 하나의 플로우로 처리
+   */
+  public async enterRoom(roomId: number, userId: string, nickname: string, avatarUrl?: string): Promise<void> {
+    try {
+      console.log(`🚀 통합 방 입장 워크플로우 시작: roomId=${roomId}, userId=${userId}`);
+
+      // Step 1: WebSocket 연결 확인/설정
+      if (!this.connected) {
+        await this.connectWithUser(userId, nickname, avatarUrl);
+      }
+
+      // Step 2: 방 입장 요청 (서버에서 동적 스트림 생성 및 참가자 등록)
+      await this.joinRoom(roomId);
+
+      // Step 3: 방 스트림 자동 구독
+      await this.subscribeToRoomStreams(roomId);
+
+      console.log(`✅ 통합 방 입장 워크플로우 완료: roomId=${roomId}`);
+    } catch (error) {
+      console.error(`❌ 통합 방 입장 워크플로우 실패: roomId=${roomId}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 방 스트림들을 자동으로 구독
+   */
+  private async subscribeToRoomStreams(roomId: number): Promise<void> {
+    try {
+      console.log(`📡 방 스트림 구독 시작: roomId=${roomId}`);
+
+      // 방 메시지 스트림 구독 (이미 useMessages에서 처리중이므로 중복 방지)
+      // this.subscribe(`/topic/rooms/${roomId}/messages`, this.handleRoomMessage);
+
+      // Presence 스트림 구독
+      this.subscribe(`/topic/rooms/${roomId}/presence`, (message) => {
+        console.log(`👥 Presence 업데이트: roomId=${roomId}`, JSON.parse(message.body));
+      });
+
+      // 타이핑 인디케이터 구독
+      this.subscribe(`/topic/rooms/${roomId}/typing`, (message) => {
+        console.log(`⌨️ 타이핑 상태: roomId=${roomId}`, JSON.parse(message.body));
+      });
+
+      console.log(`✅ 방 스트림 구독 완료: roomId=${roomId}`);
+    } catch (error) {
+      console.error(`❌ 방 스트림 구독 실패: roomId=${roomId}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * 통합 방 퇴장 워크플로우
+   */
+  public async exitRoom(roomId: number): Promise<void> {
+    try {
+      console.log(`🚪 통합 방 퇴장 워크플로우 시작: roomId=${roomId}`);
+
+      // Step 1: 방 퇴장 요청 (서버에서 참가자 제거)
+      await this.leaveRoom(roomId);
+
+      // Step 2: 방 관련 구독 해제
+      this.unsubscribe(`/topic/rooms/${roomId}/messages`);
+      this.unsubscribe(`/topic/rooms/${roomId}/presence`);
+      this.unsubscribe(`/topic/rooms/${roomId}/typing`);
+
+      console.log(`✅ 통합 방 퇴장 워크플로우 완료: roomId=${roomId}`);
+    } catch (error) {
+      console.error(`❌ 통합 방 퇴장 워크플로우 실패: roomId=${roomId}`, error);
+      throw error;
+    }
   }
 
   public connectWithUser(userId: string, nickname: string, avatarUrl?: string): Promise<void> {

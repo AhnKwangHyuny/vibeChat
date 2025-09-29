@@ -1,6 +1,7 @@
 package com.vibechat.service.streams;
 
 import com.vibechat.dto.enrichment.EnrichedMessage;
+import com.vibechat.service.room.RoomParticipantService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +27,7 @@ public class RedisStreamsProducerImpl implements RedisStreamsProducer {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final RoomParticipantService roomParticipantService;
 
     // Redis Streams 키 패턴
     private static final String ROOM_STREAM_KEY = "stream:room:{}";
@@ -34,6 +37,7 @@ public class RedisStreamsProducerImpl implements RedisStreamsProducer {
     @Override
     public String sendToRoom(Long roomId, EnrichedMessage message) {
         try {
+            // 1. Room Stream 발행 (기존 로직 유지)
             String streamKey = ROOM_STREAM_KEY.replace("{}", roomId.toString());
             Map<String, Object> messageData = buildMessageData(message);
 
@@ -50,12 +54,56 @@ public class RedisStreamsProducerImpl implements RedisStreamsProducer {
             log.info("Message published to room stream: roomId={}, messageId={}, type={}",
                 roomId, messageId, message.getMessageType());
 
+            // 2. 방 참가자들에게 User Stream 발행 (신규 로직 - 안전하게 추가)
+            try {
+                publishToParticipantStreams(roomId, message);
+            } catch (Exception e) {
+                // User Stream 발행 실패가 전체 프로세스를 중단시키지 않도록 예외를 로그만 기록
+                log.warn("Failed to publish to participant streams: roomId={}, messageId={}, error={}",
+                    roomId, messageId, e.getMessage());
+            }
+
             return messageId;
 
         } catch (Exception e) {
             log.error("Failed to publish message to room stream: roomId={}, message={}",
                 roomId, message, e);
             throw new RuntimeException("Failed to publish to room stream", e);
+        }
+    }
+
+    /**
+     * 방 참가자들에게 User Stream 발행 (신규 메서드)
+     */
+    private void publishToParticipantStreams(Long roomId, EnrichedMessage message) {
+        try {
+            List<Long> participants = roomParticipantService.getParticipants(roomId);
+
+            if (participants.isEmpty()) {
+                log.debug("No participants found for room: roomId={}", roomId);
+                return;
+            }
+
+            log.debug("Publishing to participant streams: roomId={}, participants={}",
+                roomId, participants.size());
+
+            // 각 참가자에게 개별 User Stream 발행
+            for (Long participantId : participants) {
+                try {
+                    sendToUser(participantId, message);
+                } catch (Exception e) {
+                    log.warn("Failed to publish to user stream: userId={}, roomId={}, error={}",
+                        participantId, roomId, e.getMessage());
+                    // 개별 사용자 발행 실패가 다른 사용자에게 영향을 주지 않도록 continue
+                }
+            }
+
+            log.info("Published to participant streams: roomId={}, participants={}",
+                roomId, participants.size());
+
+        } catch (Exception e) {
+            log.error("Failed to get room participants: roomId={}", roomId, e);
+            throw e; // 참가자 조회 실패는 상위로 전파
         }
     }
 
