@@ -64,12 +64,15 @@ public class WebSocketRoomService {
      * 방 퇴장 처리 - 모든 비즈니스 로직 포함
      */
     public void handleLeaveRoom(Long roomId, SimpMessageHeaderAccessor headerAccessor) {
+        String sessionId = headerAccessor.getSessionId();
+        log.info("[방 퇴장 시작] sessionId={}, roomId={}", sessionId, roomId);
+
         try {
-            String sessionId = headerAccessor.getSessionId();
             WebSocketSessionInfo sessionInfo = StomSessionUtil.extractSessionInfo(headerAccessor);
 
             // 인증 검증
             if (sessionInfo == null) {
+                log.error("[방 퇴장 인증 실패] sessionId={}, roomId={}", sessionId, roomId);
                 webSocketExceptionHandler.handleAuthenticationError(sessionId, "", "방 퇴장");
                 return;
             }
@@ -78,16 +81,22 @@ public class WebSocketRoomService {
                 sessionInfo.getUserId(), roomId, sessionId);
 
             // 비즈니스 로직 호출
+            log.info("[방 퇴장 비즈니스 로직 호출 시작] userId={}, roomId={}", sessionInfo.getUserId(), roomId);
             RoomLeaveResult result = chatRoomOperations.leaveRoom(roomId, sessionInfo);
+            log.info("[방 퇴장 비즈니스 로직 완료] userId={}, roomId={}, success={}",
+                sessionInfo.getUserId(), roomId, result.isSuccess());
 
             // 응답 처리
+            log.info("[방 퇴장 응답 처리 시작] sessionId={}, roomId={}", sessionId, roomId);
             chatResponseHandler.handleRoomLeaveResult(sessionId, result);
+            log.info("[방 퇴장 응답 처리 완료] sessionId={}, roomId={}", sessionId, roomId);
 
             log.info("[방 퇴장 처리 완료] userId={}, roomId={}, success={}",
                 sessionInfo.getUserId(), roomId, result.isSuccess());
 
         } catch (Exception e) {
-            webSocketExceptionHandler.handleRoomLeaveError(headerAccessor.getSessionId(), roomId, e);
+            log.error("[방 퇴장 처리 예외] sessionId={}, roomId={}, error={}", sessionId, roomId, e.getMessage(), e);
+            webSocketExceptionHandler.handleRoomLeaveError(sessionId, roomId, e);
         }
     }
 }

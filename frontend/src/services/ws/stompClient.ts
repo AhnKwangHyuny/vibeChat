@@ -220,7 +220,18 @@ class StompClient {
   }
 
   public sendRoomMessage(roomId: number, payload: unknown) {
-    this.publish(`/app/rooms/${roomId}/send`, JSON.stringify(payload));
+    const destination = `/app/rooms/${roomId}/send`;
+    const body = JSON.stringify(payload);
+
+    console.log(`🎯 [DEBUG] sendRoomMessage 호출:`, {
+      roomId,
+      destination,
+      payload,
+      isConnected: this.isConnected,
+      clientActive: this.client?.active
+    });
+
+    this.publish(destination, body);
   }
 
   public sendTyping(roomId: number, typing: boolean) {
@@ -341,7 +352,7 @@ class StompClient {
         }
       });
 
-      // 타임아웃 설정 (5초로 단축)
+      // 타임아웃 설정 (8초로 조정)
       const timeoutId = setTimeout(() => {
         if (!isResolved) {
           console.warn(`⏰ 방 퇴장 타임아웃: ${roomId}`);
@@ -350,7 +361,7 @@ class StompClient {
           errorSubscription?.unsubscribe();
           reject(new Error('방 퇴장 요청 시간 초과'));
         }
-      }, 5000);
+      }, 8000);
 
       // 실제 방 퇴장 요청 전송
       try {

@@ -69,10 +69,23 @@ export function useMessages(roomId: number): UseMessagesReturn {
 
   // 메시지 전송: WS로 Chat-Server에 발행 + 낙관적 UI 업데이트
   const sendMessage = useCallback(async (messageData: Omit<Message, 'id' | 'clientTempId' | 'roomId' | 'user' | 'createdAt'>): Promise<void> => {
+    console.log('🔍 [3] useMessages sendMessage 호출:', {
+      messageData: messageData,
+      userId: user.id,
+      nickname: user.nickname,
+      roomId: roomId
+    });
+
     if (!user.id || !user.nickname) {
+      console.log('🔍 [3] 사용자 인증 실패:', {
+        userId: user.id,
+        nickname: user.nickname
+      });
       toast.error('사용자 인증이 필요합니다.');
       return;
     }
+
+    console.log('🔍 [3] 사용자 인증 성공, 메시지 생성 시작');
 
     const clientTempId = uuidv4();
     const optimistic: Message = {
@@ -89,6 +102,19 @@ export function useMessages(roomId: number): UseMessagesReturn {
 
     try {
       // WebSocket으로 Chat-Server에 메시지 전송
+      console.log('🔍 [3] stompClient.sendRoomMessage 호출 시작:', {
+        roomId: roomId,
+        clientTempId: clientTempId,
+        payload: {
+          clientTempId,
+          type: messageData.type,
+          contentText: messageData.contentText,
+          mediaUrl: messageData.mediaUrl,
+          mediaThumbUrl: messageData.mediaThumbUrl,
+          mediaDurationSec: messageData.mediaDurationSec,
+        }
+      });
+
       await stompClient.sendRoomMessage(roomId, {
         clientTempId,
         type: messageData.type,
@@ -97,7 +123,8 @@ export function useMessages(roomId: number): UseMessagesReturn {
         mediaThumbUrl: messageData.mediaThumbUrl,
         mediaDurationSec: messageData.mediaDurationSec,
       });
-      console.log('Message sent via WebSocket:', { roomId, clientTempId });
+
+      console.log('🔍 [3] stompClient.sendRoomMessage 호출 완료:', { roomId, clientTempId });
     } catch (error) {
       console.error('Failed to send message:', error);
       // 실패 시 낙관적 업데이트 롤백

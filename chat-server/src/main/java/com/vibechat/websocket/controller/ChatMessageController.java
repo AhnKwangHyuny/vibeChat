@@ -3,6 +3,9 @@ package com.vibechat.websocket.controller;
 import com.vibechat.dto.SendMessagePayload;
 import com.vibechat.service.websocket.WebSocketMessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class ChatMessageController {
 
     private final WebSocketMessageService webSocketMessageService;
@@ -32,6 +36,10 @@ public class ChatMessageController {
     public void sendMessage(@DestinationVariable Long roomId,
                             @Payload SendMessagePayload payload,
                             SimpMessageHeaderAccessor headerAccessor) {
+
+        log.info("[DEBUG] ChatMessageController 메시지 수신 - roomId={}, type={}, content={}, clientTempId={}",
+                roomId, payload.getType(), payload.getContentText(), payload.getClientTempId());
+
         webSocketMessageService.handleSendMessage(roomId, payload, headerAccessor);
     }
 }

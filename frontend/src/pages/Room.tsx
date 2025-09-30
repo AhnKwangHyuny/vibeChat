@@ -210,19 +210,20 @@ export default function Room() {
     enterRoomWorkflow();
 
     return () => {
-      // 컴포넌트 언마운트 시 방 퇴장 워크플로우 실행
-      if (parsedRoomId) {
-        console.log('[ROOM] Starting room exit workflow', { roomId: parsedRoomId });
-        // 타임아웃 처리와 함께 방 퇴장
-        Promise.race([
-          stompClient.exitRoom(parsedRoomId),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Exit timeout')), 3000))
-        ]).catch((error) => {
-          console.error('[ROOM] Room exit workflow failed', error);
-          // 타임아웃이나 오류 발생 시에도 상태 정리
-          setIsWebSocketConnected(false);
-        });
-      }
+      // React StrictMode 이중 실행 방지
+      if (!parsedRoomId) return;
+
+      console.log('[ROOM] Starting room exit workflow', { roomId: parsedRoomId });
+
+      // 방 퇴장 워크플로우 (타임아웃 10초로 연장)
+      Promise.race([
+        stompClient.exitRoom(parsedRoomId),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Exit timeout')), 10000))
+      ]).catch((error) => {
+        console.error('[ROOM] Room exit workflow failed', error);
+        // 타임아웃이나 오류 발생 시에도 상태 정리
+        setIsWebSocketConnected(false);
+      });
     };
   }, [isAuthenticated, user.id, user.nickname, user.avatarUrl, parsedRoomId]);
 
@@ -254,9 +255,27 @@ export default function Room() {
     mediaThumbUrl?: string;
     mediaDurationSec?: number;
   }) => {
-    if (!messageInput.trim() && payload.type === 'TEXT') return;
+    console.log('🔍 [2] Room doSendMessage 실행:', {
+      payload: payload,
+      messageInput: messageInput,
+      hasContentText: !!payload.contentText,
+      finalContentText: payload.contentText || messageInput
+    });
 
-    console.log('[ROOM] Sending message', payload);
+    // TEXT 타입일 때는 contentText나 messageInput 중 하나는 있어야 함
+    if (payload.type === 'TEXT' && !payload.contentText?.trim() && !messageInput.trim()) {
+      console.log('🔍 [2] Room doSendMessage 빈 텍스트로 인해 중단');
+      return;
+    }
+
+    console.log('🔍 [2] Room useMessages.sendMessage 호출 예정:', {
+      type: payload.type,
+      contentText: payload.contentText || messageInput,
+      mediaUrl: payload.mediaUrl,
+      mediaThumbUrl: payload.mediaThumbUrl,
+      mediaDurationSec: payload.mediaDurationSec,
+    });
+
     sendMessage({
       type: payload.type,
       contentText: payload.contentText || messageInput,
@@ -264,15 +283,32 @@ export default function Room() {
       mediaThumbUrl: payload.mediaThumbUrl,
       mediaDurationSec: payload.mediaDurationSec,
     });
+
+    console.log('🔍 [2] Room useMessages.sendMessage 호출 완료');
     setMessageInput('');
   }, [messageInput, sendMessage]);
 
   /**
    * 텍스트 메시지 전송 핸들러
    */
-  const handleSendMessage = () => {
-    if (!messageInput.trim()) return;
-    doSendMessage({ type: 'TEXT', contentText: messageInput });
+  const handleSendMessage = (content: string) => {
+    console.log('🔍 [2] Room handleSendMessage 호출:', {
+      content: content,
+      contentLength: content.length,
+      contentTrimmed: content.trim()
+    });
+
+    if (!content.trim()) {
+      console.log('🔍 [2] Room handleSendMessage 빈 내용으로 리턴');
+      return;
+    }
+
+    console.log('🔍 [2] Room doSendMessage 호출 예정:', {
+      type: 'TEXT',
+      contentText: content.trim()
+    });
+    doSendMessage({ type: 'TEXT', contentText: content.trim() });
+    console.log('🔍 [2] Room doSendMessage 호출 완료');
   };
 
   /**

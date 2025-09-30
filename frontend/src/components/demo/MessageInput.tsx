@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { cn } from '../../utils/cn';
@@ -29,19 +29,59 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const [message, setMessage] = useState('');
   const [isComposing, setIsComposing] = useState(false);
 
+  // 컴포넌트 마운트 시 props 상태 로깅
+  useEffect(() => {
+    console.log('🔍 [1] MessageInput 컴포넌트 마운트:', {
+      disabled: disabled,
+      placeholder: placeholder,
+      onSendMessageExists: !!onSendMessage,
+      onSendMessageType: typeof onSendMessage
+    });
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔍 [1] MessageInput handleSubmit 호출:', {
+      message: message,
+      messageLength: message.length,
+      messageTrimmed: message.trim(),
+      disabled: disabled,
+      onSendMessageExists: !!onSendMessage,
+      onSendMessageType: typeof onSendMessage
+    });
+
     if (message.trim() && !disabled) {
-      onSendMessage(message.trim());
-      setMessage('');
-      onTypingChange?.(false);
+      console.log('🔍 [1] MessageInput onSendMessage 호출 예정:', message.trim());
+      try {
+        onSendMessage(message.trim());
+        console.log('🔍 [1] MessageInput onSendMessage 호출 완료');
+        setMessage('');
+        onTypingChange?.(false);
+      } catch (error) {
+        console.error('🔍 [1] MessageInput onSendMessage 에러:', error);
+      }
+    } else {
+      console.log('🔍 [1] MessageInput 전송 조건 실패:', {
+        hasMessage: !!message.trim(),
+        notDisabled: !disabled,
+        message: message,
+        messageValue: message
+      });
     }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setMessage(value);
-    
+
+    console.log('🔍 [1] MessageInput 입력값 변경:', {
+      value: value,
+      trimmed: value.trim(),
+      hasContent: !!value.trim(),
+      disabled: disabled,
+      buttonShouldBeEnabled: !(!value.trim() || disabled)
+    });
+
     if (value.trim() && !isComposing) {
       onTypingChange?.(true);
     } else if (!value.trim()) {
@@ -146,6 +186,14 @@ const MessageInput: React.FC<MessageInputProps> = ({
           disabled={!message.trim() || disabled}
           size={"sm"}
           className="px-3 sm:px-5 h-[42px] ml-auto order-4 sm:order-none mr-0"
+          onClick={(e) => {
+            console.log('🔍 [1] MessageInput Button 클릭:', {
+              buttonType: 'submit',
+              message: message,
+              disabled: disabled,
+              isSubmitDisabled: !message.trim() || disabled
+            });
+          }}
         >
           <span className="hidden sm:inline">전송</span>
           <span className="sm:hidden">

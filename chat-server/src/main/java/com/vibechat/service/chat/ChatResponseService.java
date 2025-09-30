@@ -163,7 +163,7 @@ public class ChatResponseService implements ChatResponseHandler {
             );
 
             messagingTemplate.convertAndSendToUser(sessionId, "/queue/room-leave-response", response);
-            log.debug("[방 퇴장 성공 응답 전송] sessionId={}, roomId={}", sessionId, result.getRoomId());
+            log.info("[방 퇴장 성공 응답 전송] sessionId={}, roomId={}, response={}", sessionId, result.getRoomId(), response);
         } catch (Exception e) {
             log.error("[방 퇴장 성공 응답 전송 실패] sessionId={}, roomId={}", sessionId, result.getRoomId(), e);
         }
