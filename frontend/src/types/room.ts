@@ -3,6 +3,8 @@
  * 방(Room) 관련 도메인 모델 정의
  */
 
+import { MessageReaction } from './message';
+
 // 방 공개 설정
 export type RoomPrivacy = 'PUBLIC' | 'PRIVATE';
 
@@ -132,3 +134,29 @@ export interface DeleteRoomResponse {
   success: boolean;
   message: string;
 }
+
+// WebSocket 메시지 응답 타입
+export interface WebSocketMessageResponse {
+  id: number;
+  clientTempId?: string;
+  roomId: number;
+  user: { id: number; nickname: string; avatarUrl?: string };
+  type: 'TEXT' | 'IMAGE' | 'GIF' | 'VIDEO';
+  contentText?: string;
+  mediaUrl?: string;
+  mediaThumbUrl?: string;
+  mediaDurationSec?: number;
+  createdAt: string;
+}
+
+// 온라인 사용자 타입
+export interface OnlineUser {
+  id: string;
+  nickname: string;
+  status: 'online' | 'away' | 'offline';
+  avatarUrl?: string;
+  lastSeen?: string;
+}
+
+// MessageReaction은 ./message에서 import함
+export { MessageReaction };

@@ -1,14 +1,19 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { clearUser } from '../store/userSlice';
 import { useRooms } from '../hooks/useRooms';
 import { useMessages } from '../hooks/useMessages';
-import { useSessionAuth } from '../hooks/useSessionAuth';
-import { useSupabaseAuth } from '../hooks/useSupabaseAuth';
 import { stompClient } from '../services/ws/stompClient';
+
+// 새로운 커스텀 훅들 import
+import { useRoomUIState } from '../hooks/room/useRoomUIState';
+import { useRoomConnection } from '../hooks/room/useRoomConnection';
+import { useRoomNavigation } from '../hooks/room/useRoomNavigation';
+import { useFileUpload } from '../hooks/room/useFileUpload';
+import { useSessionAuth } from '../hooks/useSessionAuth';
+import type { WebSocketMessageResponse, Room as RoomType } from '../types/room';
 
 // UI 컴포넌트 임포트
 import { Button } from '../components/ui/Button';
@@ -31,34 +36,7 @@ import NotificationBadge from '../components/ui/NotificationBadge';
 import ContextMenu from '../components/ui/ContextMenu';
 import ThreadView from '../components/demo/ThreadView';
 
-/**
- * WebSocket 메시지 응답 타입
- */
-interface WebSocketMessageResponse {
-  id: number;
-  clientTempId?: string;
-  roomId: number;
-  user: { id: number; nickname: string; avatarUrl?: string };
-  type: 'TEXT' | 'IMAGE' | 'GIF' | 'VIDEO';
-  contentText?: string;
-  mediaUrl?: string;
-  mediaThumbUrl?: string;
-  mediaDurationSec?: number;
-  createdAt: string;
-}
-
-/**
- * 방 정보 타입
- */
-interface Room {
-  id: number;
-  title: string;
-  description?: string;
-  isPrivate: boolean;
-  tags: string[];
-  participantsCount: number;
-  lastMessageAt?: string;
-}
+// 타입 정의는 ../types/room에서 import
 
 /**
  * 채팅방 페이지 컴포넌트
@@ -73,67 +51,43 @@ interface Room {
 export default function Room() {
   // === 라우터 및 기본 상태 ===
   const { roomId } = useParams<{ roomId: string }>();
-  const navigate = useNavigate();
   const parsedRoomId = roomId ? parseInt(roomId) : undefined;
-
-  // === 커스텀 훅 ===
-  const { getRoomById, isLoading: isLoadingRoom } = useRooms();
-  const { messages, isLoading, sendMessage, typingUsers, onlineCount } = useMessages(parsedRoomId || 0);
-  const { signOut: sessionSignOut } = useSessionAuth();
-  const { signOut: supabaseSignOut } = useSupabaseAuth();
 
   // === Redux 상태 ===
   const user = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch();
 
-  // 인증 상태 계산 (엄격한 검증)
-  const isAuthenticated = !!(
-    user.id &&
-    user.nickname &&
-    user.id !== '' &&
-    user.nickname !== '' &&
-    user.id !== null &&
-    user.nickname !== null
-  );
+  // === 세션 인증 (단일 소스) ===
+  const { isAuthenticated, isCheckingAuth } = useSessionAuth();
 
-  // === 로컬 상태 ===
-  const [room, setRoom] = useState<Room | null>(null);
-  const [messageInput, setMessageInput] = useState('');
-  const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
+  // === 커스텀 훅들 (리팩토링됨) ===
+  const { getRoomById, isLoading: isLoadingRoom } = useRooms();
+  const { messages, isLoading, sendMessage, typingUsers, onlineCount } = useMessages(parsedRoomId && parsedRoomId > 0 ? parsedRoomId : 0);
 
-  // UI 상태
-  const [showUserList, setShowUserList] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [showContextMenu, setShowContextMenu] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
-  const [selectedMessage, setSelectedMessage] = useState<WebSocketMessageResponse | null>(null);
-  const [showThreadView, setShowThreadView] = useState(false);
-  const [activeActionsId, setActiveActionsId] = useState<number | string | null>(null);
-  const [threadParentMessage, setThreadParentMessage] = useState<WebSocketMessageResponse | null>(null);
-  const [messageReactions, setMessageReactions] = useState<Record<number, Array<{emoji: string; count: number; users: string[]}>>>({});
+  // UI 상태 관리 훅
+  const uiState = useRoomUIState();
 
-  // 온라인 사용자 목록 (향후 실제 API 연동)
-  const [onlineUsers, setOnlineUsers] = useState<Array<{
-    id: string;
-    nickname: string;
-    status: 'online' | 'away' | 'offline';
-    avatarUrl?: string;
-    lastSeen?: string;
-  }>>([]);
+  // WebSocket 연결 관리 훅
+  const roomConnection = useRoomConnection({
+    roomId: parsedRoomId || 0,
+    userId: user.id,
+    nickname: user.nickname,
+    avatarUrl: user.avatarUrl,
+    isAuthenticated,
+  });
 
+  // 네비게이션 관리 훅
+  const roomNavigation = useRoomNavigation({
+    roomId: parsedRoomId || 0,
+    userProvider: user.provider,
+    onRoomExit: roomConnection.disconnect,
+  });
+
+  // 파일 업로드 훅
+  const { handleFileUpload } = useFileUpload();
+
+  // === 간소화된 로컬 상태 (UI 상태는 uiState 훅으로 이관) ===
+  const [room, setRoom] = useState<RoomType | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // 전역 에러 핸들러
-  const handleFatalError = useCallback((error: Error, context: string) => {
-    console.error(`[ROOM] Fatal error in ${context}:`, error);
-    toast.error(`오류가 발생했습니다: ${error.message}`);
-
-    // 3초 후 자동으로 홈으로 리다이렉트
-    setTimeout(() => {
-      navigate('/', { replace: true });
-    }, 3000);
-  }, [navigate]);
 
   // === 디버깅용 로그 ===
   useEffect(() => {
@@ -150,6 +104,12 @@ export default function Room() {
    */
   useEffect(() => {
     const loadRoom = async () => {
+      // 인증 체크 중이거나 인증되지 않은 경우 API 호출하지 않음
+      if (isCheckingAuth || !isAuthenticated || !parsedRoomId) {
+        console.log('[ROOM] Skipping room load:', { isCheckingAuth, isAuthenticated, parsedRoomId });
+        return;
+      }
+
       if (parsedRoomId && isAuthenticated) {
         try {
           console.log('[ROOM] Loading room data', { roomId: parsedRoomId });
@@ -161,14 +121,14 @@ export default function Room() {
           } else {
             console.warn('[ROOM] Room not found');
             toast.error('존재하지 않는 방입니다.');
-            navigate('/');
+            roomNavigation.navigateToHome();
           }
         } catch (error: any) {
           console.error('[ROOM] Failed to load room', error);
 
           if (error?.status === 404 || error?.status === 400) {
             toast.error('존재하지 않는 방입니다.');
-            navigate('/');
+            roomNavigation.navigateToHome();
           } else {
             toast.error('방을 불러오는데 실패했습니다.');
           }
@@ -177,55 +137,9 @@ export default function Room() {
     };
 
     loadRoom();
-  }, [parsedRoomId, isAuthenticated, getRoomById, navigate]);
+  }, [parsedRoomId, isAuthenticated, isCheckingAuth, getRoomById]);
 
-  // === 통합 방 입장 워크플로우 ===
-  useEffect(() => {
-    if (!isAuthenticated || !parsedRoomId) {
-      return; // 인증되지 않거나 방 ID가 없으면 연결하지 않음
-    }
-
-    const enterRoomWorkflow = async () => {
-      try {
-        console.log('[ROOM] Starting unified room entry workflow', {
-          roomId: parsedRoomId,
-          userId: user.id,
-          nickname: user.nickname
-        });
-
-        // 통합 방 입장 워크플로우 실행
-        await stompClient.enterRoom(parsedRoomId, user.id, user.nickname, user.avatarUrl || undefined);
-
-        setIsWebSocketConnected(true);
-        toast.success('실시간 채팅에 연결되었습니다.');
-
-        console.log('[ROOM] Room entry workflow completed successfully');
-      } catch (error) {
-        console.error('[ROOM] Room entry workflow failed', error);
-        toast.error('방 입장에 실패했습니다.');
-        setIsWebSocketConnected(false);
-      }
-    };
-
-    enterRoomWorkflow();
-
-    return () => {
-      // React StrictMode 이중 실행 방지
-      if (!parsedRoomId) return;
-
-      console.log('[ROOM] Starting room exit workflow', { roomId: parsedRoomId });
-
-      // 방 퇴장 워크플로우 (타임아웃 10초로 연장)
-      Promise.race([
-        stompClient.exitRoom(parsedRoomId),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Exit timeout')), 10000))
-      ]).catch((error) => {
-        console.error('[ROOM] Room exit workflow failed', error);
-        // 타임아웃이나 오류 발생 시에도 상태 정리
-        setIsWebSocketConnected(false);
-      });
-    };
-  }, [isAuthenticated, user.id, user.nickname, user.avatarUrl, parsedRoomId]);
+  // WebSocket 연결 관리는 useRoomConnection 훅에서 처리됨
 
   // === 라이프사이클: 스크롤 관리 ===
   /**
@@ -238,165 +152,64 @@ export default function Room() {
   }, [messages]);
 
   /**
-   * 방 변경 시 리액션 데이터 초기화
+   * 방 변경 시 UI 상태 초기화
    */
   useEffect(() => {
-    setMessageReactions({});
-  }, [parsedRoomId]);
+    uiState.resetUI();
+  }, [parsedRoomId, uiState.resetUI]);
 
-  // === 이벤트 핸들러: 메시지 전송 ===
-  /**
-   * 메시지 전송 공통 로직
-   */
-  const doSendMessage = useCallback((payload: {
-    type: 'TEXT' | 'IMAGE' | 'GIF' | 'VIDEO';
-    contentText?: string;
-    mediaUrl?: string;
-    mediaThumbUrl?: string;
-    mediaDurationSec?: number;
-  }) => {
-    console.log('🔍 [2] Room doSendMessage 실행:', {
-      payload: payload,
-      messageInput: messageInput,
-      hasContentText: !!payload.contentText,
-      finalContentText: payload.contentText || messageInput
-    });
-
-    // TEXT 타입일 때는 contentText나 messageInput 중 하나는 있어야 함
-    if (payload.type === 'TEXT' && !payload.contentText?.trim() && !messageInput.trim()) {
-      console.log('🔍 [2] Room doSendMessage 빈 텍스트로 인해 중단');
-      return;
-    }
-
-    console.log('🔍 [2] Room useMessages.sendMessage 호출 예정:', {
-      type: payload.type,
-      contentText: payload.contentText || messageInput,
-      mediaUrl: payload.mediaUrl,
-      mediaThumbUrl: payload.mediaThumbUrl,
-      mediaDurationSec: payload.mediaDurationSec,
-    });
-
-    sendMessage({
-      type: payload.type,
-      contentText: payload.contentText || messageInput,
-      mediaUrl: payload.mediaUrl,
-      mediaThumbUrl: payload.mediaThumbUrl,
-      mediaDurationSec: payload.mediaDurationSec,
-    });
-
-    console.log('🔍 [2] Room useMessages.sendMessage 호출 완료');
-    setMessageInput('');
-  }, [messageInput, sendMessage]);
-
+  // === 이벤트 핸들러: 메시지 전송 (간소화됨) ===
   /**
    * 텍스트 메시지 전송 핸들러
    */
-  const handleSendMessage = (content: string) => {
-    console.log('🔍 [2] Room handleSendMessage 호출:', {
-      content: content,
-      contentLength: content.length,
-      contentTrimmed: content.trim()
-    });
+  const handleSendMessage = useCallback((content: string) => {
+    if (!content.trim()) return;
 
-    if (!content.trim()) {
-      console.log('🔍 [2] Room handleSendMessage 빈 내용으로 리턴');
-      return;
-    }
-
-    console.log('🔍 [2] Room doSendMessage 호출 예정:', {
+    sendMessage({
       type: 'TEXT',
-      contentText: content.trim()
+      contentText: content.trim(),
     });
-    doSendMessage({ type: 'TEXT', contentText: content.trim() });
-    console.log('🔍 [2] Room doSendMessage 호출 완료');
-  };
+  }, [sendMessage]);
 
   /**
-   * 파일 업로드 핸들러 (임시 구현)
+   * 파일 업로드 핸들러 (최적화됨)
    */
-  const handleFileUpload = (file: File) => {
-    console.log('[ROOM] File upload requested', { fileName: file.name, fileType: file.type });
+  const handleFileUploadOptimized = useCallback(async (file: File) => {
+    const result = await handleFileUpload(file);
 
-    // 임시 URL 생성 (실제 구현 시 서버 업로드 필요)
-    const mockUrl = URL.createObjectURL(file);
-    const mockThumbUrl = file.type.startsWith('image/') ? mockUrl : undefined;
-
-    doSendMessage({
-      type: file.type.startsWith('image/') ? 'IMAGE' : 'VIDEO',
-      mediaUrl: mockUrl,
-      mediaThumbUrl: mockThumbUrl,
-      mediaDurationSec: file.type.startsWith('video/') ? 30 : undefined
-    });
-  };
-
-  // === 이벤트 핸들러: 방 관리 ===
-  /**
-   * 방 나가기 핸들러 (통합 워크플로우 사용)
-   */
-  const handleLeaveRoom = async () => {
-    console.log('[ROOM] User leaving room');
-
-    try {
-      // 통합 방 퇴장 워크플로우 실행
-      if (parsedRoomId) {
-        console.log('[ROOM] Executing room exit workflow');
-        await stompClient.exitRoom(parsedRoomId);
-      }
-
-      toast.success("방에서 나왔습니다.");
-      navigate('/');
-    } catch (error) {
-      console.error('[ROOM] Error during room leave:', error);
-      toast.error("방 나가기 중 오류가 발생했습니다.");
-      // 에러가 발생해도 페이지는 이동
-      navigate('/');
+    if (result) {
+      sendMessage({
+        type: result.type,
+        mediaUrl: result.mediaUrl,
+        mediaThumbUrl: result.mediaThumbUrl,
+        mediaDurationSec: result.mediaDurationSec,
+      });
     }
-  };
+  }, [handleFileUpload, sendMessage]);
 
-  /**
-   * 로그인 페이지로 이동
-   */
-  const handleLogin = () => {
-    navigate('/');
-  };
-
-  /**
-   * 로그아웃 핸들러
-   * 소셜 로그인과 세션 로그인을 모두 처리
-   */
-  const handleLogout = async () => {
-    console.log('[ROOM] Initiating logout process');
-
-    try {
-      // 1. 소셜 로그인 사용자의 경우 Supabase 세션 종료
-      if (user.provider === 'GOOGLE') {
-        await supabaseSignOut();
-        console.log('[ROOM] Supabase session terminated');
-      }
-
-      // 2. 백엔드 세션 종료 (모든 사용자 공통)
-      await sessionSignOut();
-      console.log('[ROOM] Backend session terminated');
-
-      toast.success("성공적으로 로그아웃되었습니다.");
-    } catch (error) {
-      console.error('[ROOM] Logout failed', error);
-      toast.error("로그아웃 중 문제가 발생했습니다. 페이지를 새로고침합니다.");
-
-      // 강제 정리 및 새로고침
-      dispatch(clearUser());
-      window.location.reload();
-    }
-  };
+  // 방 관리 로직은 roomNavigation 훅에서 처리됨
 
   // === 조건부 렌더링 ===
+  // 세션 체크 중
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-background-primary flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="xl" />
+          <p className="mt-4 text-foreground-muted">인증 확인 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 인증되지 않은 사용자
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background-primary flex items-center justify-center">
         <Card className="p-8 text-center">
           <h2 className="text-2xl font-bold text-foreground-primary mb-4">로그인이 필요합니다</h2>
           <p className="text-foreground-muted mb-6">채팅방에 참여하려면 먼저 로그인해주세요.</p>
-          <Button onClick={handleLogin}>
+          <Button onClick={roomNavigation.handleLogin}>
             홈으로 가서 로그인하기
           </Button>
         </Card>
@@ -420,9 +233,13 @@ export default function Room() {
     <div className="min-h-screen bg-background-primary flex flex-col">
       {/* 상단 네비게이션 */}
       <Navbar
-        user={isAuthenticated ? { id: user.id, nickname: user.nickname, avatarUrl: user.avatarUrl } : undefined}
-        onLogin={handleLogin}
-        onLogout={handleLogout}
+        user={isAuthenticated ? {
+          id: user.id || '',
+          nickname: user.nickname || '',
+          avatarUrl: user.avatarUrl || undefined
+        } : undefined}
+        onLogin={roomNavigation.handleLogin}
+        onLogout={roomNavigation.handleLogout}
       />
 
       {/* 방 헤더 */}
@@ -434,7 +251,7 @@ export default function Room() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/')}
+                onClick={roomNavigation.navigateToHome}
                 className="flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,9 +269,9 @@ export default function Room() {
             <div className="flex items-center gap-4">
               {/* WebSocket 연결 상태 */}
               <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${isWebSocketConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <div className={`w-2 h-2 rounded-full ${roomConnection.isWebSocketConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
                 <span className="text-xs text-foreground-muted">
-                  {isWebSocketConnected ? '실시간' : '연결 중...'}
+                  {roomConnection.isWebSocketConnected ? '실시간' : '연결 중...'}
                 </span>
               </div>
 
@@ -463,7 +280,7 @@ export default function Room() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowUserList(!showUserList)}
+                  onClick={uiState.toggleUserList}
                   className="flex items-center gap-2"
                 >
                   <div className="w-2 h-2 bg-semantic-success rounded-full"></div>
@@ -487,7 +304,7 @@ export default function Room() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setShowLeaveModal(true)}
+                onClick={uiState.toggleLeaveModal}
               >
                 Leave Room
               </Button>
@@ -528,11 +345,13 @@ export default function Room() {
                   className="relative"
                   onContextMenu={(e) => {
                     e.preventDefault();
-                    setSelectedMessage(message);
-                    setContextMenuPosition({ x: e.clientX, y: e.clientY });
-                    setShowContextMenu(true);
+                    uiState.showContextMenu(e.clientX, e.clientY, message);
                   }}
-                  onClick={() => setActiveActionsId(prev => (prev === (message.id || message.clientTempId) ? null : (message.id || message.clientTempId)!))}
+                  onClick={() => uiState.setActiveActions(
+                    uiState.activeActionsId === (message.id || message.clientTempId)
+                      ? null
+                      : (message.id || message.clientTempId)!
+                  )}
                 >
                   <ChatMessage
                     id={(message.id || message.clientTempId || '').toString()}
@@ -554,14 +373,13 @@ export default function Room() {
                   {/* 메시지 액션 버튼 */}
                   <div className={cn(
                     'absolute top-0 right-0 transition-opacity',
-                    activeActionsId === (message.id || message.clientTempId) ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    uiState.activeActionsId === (message.id || message.clientTempId) ? 'opacity-100' : 'opacity-0 pointer-events-none'
                   )}>
                     <MessageActions
                       messageId={message.id.toString()}
-                      active={activeActionsId === (message.id || message.clientTempId)}
+                      active={uiState.activeActionsId === (message.id || message.clientTempId)}
                       onReply={() => {
-                        setThreadParentMessage(message);
-                        setShowThreadView(true);
+                        uiState.showThreadView(message);
                       }}
                       onEdit={() => toast.info('메시지 수정 기능은 곧 제공될 예정입니다!')}
                       onDelete={() => {
@@ -573,62 +391,21 @@ export default function Room() {
                         const emojis = ['👍', '❤️', '😂', '😮', '😢', '😡'];
                         const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
-                        setMessageReactions(prev => {
-                          const existing = prev[message.id] || [];
-                          const existingReaction = existing.find(r => r.emoji === randomEmoji);
-
-                          if (existingReaction) {
-                            return {
-                              ...prev,
-                              [message.id]: existing.map(r =>
-                                r.emoji === randomEmoji
-                                  ? { ...r, count: r.count + 1, users: [...r.users, user.nickname] }
-                                  : r
-                              )
-                            };
-                          } else {
-                            return {
-                              ...prev,
-                              [message.id]: [...existing, { emoji: randomEmoji, count: 1, users: [user.nickname] }]
-                            };
-                          }
-                        });
+                        uiState.addMessageReaction(message.id, randomEmoji, user.nickname || 'Unknown');
                       }}
                       isOwn={message.user.id === parseInt(user.id || '0')}
                     />
                   </div>
 
                   {/* 메시지 리액션 */}
-                  {messageReactions[message.id] && (
+                  {uiState.messageReactions[message.id] && (
                     <MessageReactions
-                      reactions={messageReactions[message.id]}
+                      reactions={uiState.messageReactions[message.id]}
                       onReactionAdd={(emoji) => {
-                        setMessageReactions(prev => {
-                          const existing = prev[message.id] || [];
-                          const existingReaction = existing.find(r => r.emoji === emoji);
-
-                          if (existingReaction) {
-                            return {
-                              ...prev,
-                              [message.id]: existing.map(r =>
-                                r.emoji === emoji
-                                  ? { ...r, count: r.count + 1, users: [...r.users, user.nickname] }
-                                  : r
-                              )
-                            };
-                          } else {
-                            return {
-                              ...prev,
-                              [message.id]: [...existing, { emoji, count: 1, users: [user.nickname] }]
-                            };
-                          }
-                        });
+                        uiState.addMessageReaction(message.id, emoji, user.nickname || 'Unknown');
                       }}
                       onReactionRemove={(emoji) => {
-                        setMessageReactions(prev => ({
-                          ...prev,
-                          [message.id]: (prev[message.id] || []).filter(r => r.emoji !== emoji)
-                        }));
+                        uiState.removeMessageReaction(message.id, emoji);
                       }}
                       currentUserId={user.id || ''}
                     />
@@ -656,10 +433,10 @@ export default function Room() {
           <div className="relative">
             <MessageInput
               onSendMessage={handleSendMessage}
-              onFileUpload={handleFileUpload}
-              onEmojiClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              onFileUpload={handleFileUploadOptimized}
+              onEmojiClick={uiState.toggleEmojiPicker}
               placeholder="메시지를 입력하세요..."
-              disabled={!isAuthenticated}
+              disabled={!roomConnection.isWebSocketConnected}
               onTypingChange={(typing) => {
                 if (parsedRoomId) stompClient.sendTyping(parsedRoomId, !!typing);
               }}
@@ -668,11 +445,12 @@ export default function Room() {
             {/* 이모지 피커 */}
             <div className="absolute bottom-full right-4">
               <EmojiPicker
-                isOpen={showEmojiPicker}
-                onClose={() => setShowEmojiPicker(false)}
+                isOpen={uiState.showEmojiPicker}
+                onClose={uiState.toggleEmojiPicker}
                 onEmojiSelect={(emoji) => {
-                  setMessageInput(prev => prev + emoji);
-                  setShowEmojiPicker(false);
+                  // MessageInput 컴포넌트에서 직접 처리하도록 수정 필요
+                  console.log('[ROOM] Emoji selected:', emoji);
+                  uiState.toggleEmojiPicker();
                 }}
               />
             </div>
@@ -680,12 +458,12 @@ export default function Room() {
         </div>
 
         {/* 사용자 목록 사이드바 */}
-        {showUserList && (
+        {uiState.showUserList && (
           <div className="w-80 border-l border-border-default bg-background-secondary">
             <UserList
-              users={onlineUsers}
+              users={uiState.onlineUsers}
               onUserClick={(userId) => {
-                toast.info(`${onlineUsers.find(u => u.id === userId)?.nickname}님과의 DM 기능은 곧 제공될 예정입니다!`);
+                toast.info(`${uiState.onlineUsers.find(u => u.id === userId)?.nickname}님과의 DM 기능은 곧 제공될 예정입니다!`);
               }}
               title="채팅방 참여자"
               className="h-full border-none rounded-none"
@@ -695,22 +473,22 @@ export default function Room() {
       </div>
 
       {/* 방 나가기 모달 */}
-      <Modal isOpen={showLeaveModal} onClose={() => setShowLeaveModal(false)} title="Leave Room">
+      <Modal isOpen={uiState.showLeaveModal} onClose={uiState.toggleLeaveModal} title="Leave Room">
         <p className="text-foreground-muted">
           Are you sure you want to leave "{room.title}"? You'll need to rejoin to continue the conversation.
         </p>
         <div className="mt-6 flex justify-end gap-2">
-          <Button variant="secondary" onClick={() => setShowLeaveModal(false)}>
+          <Button variant="secondary" onClick={uiState.toggleLeaveModal}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleLeaveRoom}>
+          <Button variant="primary" onClick={roomNavigation.handleLeaveRoom}>
             Leave Room
           </Button>
         </div>
       </Modal>
 
       {/* 컨텍스트 메뉴 */}
-      {showContextMenu && selectedMessage && (
+      {uiState.showContextMenu && uiState.selectedMessage && (
         <ContextMenu
           items={[
             {
@@ -718,8 +496,7 @@ export default function Room() {
               label: '답글',
               icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>,
               onClick: () => {
-                setThreadParentMessage(selectedMessage);
-                setShowThreadView(true);
+                uiState.showThreadView(uiState.selectedMessage!);
               }
             },
             {
@@ -730,26 +507,9 @@ export default function Room() {
                 const emojis = ['👍', '❤️', '😂', '😮', '😢', '😡'];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
-                setMessageReactions(prev => {
-                  const existing = prev[selectedMessage.id] || [];
-                  const existingReaction = existing.find(r => r.emoji === randomEmoji);
-
-                  if (existingReaction) {
-                    return {
-                      ...prev,
-                      [selectedMessage.id]: existing.map(r =>
-                        r.emoji === randomEmoji
-                          ? { ...r, count: r.count + 1, users: [...r.users, user.nickname] }
-                          : r
-                      )
-                    };
-                  } else {
-                    return {
-                      ...prev,
-                      [selectedMessage.id]: [...existing, { emoji: randomEmoji, count: 1, users: [user.nickname] }]
-                    };
-                  }
-                });
+                if (uiState.selectedMessage) {
+                  uiState.addMessageReaction(uiState.selectedMessage.id, randomEmoji, user.nickname || 'Unknown');
+                }
               }
             },
             {
@@ -757,11 +517,11 @@ export default function Room() {
               label: '복사',
               icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>,
               onClick: () => {
-                navigator.clipboard.writeText(selectedMessage.contentText || '');
+                navigator.clipboard.writeText(uiState.selectedMessage?.contentText || '');
                 toast.success('메시지가 클립보드에 복사되었습니다.');
               }
             },
-            ...(selectedMessage.user.id === parseInt(user.id || '0') ? [
+            ...(uiState.selectedMessage?.user.id === parseInt(user.id || '0') ? [
               {
                 id: 'edit',
                 label: '수정',
@@ -787,20 +547,20 @@ export default function Room() {
               }
             ])
           ]}
-          position={contextMenuPosition}
-          onClose={() => setShowContextMenu(false)}
+          position={uiState.contextMenuPosition}
+          onClose={uiState.hideContextMenu}
         />
       )}
 
       {/* 스레드 뷰 */}
-      {showThreadView && threadParentMessage && (
+      {uiState.showThreadView && uiState.threadParentMessage && (
         <ThreadView
-          parentMessage={threadParentMessage}
+          parentMessage={uiState.threadParentMessage}
           replies={[]}
           onReply={() => {
             toast.success('답글이 전송되었습니다!');
           }}
-          onClose={() => setShowThreadView(false)}
+          onClose={uiState.hideThreadView}
           currentUserId={user.id || ''}
         />
       )}

@@ -4,7 +4,7 @@ import { authService, BackendUserResponse } from '../services/supabase/authServi
 import { toast } from 'react-toastify'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '../store'
-import { setUser } from '../store/userSlice'
+import { setUser, clearUser } from '../store/userSlice'
 
 interface AuthState {
   session: Session | null

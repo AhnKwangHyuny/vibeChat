@@ -44,7 +44,10 @@ export function useMessages(roomId: number): UseMessagesReturn {
   // 초기 메시지 로딩 (REST API from API-Server)
   useEffect(() => {
     const loadInitialMessages = async () => {
-      if (!roomId) return;
+      if (!roomId || roomId <= 0) {
+        console.log('[USE_MESSAGES] Skipping message load - invalid roomId:', roomId);
+        return;
+      }
       setIsLoading(true);
       try {
         // TODO: [2025-09-22] 백엔드 메시지 조회 API 구현 후 주석 해제
@@ -153,7 +156,7 @@ export function useMessages(roomId: number): UseMessagesReturn {
 
   // WebSocket 구독 설정 (메시지, 타이핑, 프레즌스)
   useEffect(() => {
-    if (!roomId || !user.id) {
+    if (!roomId || roomId <= 0 || !user.id) {
       console.log('WebSocket 구독 스킵 - roomId 또는 user.id 없음:', { roomId, userId: user.id });
       return;
     }

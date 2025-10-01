@@ -3188,3 +3188,601 @@
 2025-10-01 00:37:13.526 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
 2025-10-01 00:37:13.526 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
 2025-10-01 00:37:13.529 [http-nio-8080-exec-5] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 00:40:41.553 [http-nio-8080-exec-6] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 00:40:41.927 [http-nio-8080-exec-6] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 00:40:41.936 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 00:40:41.937 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 00:40:41.937 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 00:40:41.938 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 00:40:41.938 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 00:40:41.939 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 00:40:41.939 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 00:40:41.939 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 00:40:41.939 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 00:40:41.939 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 00:40:41.939 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 00:40:41.942 [http-nio-8080-exec-6] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 00:45:28.919 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 00:45:29.327 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 00:45:29.345 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 00:45:29.347 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 00:45:29.347 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 00:45:29.351 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 00:45:29.351 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 00:45:29.352 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 00:45:29.352 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 00:45:29.352 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 00:45:29.352 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 00:45:29.352 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 00:45:29.352 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 00:45:29.357 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 00:59:38.693 [http-nio-8080-exec-2] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 00:59:39.325 [http-nio-8080-exec-2] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 00:59:39.347 [http-nio-8080-exec-2] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 00:59:39.348 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 00:59:39.348 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 00:59:39.363 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 00:59:39.364 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 00:59:39.365 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 00:59:39.365 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 00:59:39.366 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 00:59:39.366 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 00:59:39.366 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 00:59:39.366 [http-nio-8080-exec-2] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 00:59:39.374 [http-nio-8080-exec-2] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 01:00:21.419 [http-nio-8080-exec-6] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:00:21.516 [http-nio-8080-exec-6] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:00:21.522 [http-nio-8080-exec-6] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 01:00:21.523 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 01:00:21.523 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:00:21.525 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 01:00:21.525 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 01:00:21.525 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 01:00:21.525 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 01:00:21.525 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 01:00:21.525 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 01:00:21.525 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:00:21.525 [http-nio-8080-exec-6] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 01:00:21.527 [http-nio-8080-exec-6] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 01:00:48.037 [http-nio-8080-exec-8] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:00:48.150 [http-nio-8080-exec-8] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:00:48.153 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 01:00:48.154 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 01:00:48.154 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:00:48.155 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 01:00:48.155 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 01:00:48.155 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 01:00:48.155 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 01:00:48.155 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 01:00:48.155 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 01:00:48.155 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:00:48.155 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 01:00:48.157 [http-nio-8080-exec-8] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 01:00:49.852 [http-nio-8080-exec-4] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:00:49.891 [http-nio-8080-exec-4] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:00:49.895 [http-nio-8080-exec-4] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 01:00:49.896 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 01:00:49.896 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:00:49.906 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 01:00:49.906 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 01:00:49.906 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 01:00:49.906 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 01:00:49.906 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 01:00:49.906 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 01:00:49.906 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:00:49.906 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 01:00:49.907 [http-nio-8080-exec-4] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 01:00:52.988 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:00:53.097 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:00:53.133 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 01:00:53.133 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 01:00:53.133 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:00:53.134 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 01:00:53.135 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 01:00:53.135 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 01:00:53.135 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 01:00:53.135 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 01:00:53.135 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 01:00:53.135 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:00:53.135 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 01:00:53.137 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 01:01:05.273 [http-nio-8080-exec-3] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:01:05.369 [http-nio-8080-exec-3] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:01:05.376 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 01:01:05.376 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 01:01:05.376 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:01:05.378 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 01:01:05.378 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 01:01:05.378 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 01:01:05.378 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 01:01:05.378 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 01:01:05.378 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 01:01:05.378 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:01:05.378 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 01:01:05.380 [http-nio-8080-exec-3] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 01:01:40.835 [http-nio-8080-exec-1] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:01:41.389 [http-nio-8080-exec-1] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 01:01:41.430 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 01:01:41.442 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 01:01:41.443 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:01:41.446 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 01:01:41.448 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 01:01:41.448 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 01:01:41.448 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 01:01:41.448 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 01:01:41.448 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 01:01:41.448 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 01:01:41.449 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 01:01:41.453 [http-nio-8080-exec-1] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 03:07:26.614 [scheduling-1] INFO  c.vibechat.scheduler.MessageTrimJob - Starting message trim job...
+2025-10-01 03:07:27.038 [scheduling-1] DEBUG org.hibernate.SQL - 
+    select
+        cr1_0.id 
+    from
+        chat_rooms cr1_0
+2025-10-01 03:07:27.069 [scheduling-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 03:07:27.238 [scheduling-1] ERROR c.vibechat.scheduler.MessageTrimJob - Failed to trim messages for room 1
+org.springframework.dao.InvalidDataAccessApiUsageException: Executing an update/delete query
+	at org.springframework.orm.jpa.EntityManagerFactoryUtils.convertJpaAccessExceptionIfPossible(EntityManagerFactoryUtils.java:400)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:246)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:550)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:335)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:160)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:136)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223)
+	at jdk.proxy2/jdk.proxy2.$Proxy177.trimOldMessages(Unknown Source)
+	at com.vibechat.scheduler.MessageTrimJob.trimOldMessages(MessageTrimJob.java:29)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.runInternal(ScheduledMethodRunnable.java:130)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.lambda$run$2(ScheduledMethodRunnable.java:124)
+	at io.micrometer.observation.Observation.observe(Observation.java:499)
+	at org.springframework.scheduling.support.ScheduledMethodRunnable.run(ScheduledMethodRunnable.java:124)
+	at org.springframework.scheduling.support.DelegatingErrorHandlingRunnable.run(DelegatingErrorHandlingRunnable.java:54)
+	at org.springframework.scheduling.concurrent.ReschedulingRunnable.run(ReschedulingRunnable.java:96)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: jakarta.persistence.TransactionRequiredException: Executing an update/delete query
+	at org.hibernate.internal.AbstractSharedSessionContract.checkTransactionNeededForUpdateOperation(AbstractSharedSessionContract.java:529)
+	at org.hibernate.query.spi.AbstractQuery.executeUpdate(AbstractQuery.java:647)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$DeferredQueryInvocationHandler.invoke(SharedEntityManagerCreator.java:418)
+	at jdk.proxy2/jdk.proxy2.$Proxy229.executeUpdate(Unknown Source)
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution$ModifyingExecution.doExecute(JpaQueryExecution.java:266)
+	at org.springframework.data.jpa.repository.query.JpaQueryExecution.execute(JpaQueryExecution.java:92)
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.doExecute(AbstractJpaQuery.java:152)
+	at org.springframework.data.jpa.repository.query.AbstractJpaQuery.execute(AbstractJpaQuery.java:140)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:170)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:169)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:148)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:70)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:379)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
+	... 22 common frames omitted
+2025-10-01 03:07:27.242 [scheduling-1] INFO  c.vibechat.scheduler.MessageTrimJob - Message trim job finished.
+2025-10-01 03:36:26.129 [http-nio-8080-exec-8] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:36:26.274 [http-nio-8080-exec-8] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:36:26.309 [http-nio-8080-exec-8] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 03:36:26.313 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 03:36:26.314 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:36:26.328 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 03:36:26.329 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 03:36:26.330 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 03:36:26.330 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 03:36:26.330 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 03:36:26.330 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 03:36:26.330 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:36:26.330 [http-nio-8080-exec-8] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 03:36:26.339 [http-nio-8080-exec-8] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 03:37:17.930 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:37:18.034 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:37:18.041 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 03:37:18.042 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 03:37:18.042 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:37:18.043 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 03:37:18.044 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 03:37:18.044 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 03:37:18.044 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 03:37:18.044 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 03:37:18.044 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 03:37:18.044 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:37:18.044 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 03:37:18.046 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 03:39:28.162 [http-nio-8080-exec-1] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:39:28.670 [http-nio-8080-exec-1] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:39:28.715 [http-nio-8080-exec-1] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 03:39:28.717 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 03:39:28.717 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:39:28.723 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 03:39:28.725 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 03:39:28.726 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 03:39:28.726 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 03:39:28.726 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 03:39:28.726 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 03:39:28.726 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:39:28.726 [http-nio-8080-exec-1] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 03:39:28.737 [http-nio-8080-exec-1] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 03:39:38.381 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-01 03:39:38.383 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-01 03:39:38.383 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Total cookies count: 1
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Found session cookie - Name: SESSION, Value: ZjM5MDBmNGEtN2RiOS00MzFkLTk4ZjgtYjdjYjlhMjlmYjk0
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: true
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Session ID: f3900f4a-7db9-431d-98f8-b7cb9a29fb94
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Session creation time: 1759257386340
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Session last accessed time: 1759257578379
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - UserPrincipal from session: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE]
+2025-10-01 03:39:38.384 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Final UserPrincipal result: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE]
+2025-10-01 03:39:38.385 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] Returning UserPrincipal: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE] ===
+2025-10-01 03:39:38.394 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-01 03:39:38.394 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Total cookies count: 1
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Found session cookie - Name: SESSION, Value: ZjM5MDBmNGEtN2RiOS00MzFkLTk4ZjgtYjdjYjlhMjlmYjk0
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: true
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Session ID: f3900f4a-7db9-431d-98f8-b7cb9a29fb94
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Session creation time: 1759257386340
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Session last accessed time: 1759257578394
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - UserPrincipal from session: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE]
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Final UserPrincipal result: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE]
+2025-10-01 03:39:38.395 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] Returning UserPrincipal: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE] ===
+2025-10-01 03:39:38.405 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-01 03:39:38.405 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Total cookies count: 1
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Found session cookie - Name: SESSION, Value: ZjM5MDBmNGEtN2RiOS00MzFkLTk4ZjgtYjdjYjlhMjlmYjk0
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: true
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Session ID: f3900f4a-7db9-431d-98f8-b7cb9a29fb94
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Session creation time: 1759257386340
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Session last accessed time: 1759257578404
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - UserPrincipal from session: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE]
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Final UserPrincipal result: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE]
+2025-10-01 03:39:38.406 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] Returning UserPrincipal: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE] ===
+2025-10-01 03:39:38.422 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-01 03:39:38.422 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-01 03:39:38.422 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-01 03:39:38.422 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-01 03:39:38.422 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Total cookies count: 1
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Found session cookie - Name: SESSION, Value: ZjM5MDBmNGEtN2RiOS00MzFkLTk4ZjgtYjdjYjlhMjlmYjk0
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: true
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Session ID: f3900f4a-7db9-431d-98f8-b7cb9a29fb94
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Session creation time: 1759257386340
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Session last accessed time: 1759257578420
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - UserPrincipal from session: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE]
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Final UserPrincipal result: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE]
+2025-10-01 03:39:38.423 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] Returning UserPrincipal: UserPrincipal[id=1, nickname='안광현', provider=GOOGLE] ===
+2025-10-01 03:39:38.478 [http-nio-8080-exec-5] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:39:38.479 [http-nio-8080-exec-3] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:39:38.649 [http-nio-8080-exec-3] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:39:38.673 [http-nio-8080-exec-3] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 03:39:38.673 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 03:39:38.674 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:39:38.675 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 03:39:38.676 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 03:39:38.677 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 03:39:38.677 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 03:39:38.677 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 03:39:38.677 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 03:39:38.677 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:39:38.677 [http-nio-8080-exec-3] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 03:39:38.679 [http-nio-8080-exec-3] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 03:39:38.707 [http-nio-8080-exec-5] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:39:38.724 [http-nio-8080-exec-5] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 03:39:38.724 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 03:39:38.726 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:39:38.728 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 03:39:38.729 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 03:39:38.729 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 03:39:38.729 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 03:39:38.730 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 03:39:38.734 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 03:39:38.734 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:39:38.734 [http-nio-8080-exec-5] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 03:39:38.737 [http-nio-8080-exec-5] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 03:44:58.702 [http-nio-8080-exec-4] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:44:58.702 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Google 인증 시도: providerId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:44:59.472 [http-nio-8080-exec-4] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:44:59.475 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Supabase 토큰 검증 성공: supabaseUserId=81870a35-4354-4609-9d5e-3b6f782e8ff9
+2025-10-01 03:44:59.552 [http-nio-8080-exec-7] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 03:44:59.553 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 03:44:59.554 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:44:59.552 [http-nio-8080-exec-4] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id,
+        u1_0.avatar_url,
+        u1_0.created_at,
+        u1_0.greeting,
+        u1_0.nickname,
+        u1_0.provider,
+        u1_0.provider_id,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.provider_id=?
+2025-10-01 03:44:59.556 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GOOGLE]
+2025-10-01 03:44:59.556 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:VARCHAR) <- [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:44:59.572 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 03:44:59.573 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 03:44:59.576 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 03:44:59.576 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 03:44:59.576 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 03:44:59.577 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 03:44:59.577 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:44:59.577 [http-nio-8080-exec-7] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 03:44:59.579 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (1:BIGINT) -> [1]
+2025-10-01 03:44:59.579 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (2:VARCHAR) -> [https://lh3.googleusercontent.com/a/ACg8ocKj2O-NfRmQsSk-NedCM6IydnC1xDBOrq1YSChWcNHX0ThmTA=s96-c]
+2025-10-01 03:44:59.579 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (3:TIMESTAMP) -> [2025-09-30T21:52:04.125428]
+2025-10-01 03:44:59.579 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (4:VARCHAR) -> [null]
+2025-10-01 03:44:59.579 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (5:VARCHAR) -> [안광현]
+2025-10-01 03:44:59.581 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (6:ENUM) -> [GOOGLE]
+2025-10-01 03:44:59.581 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (7:VARCHAR) -> [81870a35-4354-4609-9d5e-3b6f782e8ff9]
+2025-10-01 03:44:59.581 [http-nio-8080-exec-4] TRACE org.hibernate.orm.jdbc.extract - extracted value (8:TIMESTAMP) -> [2025-09-30T21:52:04.125469]
+2025-10-01 03:44:59.584 [http-nio-8080-exec-7] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 03:44:59.585 [http-nio-8080-exec-4] INFO  c.v.service.auth.AuthServiceImpl - Google 사용자 생성/업데이트 완료: userId=1
+2025-10-01 04:07:26.453 [scheduling-1] DEBUG org.hibernate.SQL - 
+    select
+        u1_0.id 
+    from
+        users u1_0 
+    where
+        u1_0.provider=? 
+        and u1_0.updated_at<?
+2025-10-01 04:07:26.454 [scheduling-1] TRACE org.hibernate.orm.jdbc.bind - binding parameter (1:ENUM) <- [GUEST]
+2025-10-01 04:07:26.455 [scheduling-1] TRACE org.hibernate.orm.jdbc.bind - binding parameter (2:TIMESTAMP) <- [2025-09-24T04:07:26.430684]
+2025-10-01 04:15:25.305 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Retrograde clock change detected (housekeeper delta=25s657ms), soft-evicting connections from pool.
+2025-10-01 05:16:00.355 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s704ms).
+2025-10-01 05:31:50.554 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m50s199ms).
+2025-10-01 05:52:19.726 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m59s148ms).
+2025-10-01 06:05:12.052 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12m52s325ms).
+2025-10-01 06:22:43.400 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m1s325ms).
+2025-10-01 06:39:28.687 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m45s286ms).
+2025-10-01 06:55:26.434 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m27s758ms).
+2025-10-01 07:06:18.476 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m22s114ms).
+2025-10-01 07:22:35.158 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m46s677ms).
+2025-10-01 07:40:06.331 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m31s137ms).
+2025-10-01 07:57:59.088 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m22s750ms).
+2025-10-01 08:07:18.881 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m49s783ms).
+2025-10-01 08:26:56.491 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m37s533ms).
+2025-10-01 08:44:44.390 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m47s890ms).
+2025-10-01 09:02:12.104 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m27s686ms).
+2025-10-01 09:08:07.057 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m54s930ms).
+2025-10-01 09:26:11.476 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m4s399ms).
+2025-10-01 09:44:53.763 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m12s264ms).
+2025-10-01 09:50:35.289 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m41s522ms).
+2025-10-01 11:30:50.215 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-01 11:30:50.260 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-10-01 11:30:50.269 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
