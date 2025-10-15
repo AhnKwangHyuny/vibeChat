@@ -1,11 +1,9 @@
 package com.vibechat.service.streams.consumer;
 
-import com.vibechat.consumer.core.MessageConsumer;
 import com.vibechat.consumer.room.RoomBroadcastConsumer;
 import com.vibechat.consumer.user.UserReadStateConsumer;
 import com.vibechat.consumer.storage.MessageStorageConsumer;
 import com.vibechat.consumer.notification.NotificationConsumer;
-import com.vibechat.service.streams.router.StreamMessageRouter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.stream.Consumer;
@@ -22,10 +20,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Consumer Group 등록 관리 서비스 구현체
  *
- * 핵심 전략: Lazy Container Start Pattern
- * - Container는 생성만 하고 시작하지 않음
- * - 첫 Listener 등록 시점에 Container 시작 (ensureContainerStarted)
- * - Listener가 없는 Container는 메시지를 폴링하지 않음을 방지
+ * 핵심 전략: Consumer Group별 전용 Listener
+ * - 각 Consumer Group이 독립적인 Listener를 가짐
+ * - Fan-out 패턴: 하나의 메시지를 여러 Consumer가 각자의 속도로 처리
+ * - 장애 격리: 한 Consumer의 장애가 다른 Consumer에 영향 없음
  */
 @Service
 @RequiredArgsConstructor
@@ -43,10 +41,8 @@ public class ConsumerRegistrationServiceImpl implements ConsumerRegistrationServ
     private final UserReadStateConsumer userReadStateConsumer;
     private final MessageStorageConsumer messageStorageConsumer;
     private final NotificationConsumer notificationConsumer;
-    private final StreamMessageRouter streamMessageRouter;
     private final RedisTemplate<String, Object> redisTemplate;
 
-    private StreamListener<String, MapRecord<String, String, Object>> universalListener;
     private final AtomicBoolean containerStarted = new AtomicBoolean(false);
 
     @Override
@@ -54,15 +50,27 @@ public class ConsumerRegistrationServiceImpl implements ConsumerRegistrationServ
         try {
             log.info("[ConsumerRegistration] 방 스트림 등록 시작: streamKey={}", streamKey);
 
-            //  Container 시작 보장
+            // 1. Container 시작 보장
             ensureContainerStarted();
 
-            // 2. Consumer Group 및 Listener 등록
-            registerStreamForConsumer(streamKey, BROADCAST_GROUP, "broadcast-consumer-1", roomBroadcastConsumer);
-            registerStreamForConsumer(streamKey, STORAGE_GROUP, "storage-consumer-1", messageStorageConsumer);
+            // 2. 각 Consumer Group에 전용 Listener 등록
+            registerStreamWithDedicatedListener(streamKey, BROADCAST_GROUP, "broadcast-consumer-1",
+                record -> {
+                    try {
+                        roomBroadcastConsumer.processMessage(record);
+                    } catch (Exception e) {
+                        log.error("[BROADCAST] 메시지 처리 실패: messageId={}", record.getId().getValue(), e);
+                    }
+                });
 
-            // 3. Router에 스트림 등록
-            streamMessageRouter.registerStream(streamKey);
+            registerStreamWithDedicatedListener(streamKey, STORAGE_GROUP, "storage-consumer-1",
+                record -> {
+                    try {
+                        messageStorageConsumer.processMessage(record);
+                    } catch (Exception e) {
+                        log.error("[STORAGE] 메시지 처리 실패: messageId={}", record.getId().getValue(), e);
+                    }
+                });
 
             log.info("[ConsumerRegistration] 방 스트림 등록 완료: streamKey={}", streamKey);
 
@@ -83,8 +91,9 @@ public class ConsumerRegistrationServiceImpl implements ConsumerRegistrationServ
         try {
             log.info("[ConsumerRegistration] 방 스트림 제거 시작: streamKey={}", streamKey);
 
-            streamMessageRouter.unregisterStream(streamKey);
-
+            // Consumer Group 등록 해제는 Redis Streams가 자동으로 관리
+            // 스트림이 삭제되면 Consumer Group도 삭제됨
+            
             log.info("[ConsumerRegistration] 방 스트림 제거 완료: streamKey={}", streamKey);
 
         } catch (Exception e) {
@@ -106,7 +115,7 @@ public class ConsumerRegistrationServiceImpl implements ConsumerRegistrationServ
         }
     }
 
-    // ========== Private Helper Methods ==========
+    // ========== 헬퍼 메서드들 ==========
 
     /**
      * Container 시작 보장 (Lazy Start Pattern 핵심)
@@ -129,24 +138,16 @@ public class ConsumerRegistrationServiceImpl implements ConsumerRegistrationServ
     }
 
     /**
-     * Universal Listener 초기화 (Lazy Initialization)
-     *
-     * StreamMessageRouter로 메시지 라우팅 위임
+     * Consumer Group에 전용 Listener 등록
+     * 
+     * 각 Consumer Group이 독립적인 Listener를 가지도록 함
      */
-    private StreamListener<String, MapRecord<String, String, Object>> getUniversalListener() {
-        if (universalListener == null) {
-            universalListener = streamMessageRouter::routeMessage;
-        }
-        return universalListener;
-    }
-
-    /**
-     * 스트림을 Universal Listener로 등록
-     *
-     * 메모리 최적화: 모든 스트림이 하나의 Listener 공유
-     */
-    private void registerStreamForConsumer(String streamKey, String consumerGroup, String consumerId,
-                                         MessageConsumer consumer) {
+    private void registerStreamWithDedicatedListener(
+            String streamKey,
+            String consumerGroup,
+            String consumerId,
+            StreamListener<String, MapRecord<String, String, Object>> dedicatedListener) {
+        
         try {
             // 1. Consumer Group 생성 (이미 존재하면 무시)
             createConsumerGroupIfNotExists(streamKey, consumerGroup);
@@ -157,11 +158,11 @@ public class ConsumerRegistrationServiceImpl implements ConsumerRegistrationServ
             // 3. StreamOffset 설정 (마지막 소비 지점부터 읽기)
             StreamOffset<String> streamOffset = StreamOffset.create(streamKey, ReadOffset.lastConsumed());
 
-            // 4. Container에 Subscription 등록
-            listenerContainer.receiveAutoAck(redisConsumer, streamOffset, getUniversalListener());
+            // 4. Container에 전용 Listener 등록
+            listenerContainer.receiveAutoAck(redisConsumer, streamOffset, dedicatedListener);
 
-            log.info("[ConsumerRegistration] Listener 등록 완료: stream={}, group={}, consumer={}",
-                streamKey, consumerGroup, consumer.getClass().getSimpleName());
+            log.info("[ConsumerRegistration] 전용 Listener 등록 완료: stream={}, group={}",
+                streamKey, consumerGroup);
 
         } catch (Exception e) {
             log.error("[ConsumerRegistration] Listener 등록 실패: stream={}, group={}",
@@ -173,7 +174,6 @@ public class ConsumerRegistrationServiceImpl implements ConsumerRegistrationServ
     /**
      * Consumer Group 생성 (이미 존재하면 무시)
      *
-     * ReadOffset.latest(): 입장 시점 이후 메시지만 처리
      */
     private void createConsumerGroupIfNotExists(String streamKey, String consumerGroup) {
         try {
