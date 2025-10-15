@@ -1,11 +1,12 @@
 package com.vibechat.websocket.event;
 
+import com.vibechat.event.RoomPresenceUpdateEvent;
 import com.vibechat.websocket.connection.WebSocketConnectionEventService;
-import com.vibechat.websocket.presence.WebSocketPresenceService;
 import com.vibechat.websocket.session.WebSocketSessionInfo;
 import com.vibechat.service.room.RoomParticipantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
@@ -18,8 +19,9 @@ import java.util.Map;
 /**
  * WebSocket 이벤트 핸들러 (완전 리팩토링)
  *
- * SRP: WebSocket 생명주기 이벤트 처리만 담당
- * 기존 StompEventListener를 대체하여 새로운 아키텍처와 호환
+ * SRP: WebSocket 생명주기 이벤트 수신 및 적절한 서비스로 위임
+ * - 비즈니스 로직 없음, 오케스트레이션만 담당
+ * - Presence 업데이트는 이벤트로 발행 (느슨한 결합)
  */
 @Component
 @RequiredArgsConstructor
@@ -27,8 +29,8 @@ import java.util.Map;
 public class WebSocketEventHandler {
 
     private final WebSocketConnectionEventService connectionEventService;
-    private final WebSocketPresenceService presenceService;
     private final RoomParticipantService roomParticipantService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * WebSocket 연결 완료 시 후처리
@@ -175,74 +177,39 @@ public class WebSocketEventHandler {
     }
 
     /**
-     * 방 입장 핵심 로직 (비즈니스 로직)
+     * 방 입장 처리 (오케스트레이션)
      *
-     * 방 구독 시 자동으로 방 참가자로 등록
+     * 비즈니스 로직 없음 - 서비스 호출 및 이벤트 발행만 담당
      */
     private void handleRoomEntry(Long roomId, Long userId, WebSocketSessionInfo sessionInfo) {
         try {
-            // 1. 이미 참가자인지 확인
-            boolean isAlreadyParticipant = roomParticipantService.isParticipant(roomId, userId);
-
-            if (!isAlreadyParticipant) {
-                // 2. 방 참가자로 등록
+            // 1. 방 참가자로 등록 (서비스에 위임)
+            boolean isNewParticipant = !roomParticipantService.isParticipant(roomId, userId);
+            
+            if (isNewParticipant) {
                 roomParticipantService.addParticipant(roomId, userId);
-
-                log.info("[방 입장 완료] userId={}, nickname={}, roomId={} - 새로운 참가자 등록",
+                log.info("[방 입장] userId={}, nickname={}, roomId={} - 새 참가자",
                     userId, sessionInfo.getNickname(), roomId);
-
-                // 3. 방 입장 시스템 메시지 전송 (선택적)
-                sendRoomJoinSystemMessage(roomId, sessionInfo);
-
-                // 4. 방 통계 정보 업데이트
-                logRoomParticipantStats(roomId);
-
             } else {
                 log.debug("[방 재입장] userId={}, nickname={}, roomId={} - 기존 참가자",
                     userId, sessionInfo.getNickname(), roomId);
             }
 
+            // 2. Presence 업데이트 이벤트 발행 (느슨한 결합)
+            eventPublisher.publishEvent(
+                RoomPresenceUpdateEvent.userJoined(roomId, userId)
+            );
+
         } catch (Exception e) {
             log.error("[방 입장 처리 실패] userId={}, roomId={}", userId, roomId, e);
-            // 방 입장 실패가 구독 자체를 방해하지 않도록 예외를 다시 던지지 않음
         }
     }
 
     /**
-     * 방 입장 시스템 메시지 전송 (선택적 구현)
-     */
-    private void sendRoomJoinSystemMessage(Long roomId, WebSocketSessionInfo sessionInfo) {
-        try {
-            // TODO: 시스템 메시지 전송 로직 구현
-            // 예: "{nickname}님이 입장하셨습니다" 메시지를 방의 모든 참가자에게 전송
-
-            log.debug("[시스템 메시지] {}님이 방 {}에 입장하셨습니다",
-                sessionInfo.getNickname(), roomId);
-
-        } catch (Exception e) {
-            log.warn("[방 입장 시스템 메시지 전송 실패] roomId={}, userId={}",
-                roomId, sessionInfo.getUserId(), e);
-        }
-    }
-
-    /**
-     * 방 참가자 통계 로깅
-     */
-    private void logRoomParticipantStats(Long roomId) {
-        try {
-            var stats = roomParticipantService.getStats(roomId);
-            log.info("[방 참가자 통계] {}", stats.toString());
-        } catch (Exception e) {
-            log.debug("[방 참가자 통계 조회 실패] roomId={}", roomId, e);
-        }
-    }
-
-    /**
-     * 방 구독 통계 업데이트
+     * 방 구독 통계 업데이트 (모니터링/로깅 용도)
      */
     private void updateRoomSubscriptionStats(Long roomId, Long userId) {
         try {
-            // 방별 구독 통계 업데이트
             int participantCount = roomParticipantService.getParticipantCount(roomId);
             log.debug("[방 구독 통계] roomId={}, userId={}, totalParticipants={}",
                 roomId, userId, participantCount);

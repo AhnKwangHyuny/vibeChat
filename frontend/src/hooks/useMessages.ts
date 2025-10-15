@@ -26,7 +26,7 @@ interface UseMessagesReturn {
   loadMoreMessages: (roomId: number, beforeId?: number) => Promise<void>;
   hasMore: boolean;
   typingUsers: string[];
-  onlineCount: number;
+  // onlineCount는 Room.tsx에서 직접 Presence 구독으로 관리
 }
 
 // 주의: 기존 목업 메시지를 제거하고 실제 API/WS 기반으로 동작하도록 변경
@@ -36,7 +36,6 @@ export function useMessages(roomId: number): UseMessagesReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
-  const [onlineCount, setOnlineCount] = useState(0);
 
   // Redux에서 사용자 정보 가져오기
   const user = useSelector((state: RootState) => state.user);
@@ -211,19 +210,11 @@ export function useMessages(roomId: number): UseMessagesReturn {
       });
       if (typingSub) subscriptions.push(typingSub);
 
-      // 프레즌스 구독
-      const presenceSub = stompClient.subscribe(`/topic/rooms/${roomId}/presence`, (frame) => {
-        try {
-          const evt = JSON.parse(frame.body) as { count: number };
-          console.log('Received presence event:', evt);
-          setOnlineCount(evt.count);
-        } catch (e) {
-          console.error('Failed to parse presence event:', e);
-        }
-      });
-      if (presenceSub) subscriptions.push(presenceSub);
+      // NOTE: Presence 구독은 Room.tsx에서 처리 (중복 구독 방지)
+      // onlineCount는 Room.tsx에서 props로 전달받아야 함
 
       console.log('WebSocket subscriptions established for room:', roomId);
+      
     } catch (error) {
       console.error('Failed to set up WebSocket subscriptions:', error);
     }
@@ -251,6 +242,5 @@ export function useMessages(roomId: number): UseMessagesReturn {
     loadMoreMessages,
     hasMore,
     typingUsers,
-    onlineCount,
   };
 }

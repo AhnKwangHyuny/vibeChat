@@ -58,10 +58,11 @@ public class RoomParticipantServiceImpl implements RoomParticipantService {
             String userRoomsKey = USER_ROOMS_KEY.replace("{}", userId.toString());
 
             // 양방향 관계 해제
-            redisTemplate.opsForSet().remove(roomParticipantsKey, userId.toString());
-            redisTemplate.opsForSet().remove(userRoomsKey, roomId.toString());
+            Long removedFromRoom = redisTemplate.opsForSet().remove(roomParticipantsKey, userId.toString());
+            Long removedFromUser = redisTemplate.opsForSet().remove(userRoomsKey, roomId.toString());
 
-            log.info("[RoomParticipant] 참가자 제거 완료: roomId={}, userId={}", roomId, userId);
+            log.info("[RoomParticipant] 참가자 제거 완료: roomId={}, userId={}, removedFromRoom={}, removedFromUser={}", 
+                roomId, userId, removedFromRoom, removedFromUser);
 
         } catch (Exception e) {
             log.error("[RoomParticipant] 참가자 제거 실패: roomId={}, userId={}", roomId, userId, e);
@@ -76,13 +77,17 @@ public class RoomParticipantServiceImpl implements RoomParticipantService {
             Set<Object> participantIds = redisTemplate.opsForSet().members(roomParticipantsKey);
 
             if (participantIds == null) {
+                log.debug("[RoomParticipant] 참가자 없음: roomId={}", roomId);
                 return List.of();
             }
 
-            return participantIds.stream()
+            List<Long> result = participantIds.stream()
                 .map(Object::toString)
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
+
+            log.info("[RoomParticipant] 참가자 목록 조회: roomId={}, participants={}", roomId, result);
+            return result;
 
         } catch (Exception e) {
             log.error("[RoomParticipant] 참가자 목록 조회 실패: roomId={}", roomId, e);

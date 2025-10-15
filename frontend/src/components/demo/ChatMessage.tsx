@@ -115,11 +115,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           <span className="text-xs text-foreground-muted">
             {formatTime(createdAt)}
           </span>
-          {isPending && (
-            <Badge variant="warning" size="sm">
-              전송 중...
-            </Badge>
-          )}
         </div>
         
         <div className={cn(

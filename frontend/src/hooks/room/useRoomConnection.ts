@@ -130,11 +130,23 @@ export function useRoomConnection({
 
   // 방 입장 효과
   useEffect(() => {
+    // 연결 조건 재확인
+    if (!isAuthenticated || !roomId || !userId || !nickname) {
+      console.log('[ROOM_CONNECTION] 연결 조건 불만족, 스킵:', {
+        isAuthenticated,
+        roomId,
+        userId,
+        nickname,
+      });
+      return;
+    }
+
     connectToRoom();
 
     // 컴포넌트 언마운트 시 연결 해제
     return () => {
       if (roomId) {
+        console.log('[ROOM_CONNECTION] useEffect cleanup - 방 퇴장 시작');
         // 언마운트 시에는 직접 호출로 순환 참조 방지
         Promise.race([
           stompClient.exitRoom(roomId),
@@ -149,7 +161,7 @@ export function useRoomConnection({
         });
       }
     };
-  }, [roomId, isAuthenticated, userId, nickname, avatarUrl]); // 기본 의존성만 사용
+  }, [roomId, isAuthenticated]); // userId, nickname, avatarUrl 제거로 불필요한 재연결 방지
 
   return {
     isWebSocketConnected,

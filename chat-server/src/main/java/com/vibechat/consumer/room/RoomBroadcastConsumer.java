@@ -83,14 +83,26 @@ public class RoomBroadcastConsumer extends AbstractMessageConsumer {
         Long roomId, Long userId, String messageType,
         String content, String clientTempId) {
 
+        // Redis Streams에서 사용자 정보 추출
+        // Producer에서 "userNickname", "userAvatarUrl"로 저장함
+        String nickname = (String) messageData.get("userNickname");
+        String avatarUrl = (String) messageData.get("userAvatarUrl");
+
+        // Fallback 처리: nickname이 없으면 기본값 사용
+        if (nickname == null || nickname.isBlank()) {
+            nickname = "사용자" + userId;
+            log.warn("[RoomBroadcast] nickname 없음, Fallback 사용: userId={}, messageId={}", 
+                userId, messageId);
+        }
+
         return WebSocketMessageResponse.builder()
             .id(Long.parseLong(messageId.split("-")[0])) // 타임스탬프 부분 사용
             .clientTempId(clientTempId)
             .roomId(roomId)
             .user(UserSummaryDto.builder()
                 .id(userId)
-                .nickname("사용자" + userId)
-                .avatarUrl(null)
+                .nickname(nickname)      // Redis 데이터 사용
+                .avatarUrl(avatarUrl)    // Redis 데이터 사용
                 .build())
             .type(MessageType.valueOf(messageType))
             .contentText(content)

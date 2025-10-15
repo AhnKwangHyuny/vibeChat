@@ -1,7 +1,7 @@
 package com.vibechat.websocket.controller;
 
+import com.vibechat.service.room.RoomParticipantService;
 import com.vibechat.utils.session.StomSessionUtil;
-import com.vibechat.websocket.presence.WebSocketPresenceService;
 import com.vibechat.websocket.session.WebSocketSessionInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ import java.util.Map;
 @Slf4j
 public class PresenceController {
 
-    private final WebSocketPresenceService presenceService;
+    private final RoomParticipantService roomParticipantService;
     private final SimpMessagingTemplate messagingTemplate;
 
     /**
@@ -69,7 +70,9 @@ public class PresenceController {
     }
 
     /**
-     * 방의 현재 Presence 상태 조회
+     * 방의 현재 Presence 상태 조회 및 브로드캐스트
+     * 
+     * 프론트엔드 구독 타이밍 문제 해결을 위한 수동 요청 핸들러
      */
     @MessageMapping("/rooms/{roomId}/presence/status")
     public void getRoomPresenceStatus(@DestinationVariable Long roomId,
@@ -84,25 +87,26 @@ public class PresenceController {
                 return;
             }
 
-            log.debug("[Presence 상태 조회] userId={}, roomId={}",
+            log.info("[Presence 수동 요청] userId={}, roomId={}", 
                 sessionInfo.getUserId(), roomId);
 
-            // 2. 방의 현재 Presence 통계 조회
-            var presenceStats = presenceService.getPresenceStats();
+            // 2. 방별 참가자 수 및 목록 조회
+            int participantCount = roomParticipantService.getParticipantCount(roomId);
+            List<Long> participantIds = roomParticipantService.getParticipants(roomId);
 
-            // 3. 응답 전송
-            Map<String, Object> response = Map.of(
-                "roomId", roomId,
-                "activeUsers", presenceStats.getActiveUsers(),
-                "activeSessions", presenceStats.getActiveSessions(),
+            // 3. 방 전체 브로드캐스트 (모든 구독자가 받도록)
+            // TODO: 참가자 상세 정보 (nickname, avatarUrl) 추가 필요
+            Map<String, Object> presenceEvent = Map.of(
+                "count", participantCount,
+                "participantIds", participantIds,
                 "timestamp", System.currentTimeMillis()
             );
 
-            messagingTemplate.convertAndSendToUser(
-                headerAccessor.getSessionId(), "/queue/presence", response);
+            String destination = String.format("/topic/rooms/%d/presence", roomId);
+            messagingTemplate.convertAndSend(destination, presenceEvent);
 
-            log.debug("[Presence 상태 응답 완료] roomId={}, activeUsers={}",
-                roomId, presenceStats.getActiveUsers());
+            log.info("[Presence 수동 브로드캐스트] roomId={}, count={}, destination={}", 
+                roomId, participantCount, destination);
 
         } catch (Exception e) {
             log.error("[Presence 상태 조회 예외] roomId={}, sessionId={}",

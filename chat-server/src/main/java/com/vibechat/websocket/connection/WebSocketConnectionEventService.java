@@ -1,6 +1,7 @@
 package com.vibechat.websocket.connection;
 
 import com.vibechat.consumer.notification.NotificationConsumer;
+import com.vibechat.event.RoomPresenceUpdateEvent;
 import com.vibechat.websocket.presence.WebSocketPresenceService;
 import com.vibechat.websocket.session.WebSocketSessionInfo;
 import com.vibechat.service.room.RoomParticipantService;
@@ -8,13 +9,15 @@ import com.vibechat.service.room.RoomParticipantService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 /**
  * WebSocket 연결/해제 이벤트 처리 서비스
  *
- * SRP: 연결 이벤트에 따른 후속 처리만 담당
- * OCP: 새로운 이벤트 처리 로직 확장 가능
+ * SRP: 연결 이벤트에 따른 후속 처리 오케스트레이션
+ * - 비즈니스 로직은 각 도메인 서비스에 위임
+ * - Presence 업데이트는 이벤트로 발행 (느슨한 결합)
  */
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class WebSocketConnectionEventService {
     private final WebSocketPresenceService presenceService;
     private final NotificationConsumer notificationConsumer;
     private final RoomParticipantService roomParticipantService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 사용자 연결 시 후속 처리
@@ -132,22 +136,23 @@ public class WebSocketConnectionEventService {
             log.info("[방 퇴장 처리 시작] userId={}, nickname={}, 참가 중인 방 개수={}",
                 userId, sessionInfo.getNickname(), userRooms.size());
 
-            // 2. 각 방에서 사용자 제거
+            // 2. 각 방에서 사용자 제거 및 Presence 이벤트 발행
             int successCount = 0;
             for (Long roomId : userRooms) {
                 try {
-                    // 방에서 참가자 제거
+                    // 방에서 참가자 제거 (서비스에 위임)
                     roomParticipantService.removeParticipant(roomId, userId);
                     successCount++;
 
-                    // 방 퇴장 시스템 메시지 전송 (선택적)
-                    sendRoomLeaveSystemMessage(roomId, sessionInfo);
+                    // Presence 업데이트 이벤트 발행 (느슨한 결합)
+                    eventPublisher.publishEvent(
+                        RoomPresenceUpdateEvent.connectionLost(roomId, userId)
+                    );
 
                     log.debug("[방 퇴장 완료] userId={}, roomId={}", userId, roomId);
 
                 } catch (Exception e) {
                     log.warn("[방 퇴장 실패] userId={}, roomId={}", userId, roomId, e);
-                    // 개별 방 퇴장 실패가 전체 처리를 중단시키지 않도록 continue
                 }
             }
 
@@ -157,23 +162,6 @@ public class WebSocketConnectionEventService {
         } catch (Exception e) {
             log.error("[방 퇴장 처리 실패] userId={}", userId, e);
             // 방 퇴장 실패가 연결 해제를 방해하지 않도록 예외를 다시 던지지 않음
-        }
-    }
-
-    /**
-     * 방 퇴장 시스템 메시지 전송 (선택적 구현)
-     */
-    private void sendRoomLeaveSystemMessage(Long roomId, WebSocketSessionInfo sessionInfo) {
-        try {
-            // TODO: 시스템 메시지 전송 로직 구현
-            // 예: "{nickname}님이 나갔습니다" 메시지를 방의 나머지 참가자에게 전송
-
-            log.debug("[시스템 메시지] {}님이 방 {}에서 나갔습니다",
-                sessionInfo.getNickname(), roomId);
-
-        } catch (Exception e) {
-            log.warn("[방 퇴장 시스템 메시지 전송 실패] roomId={}, userId={}",
-                roomId, sessionInfo.getUserId(), e);
         }
     }
 
@@ -205,10 +193,15 @@ public class WebSocketConnectionEventService {
             boolean wasParticipant = roomParticipantService.isParticipant(roomId, userId);
 
             if (wasParticipant) {
+                // 방에서 참가자 제거 (서비스에 위임)
                 roomParticipantService.removeParticipant(roomId, userId);
+                
+                // Presence 업데이트 이벤트 발행 (느슨한 결합)
+                eventPublisher.publishEvent(
+                    RoomPresenceUpdateEvent.userLeft(roomId, userId)
+                );
+                
                 log.info("[단일 방 퇴장] userId={}, roomId={}, reason={}", userId, roomId, reason);
-
-                // TODO: 시스템 메시지 전송 (사용자 정보 조회 후)
             } else {
                 log.debug("[단일 방 퇴장] 이미 참가자가 아님: userId={}, roomId={}", userId, roomId);
             }

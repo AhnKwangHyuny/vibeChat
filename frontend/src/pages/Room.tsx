@@ -61,7 +61,7 @@ export default function Room() {
 
   // === 커스텀 훅들 (리팩토링됨) ===
   const { getRoomById, isLoading: isLoadingRoom } = useRooms();
-  const { messages, isLoading, sendMessage, typingUsers, onlineCount } = useMessages(parsedRoomId && parsedRoomId > 0 ? parsedRoomId : 0);
+  const { messages, isLoading, sendMessage, typingUsers } = useMessages(parsedRoomId && parsedRoomId > 0 ? parsedRoomId : 0);
 
   // UI 상태 관리 훅
   const uiState = useRoomUIState();
@@ -87,6 +87,7 @@ export default function Room() {
 
   // === 간소화된 로컬 상태 (UI 상태는 uiState 훅으로 이관) ===
   const [room, setRoom] = useState<RoomType | null>(null);
+  const [onlineCount, setOnlineCount] = useState(0); // Presence에서 관리
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // === 디버깅용 로그 ===
@@ -97,6 +98,58 @@ export default function Room() {
       isAuthenticated
     });
   }, [user.id, user.nickname, isAuthenticated]);
+
+  // === Presence 구독 (온라인 참가자 목록 + 카운트 업데이트) ===
+  useEffect(() => {
+    if (!parsedRoomId) return;
+
+    const presenceSubscription = stompClient.subscribe(
+      `/topic/rooms/${parsedRoomId}/presence`,
+      (message) => {
+        try {
+          const presenceData = JSON.parse(message.body);
+          console.log('[Presence 수신]', presenceData);
+
+          // 1. 온라인 카운트 업데이트
+          if (typeof presenceData.count === 'number') {
+            setOnlineCount(presenceData.count);
+            console.log('[Presence] onlineCount 업데이트:', presenceData.count);
+          }
+
+          // 2. 참가자 목록 업데이트
+          // TODO: participantIds를 기반으로 사용자 상세 정보 조회하여 onlineUsers 업데이트
+          // 현재는 participantIds만 받음 (nickname, avatarUrl은 별도 API 필요)
+          if (presenceData.participantIds && Array.isArray(presenceData.participantIds)) {
+            const onlineUsersList = presenceData.participantIds.map((id: number) => ({
+              id: String(id),
+              nickname: `사용자${id}`, // TODO: 실제 닉네임으로 교체
+              status: 'online' as const,
+            }));
+            uiState.setOnlineUsers(onlineUsersList);
+            console.log('[Presence] onlineUsers 업데이트:', onlineUsersList.length, '명');
+          }
+        } catch (error) {
+          console.error('[Presence 처리 실패]', error);
+        }
+      }
+    );
+
+    // 구독 완료 후 현재 Presence 상태 요청 (구독 타이밍 문제 해결)
+    setTimeout(() => {
+      try {
+        stompClient.publish(`/app/rooms/${parsedRoomId}/presence/status`, JSON.stringify({
+          requestedAt: new Date().toISOString()
+        }));
+        console.log('[Presence] 수동 상태 요청 전송:', parsedRoomId);
+      } catch (e) {
+        console.error('[Presence] 상태 요청 실패:', e);
+      }
+    }, 500); // 500ms 후 요청
+
+    return () => {
+      presenceSubscription?.unsubscribe();
+    };
+  }, [parsedRoomId, uiState.setOnlineUsers]);
 
   // === 라이프사이클: 방 정보 로딩 ===
   /**
@@ -367,7 +420,7 @@ export default function Room() {
                     durationSec={message.mediaDurationSec}
                     createdAt={message.createdAt}
                     isOwn={message.user.id === parseInt(user.id || '0')}
-                    isPending={!!message.clientTempId}
+                    isPending={message.user.id === parseInt(user.id || '0') && !!message.clientTempId}
                   />
 
                   {/* 메시지 액션 버튼 */}
@@ -504,7 +557,7 @@ export default function Room() {
               label: '반응하기',
               icon: <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
               onClick: () => {
-                const emojis = ['👍', '❤️', '😂', '😮', '😢', '😡'];
+                // const emojis = ['👍', '❤️', '😂', '😮', '😢', '😡'];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
 
                 if (uiState.selectedMessage) {

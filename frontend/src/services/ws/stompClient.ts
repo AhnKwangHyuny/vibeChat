@@ -386,15 +386,23 @@ class StompClient {
    */
   public async enterRoom(roomId: number, userId: string, nickname: string, avatarUrl?: string): Promise<void> {
     try {
-      console.log(`🚀 통합 방 입장 워크플로우 시작: roomId=${roomId}, userId=${userId}`);
+      console.log(`🚀 통합 방 입장 워크플로우 시작: roomId=${roomId}, userId=${userId}, connected=${this.connected}`);
 
       // Step 1: WebSocket 연결 확인/설정
       if (!this.connected) {
+        console.log(`📡 WebSocket 연결 시도...`);
         await this.connectWithUser(userId, nickname, avatarUrl);
+      } else {
+        console.log(`✅ WebSocket 이미 연결됨 - 연결 단계 스킵`);
       }
 
       // Step 2: 방 입장 요청 (서버에서 동적 스트림 생성 및 참가자 등록)
-      await this.joinRoom(roomId);
+      // Note: joinRoom은 타임아웃 이슈가 있어 간소화
+      console.log(`📤 방 입장 요청 전송: roomId=${roomId}`);
+      this.publish(`/app/rooms/${roomId}/join`, JSON.stringify({
+        roomId: roomId,
+        timestamp: new Date().toISOString()
+      }));
 
       // Step 3: 방 스트림 자동 구독
       await this.subscribeToRoomStreams(roomId);
@@ -457,6 +465,16 @@ class StompClient {
 
   public connectWithUser(userId: string, nickname: string, avatarUrl?: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      // 중복 연결 방지
+      if (this.isConnected) {
+        console.log('⚠️ 이미 WebSocket 연결됨 - 재연결 스킵:', {
+          userId,
+          nickname,
+          currentConnection: this.isConnected
+        });
+        return resolve();
+      }
+
       // 연결 헤더에 사용자 정보 포함
       const connectHeaders = {
         userId: userId,
