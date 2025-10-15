@@ -6,12 +6,11 @@ import com.vibechat.domain.MessageType;
 import com.vibechat.dto.WebSocketMessageResponse;
 import com.vibechat.dto.UserSummaryDto;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ public class RoomBroadcastConsumer extends AbstractMessageConsumer {
     }
 
     @Override
-    protected void processBusinessLogic(ObjectRecord<String, Object> record) throws ConsumerProcessingException {
+    protected void processBusinessLogic(MapRecord<String, String, Object> record) throws ConsumerProcessingException {
         String messageId = record.getId().getValue();
         Map<String, Object> messageData = extractMessageData(record);
 
@@ -90,8 +89,8 @@ public class RoomBroadcastConsumer extends AbstractMessageConsumer {
             .roomId(roomId)
             .user(UserSummaryDto.builder()
                 .id(userId)
-                .nickname("사용자" + userId) // TODO: 실제 닉네임 조회 필요
-                .avatarUrl(null) // TODO: 아바타 URL 조회 필요
+                .nickname("사용자" + userId)
+                .avatarUrl(null)
                 .build())
             .type(MessageType.valueOf(messageType))
             .contentText(content)

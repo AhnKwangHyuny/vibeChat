@@ -6,7 +6,7 @@ import com.vibechat.consumer.storage.MessageStorageConsumer;
 import com.vibechat.consumer.notification.NotificationConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -32,7 +32,7 @@ public class StreamMessageRouterImpl implements StreamMessageRouter {
     private final Set<String> registeredStreams = ConcurrentHashMap.newKeySet();
 
     @Override
-    public void routeMessage(ObjectRecord<String, Object> record) {
+    public void routeMessage(MapRecord<String, String, Object> record) {
         String streamKey = record.getStream();
 
         try {
@@ -58,7 +58,7 @@ public class StreamMessageRouterImpl implements StreamMessageRouter {
     }
 
     @Override
-    public void routeRoomMessage(ObjectRecord<String, Object> record) {
+    public void routeRoomMessage(MapRecord<String, String, Object> record) {
         String messageId = record.getId().getValue();
 
         // 1. RoomBroadcastConsumer 처리 (WebSocket 브로드캐스트)
@@ -77,7 +77,7 @@ public class StreamMessageRouterImpl implements StreamMessageRouter {
     }
 
     @Override
-    public void routeUserMessage(ObjectRecord<String, Object> record) {
+    public void routeUserMessage(MapRecord<String, String, Object> record) {
         String messageId = record.getId().getValue();
 
         // 1. UserReadStateConsumer 처리 (읽음 상태 관리)
@@ -110,6 +110,7 @@ public class StreamMessageRouterImpl implements StreamMessageRouter {
     /**
      * 스트림 등록 (ConsumerRegistrationService에서 호출)
      */
+    @Override
     public void registerStream(String streamKey) {
         registeredStreams.add(streamKey);
         log.debug("[Router] 스트림 등록: {}", streamKey);
@@ -118,6 +119,7 @@ public class StreamMessageRouterImpl implements StreamMessageRouter {
     /**
      * 스트림 제거 (ConsumerRegistrationService에서 호출)
      */
+    @Override
     public void unregisterStream(String streamKey) {
         registeredStreams.remove(streamKey);
         log.debug("[Router] 스트림 제거: {}", streamKey);

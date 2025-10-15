@@ -44,14 +44,13 @@ public class DynamicStreamService implements DynamicStreamOperations {
             if (!redisStreamExists(streamKey)) {
                 // 2. 새 스트림 생성
                 createRedisStream(streamKey);
-
-                // 3. Consumer Group에 동적 등록
-                registerConsumerGroupForRoom(roomId, streamKey);
-
                 log.info("[DynamicStream] 새 방 스트림 생성 완료: roomId={}, streamKey={}", roomId, streamKey);
             } else {
                 log.info("[DynamicStream] 방 스트림 이미 존재: roomId={}, streamKey={}", roomId, streamKey);
             }
+
+            // 3. Consumer Group 등록 (스트림 존재 여부와 무관하게 항상 실행)
+            registerConsumerGroupForRoom(roomId, streamKey);
 
         } catch (Exception e) {
             log.error("[DynamicStream] 방 스트림 생성 실패: roomId={}", roomId, e);

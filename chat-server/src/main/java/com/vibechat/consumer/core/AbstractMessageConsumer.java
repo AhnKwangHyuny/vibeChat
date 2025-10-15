@@ -1,7 +1,7 @@
 package com.vibechat.consumer.core;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.MapRecord;
 
 import java.util.Map;
 import java.util.Set;
@@ -25,11 +25,11 @@ public abstract class AbstractMessageConsumer implements MessageConsumer {
     }
 
     @Override
-    public final void processMessage(ObjectRecord<String, Object> record) throws ConsumerProcessingException {
+    public final void processMessage(MapRecord<String, String, Object> record) throws ConsumerProcessingException {
         String messageId = record.getId().getValue();
 
         try {
-            log.debug("[{}] 메시지 처리 시작: messageId={}", consumerType, messageId);
+            log.info("[{}] 메시지 처리 시작: messageId={}", consumerType, messageId);
 
             // 1. 메시지 검증
             validateMessage(record);
@@ -74,7 +74,7 @@ public abstract class AbstractMessageConsumer implements MessageConsumer {
     /**
      * 메시지 기본 검증
      */
-    private void validateMessage(ObjectRecord<String, Object> record) throws ConsumerProcessingException {
+    private void validateMessage(MapRecord<String, String, Object> record) throws ConsumerProcessingException {
         if (record == null) {
             throw new ConsumerProcessingException(consumerType, "null",
                 "메시지 레코드가 null입니다", false);
@@ -88,29 +88,39 @@ public abstract class AbstractMessageConsumer implements MessageConsumer {
 
     /**
      * 메시지에서 타입 추출
+     * 
+     * MapRecord 아키텍처:
+     * - Redis Streams native hash 구조 사용
+     * - MapRecord.getValue()가 직접 Map<String, Object> 반환
+     * - 타입 캐스팅 불필요, 간결한 처리
      */
-    private String extractMessageType(ObjectRecord<String, Object> record) {
-        Object value = record.getValue();
-        if (value instanceof java.util.Map) {
-            @SuppressWarnings("unchecked")
-            java.util.Map<String, Object> messageData = (java.util.Map<String, Object>) value;
-            return (String) messageData.get("messageType");
+    private String extractMessageType(MapRecord<String, String, Object> record) {
+        Map<String, Object> messageData = record.getValue();
+        
+        String messageType = (String) messageData.get("messageType");
+        
+        if (messageType == null) {
+            log.warn("[{}] messageType 필드 없음: messageId={}, keys={}", 
+                consumerType, record.getId().getValue(), messageData.keySet());
+            return "UNKNOWN";
         }
-        return "UNKNOWN";
+        
+        return messageType;
     }
 
     /**
      * 실제 비즈니스 로직 처리 (하위 클래스 구현)
      */
-    protected abstract void processBusinessLogic(ObjectRecord<String, Object> record)
+    protected abstract void processBusinessLogic(MapRecord<String, String, Object> record)
         throws ConsumerProcessingException;
 
     /**
      * 메시지 데이터를 Map으로 안전하게 추출
+     * 
+     * MapRecord는 이미 Map<String, Object>를 반환하므로 캐스팅 불필요
      */
-    @SuppressWarnings("unchecked")
-    protected Map<String, Object> extractMessageData(ObjectRecord<String, Object> record) {
-        return (Map<String, Object>) record.getValue();
+    protected Map<String, Object> extractMessageData(MapRecord<String, String, Object> record) {
+        return record.getValue();
     }
 
     /**

@@ -3,7 +3,7 @@ package com.vibechat.consumer.user;
 import com.vibechat.consumer.core.AbstractMessageConsumer;
 import com.vibechat.consumer.core.ConsumerProcessingException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ public class UserReadStateConsumer extends AbstractMessageConsumer {
     }
 
     @Override
-    protected void processBusinessLogic(ObjectRecord<String, Object> record) throws ConsumerProcessingException {
+    protected void processBusinessLogic(MapRecord<String, String, Object> record) throws ConsumerProcessingException {
         String messageId = record.getId().getValue();
         Map<String, Object> messageData = extractMessageData(record);
 

@@ -1,6 +1,6 @@
 package com.vibechat.consumer.core;
 
-import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.MapRecord;
 
 /**
  * Redis Streams 메시지 컨슈머 기본 인터페이스
@@ -14,10 +14,10 @@ public interface MessageConsumer {
     /**
      * 메시지 처리 핵심 메소드
      *
-     * @param record Redis Streams에서 받은 메시지 레코드
+     * @param record Redis Streams에서 받은 메시지 레코드 (MapRecord - Redis native 구조)
      * @throws ConsumerProcessingException 처리 실패 시
      */
-    void processMessage(ObjectRecord<String, Object> record) throws ConsumerProcessingException;
+    void processMessage(MapRecord<String, String, Object> record) throws ConsumerProcessingException;
 
     /**
      * Consumer 타입 식별자

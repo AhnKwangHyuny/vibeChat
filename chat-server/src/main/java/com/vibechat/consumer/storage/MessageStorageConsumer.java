@@ -5,11 +5,11 @@ import com.vibechat.consumer.core.ConsumerProcessingException;
 import com.vibechat.domain.message.ChatMessage;
 import com.vibechat.repository.ChatMessageRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +38,8 @@ public class MessageStorageConsumer extends AbstractMessageConsumer {
     }
 
     @Override
-    protected void processBusinessLogic(ObjectRecord<String, Object> record) throws ConsumerProcessingException {
+    @Transactional
+    protected void processBusinessLogic(MapRecord<String, String, Object> record) throws ConsumerProcessingException {
         String messageId = record.getId().getValue();
         Map<String, Object> messageData = extractMessageData(record);
 
@@ -52,7 +53,7 @@ public class MessageStorageConsumer extends AbstractMessageConsumer {
             // 2. 이벤트 타입 확인 (메시지 수신만 저장)
             String eventType = (String) messageData.get("eventType");
             if (!"MESSAGE_RECEIVED".equals(eventType)) {
-                log.debug("[MessageStorage] 저장 대상이 아닌 이벤트: eventType={}, messageId={}",
+                log.info("[MessageStorage] 저장 대상이 아닌 이벤트: eventType={}, messageId={}",
                     eventType, messageId);
                 return;
             }

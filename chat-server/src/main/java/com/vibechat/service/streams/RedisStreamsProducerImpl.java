@@ -1,10 +1,10 @@
 package com.vibechat.service.streams;
 
-import com.vibechat.dto.enrichment.EnrichedMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vibechat.dto.enrichment.EnrichedMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -27,7 +27,8 @@ import java.util.Map;
 public class RedisStreamsProducerImpl implements RedisStreamsProducer {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     // Redis Streams 키 패턴
     private static final String ROOM_STREAM_KEY = "stream:room:{}";
@@ -35,16 +36,15 @@ public class RedisStreamsProducerImpl implements RedisStreamsProducer {
     @Override
     public String sendToRoom(Long roomId, EnrichedMessage message) {
         try {
-            // Room Stream 발행 (Consumer Group에서 비동기 처리)
             String streamKey = ROOM_STREAM_KEY.replace("{}", roomId.toString());
             Map<String, Object> messageData = buildMessageData(message);
 
-            log.debug("Room Stream에 메시지 발행: roomId={}, streamKey={}", roomId, streamKey);
+            log.info("Room Stream에 메시지 발행: roomId={}, streamKey={}", roomId, streamKey);
 
-            ObjectRecord<String, Map<String, Object>> record = StreamRecords
+            MapRecord<String, String, Object> record = StreamRecords
                 .newRecord()
-                .ofObject(messageData)
-                .withStreamKey(streamKey);
+                .in(streamKey)
+                .ofMap(messageData);
 
             RecordId recordId = redisTemplate.opsForStream().add(record);
             String messageId = recordId.getValue();
@@ -66,10 +66,11 @@ public class RedisStreamsProducerImpl implements RedisStreamsProducer {
             Map<String, Object> data = new HashMap<>();
 
             // 기본 필드
+            data.put("eventType", "MESSAGE_RECEIVED");
             data.put("messageType", message.getMessageType().name());
             data.put("content", message.getContent());
-            data.put("userId", message.getUserId());
-            data.put("roomId", message.getRoomId());
+            data.put("userId", String.valueOf(message.getUserId()));
+            data.put("roomId", String.valueOf(message.getRoomId()));
             data.put("timestamp", message.getTimestamp().toString());
             data.put("clientTempId", message.getClientTempId());
 
@@ -84,10 +85,19 @@ public class RedisStreamsProducerImpl implements RedisStreamsProducer {
                 data.put("thumbnailUrl", message.getThumbnailUrl());
             }
             if (message.getMetadata() != null) {
-                data.put("metadata", message.getMetadata());
+
+                data.put("metadata", objectMapper.writeValueAsString(message.getMetadata()));
             }
 
-            log.debug("Built message data with {} fields", data.size());
+            if (message.getNickname() != null) {
+                data.put("userNickname", message.getNickname());
+            }
+            if (message.getAvatarUrl() != null) {
+                data.put("userAvatarUrl", message.getAvatarUrl());
+            }
+
+            log.info("Built message data with {} fields", data.size());
+            log.info("show record before building {}", data.toString());
             return data;
 
         } catch (Exception e) {

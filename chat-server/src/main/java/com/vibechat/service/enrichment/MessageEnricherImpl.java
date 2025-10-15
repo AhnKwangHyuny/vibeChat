@@ -25,7 +25,14 @@ public class MessageEnricherImpl implements MessageEnricher {
     private final ObjectMapper objectMapper;
 
     @Override
+    @Deprecated
     public EnrichedMessage enrich(SendMessagePayload payload, Long userId, Long roomId) {
+        log.warn("Deprecated enrich 호출됨. 사용자 정보 없이 처리. userId={}", userId);
+        return enrichWithUserInfo(payload, userId, roomId, null, null);
+    }
+
+    @Override
+    public EnrichedMessage enrichWithUserInfo(SendMessagePayload payload, Long userId, Long roomId, String nickname, String avatarUrl) {
         try {
             log.debug("Enriching message: type={}, userId={}, roomId={}",
                 payload.getType(), userId, roomId);
@@ -41,6 +48,8 @@ public class MessageEnricherImpl implements MessageEnricher {
                 .fileName(payload.getFilename())
                 .thumbnailUrl(payload.getMediaThumbUrl())
                 .userId(userId)
+                .nickname(nickname)     // 🆕 닉네임 추가
+                .avatarUrl(avatarUrl)   // 🆕 아바타 URL 추가
                 .roomId(roomId)
                 .timestamp(timestamp)
                 .clientTempId(payload.getClientTempId())

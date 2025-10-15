@@ -47,9 +47,9 @@ public class WebSocketMessageService {
                 return;
             }
 
-            // 메시지 처리 비즈니스 로직 호출
+            // 메시지 처리 비즈니스 로직 호출 (세션 정보 포함)
             MessageProcessResult result = messageCoordinatorService.processRoomMessage(
-                roomId, sessionInfo.getUserId(), payload);
+                roomId, sessionInfo, payload);
 
             // 응답 처리
             chatResponseHandler.handleMessageResult(sessionId, result, payload.getClientTempId());

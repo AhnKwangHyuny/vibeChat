@@ -1,0 +1,22 @@
+2025-10-15 00:04:20.932 [clientOutboundChannel-55] INFO  c.v.w.event.WebSocketEventHandler - [WebSocket 연결 해제 이벤트] sessionId=xdenxpp4
+2025-10-15 00:04:20.965 [clientOutboundChannel-55] INFO  c.v.w.p.WebSocketPresenceService - [사용자 완전 오프라인] userId=1
+2025-10-15 00:04:20.966 [clientOutboundChannel-55] INFO  c.v.w.p.WebSocketPresenceService - [Presence 정리 완료] userId=1, sessionId=xdenxpp4, 남은 세션 수=0
+2025-10-15 00:04:20.968 [clientOutboundChannel-55] INFO  c.v.w.c.WebSocketConnectionEventService - [방 퇴장 처리 시작] userId=1, nickname=팡팡, 참가 중인 방 개수=1
+2025-10-15 00:04:20.970 [clientOutboundChannel-55] INFO  c.v.s.r.RoomParticipantServiceImpl - [RoomParticipant] 참가자 제거 완료: roomId=1, userId=1
+2025-10-15 00:04:20.970 [clientOutboundChannel-55] INFO  c.v.w.c.WebSocketConnectionEventService - [방 퇴장 처리 완료] userId=1, nickname=팡팡, 성공=1/1
+2025-10-15 00:04:20.970 [clientOutboundChannel-55] INFO  c.v.w.c.WebSocketConnectionEventService - [사용자 완전 오프라인] userId=1, nickname=팡팡, 세션 지속시간=7분
+2025-10-15 00:04:20.970 [clientOutboundChannel-55] INFO  c.v.w.c.WebSocketConnectionEventService - [사용자 연결 해제 처리 완료] userId=1, sessionId=xdenxpp4, nickname=팡팡
+2025-10-15 00:04:20.970 [clientOutboundChannel-55] INFO  c.v.w.WebSocketConnectionInterceptor - [WebSocket DISCONNECT 시작] sessionId=xdenxpp4
+2025-10-15 00:04:20.971 [clientOutboundChannel-55] WARN  c.v.w.c.WebSocketConnectionEventService - [연결 해제 처리] 세션 정보를 찾을 수 없음: sessionId=xdenxpp4
+2025-10-15 00:04:20.971 [clientOutboundChannel-55] INFO  c.v.w.WebSocketConnectionInterceptor - [WebSocket DISCONNECT 완료] sessionId=xdenxpp4
+2025-10-15 00:05:52.014 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2025-10-15 00:05:52.018 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@4346ed39]]
+2025-10-15 00:05:52.019 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2025-10-15 00:05:52.029 [SpringApplicationShutdownHook] WARN  o.s.d.r.c.l.LettucePoolingConnectionProvider - LettucePoolingConnectionProvider contains unreleased connections
+2025-10-15 00:05:52.040 [redis-streams-consumer-86] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-15 00:05:52.040 [redis-streams-consumer-87] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-15 00:05:52.041 [redis-streams-consumer-85] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-15 00:05:52.042 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-15 00:05:52.073 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-15 00:05:52.079 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-10-15 00:05:52.085 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

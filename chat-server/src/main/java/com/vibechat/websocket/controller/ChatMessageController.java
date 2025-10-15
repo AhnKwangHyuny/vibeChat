@@ -4,8 +4,6 @@ import com.vibechat.dto.SendMessagePayload;
 import com.vibechat.service.websocket.WebSocketMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jboss.logging.BasicLogger;
-import org.jboss.logging.Logger;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;

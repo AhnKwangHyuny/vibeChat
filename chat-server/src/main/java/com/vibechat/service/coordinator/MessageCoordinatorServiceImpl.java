@@ -4,6 +4,7 @@ import com.vibechat.dto.SendMessagePayload;
 import com.vibechat.dto.coordinator.MessageProcessResult;
 import com.vibechat.dto.validation.ValidationResult;
 import com.vibechat.dto.enrichment.EnrichedMessage;
+import com.vibechat.websocket.session.WebSocketSessionInfo;
 import com.vibechat.service.RateLimitService;
 import com.vibechat.service.validation.MessageValidator;
 import com.vibechat.service.enrichment.MessageEnricher;
@@ -30,8 +31,26 @@ public class MessageCoordinatorServiceImpl implements MessageCoordinatorService 
     private final RedisStreamsProducer redisStreamsProducer;
 
     @Override
+    @Deprecated
     @Transactional
     public MessageProcessResult processRoomMessage(Long roomId, Long userId, SendMessagePayload payload) {
+
+        log.warn("Deprecated processRoomMessage 호출됨. 세션 정보 없이 처리. userId={}", userId);
+        return processRoomMessageInternal(roomId, userId, null, null, payload);
+    }
+
+    @Override
+    @Transactional
+    public MessageProcessResult processRoomMessage(Long roomId, WebSocketSessionInfo sessionInfo, SendMessagePayload payload) {
+        return processRoomMessageInternal(roomId, sessionInfo.getUserId(),
+            sessionInfo.getNickname(), sessionInfo.getAvatarUrl(), payload);
+    }
+
+    /**
+     * 내부 메시지 처리 로직 (공통)
+     */
+    private MessageProcessResult processRoomMessageInternal(Long roomId, Long userId,
+            String nickname, String avatarUrl, SendMessagePayload payload) {
         long startTime = System.currentTimeMillis();
 
         try {
@@ -48,8 +67,8 @@ public class MessageCoordinatorServiceImpl implements MessageCoordinatorService 
                 throw new MessageValidationException("[Message Coordinator 메시지 검증 실패: " + errors);
             }
 
-            // 3. 메시지 강화 (메타데이터 추가)
-            EnrichedMessage enrichedMessage = messageEnricher.enrich(payload, userId, roomId);
+            // 3. 메시지 강화 (메타데이터 + 사용자 정보 추가)
+            EnrichedMessage enrichedMessage = messageEnricher.enrichWithUserInfo(payload, userId, roomId, nickname, avatarUrl);
 
             // 4. Redis Streams 발행 (비동기 처리 시작점)
             String messageId = redisStreamsProducer.sendToRoom(roomId, enrichedMessage);

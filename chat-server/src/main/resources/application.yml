@@ -28,10 +28,19 @@ spring:
       max-file-size: ${MEDIA_MAX_UPLOAD_MB:20}MB
       max-request-size: ${MEDIA_MAX_UPLOAD_MB:20}MB
 
-  data:                        # Redis 및 MongoDB 설정
+  data:
     redis:
-      host: ${SPRING_REDIS_HOST:localhost}
-      port: ${SPRING_REDIS_PORT:6379}
+      host: 127.0.0.1
+      port: ${CHAT_SERVER_REDIS_PORT:6380}
+      timeout: 60s              # 30s → 60s로 증가
+      connect-timeout: 30s      # 10s → 30s로 증가
+      lettuce:
+        pool:
+          max-active: 12
+          max-idle: 8
+          min-idle: 4
+          max-wait: 30s           # 15s → 30s로 증가
+        shutdown-timeout: 5s
     mongodb:
       uri: ${SPRING_MONGODB_URI:mongodb://localhost:27017/vibechat_messages}
       database: ${SPRING_MONGODB_DATABASE:vibechat_messages}

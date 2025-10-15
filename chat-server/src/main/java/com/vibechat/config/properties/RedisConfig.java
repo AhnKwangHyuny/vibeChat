@@ -1,69 +1,90 @@
 package com.vibechat.config.properties;
 
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.resource.ClientResources;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import jakarta.annotation.PostConstruct;
+import java.time.Duration;
 
 @Configuration
 @Slf4j
 public class RedisConfig {
 
-    @PostConstruct
-    public void init() {
-        log.info("RedisConfig 초기화 시작");
+    @Value("${spring.data.redis.host:127.0.0.1}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port:6380}")
+    private int redisPort;
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactory() {
+        log.info("Redis ConnectionFactory 초기화 시작: {}:{}", redisHost, redisPort);
+
+        ClientResources clientResources = ClientResources.builder()
+            .ioThreadPoolSize(4)
+            .computationThreadPoolSize(4)
+            .build();
+        log.info("Lettuce ClientResources 설정 완료: ioThreads={}, computationThreads={}", 4, 4);
+
+        ClientOptions clientOptions = ClientOptions.builder()
+            .autoReconnect(true)
+            .pingBeforeActivateConnection(true)
+            .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+            .build();
+        log.info("Lettuce ClientOptions 설정 완료: autoReconnect={}, pingBeforeActivate={}", true, true);
+
+        LettuceClientConfiguration clientConfig = LettucePoolingClientConfiguration.builder()
+            .commandTimeout(Duration.ofSeconds(60))       // 명령 타임아웃
+            .shutdownTimeout(Duration.ofSeconds(100))     // 종료 타임아웃
+            .clientOptions(clientOptions)                 // Client Options 연결
+            .clientResources(clientResources)             // Client Resources 연결
+            .build();
+        log.info("LettuceClientConfiguration 설정 완료: commandTimeout=60s, shutdownTimeout=100s");
+
+        RedisStandaloneConfiguration serverConfig = new RedisStandaloneConfiguration();
+        serverConfig.setHostName(redisHost);
+        serverConfig.setPort(redisPort);
+        log.info("Redis 서버 설정 완료: {}:{}", redisHost, redisPort);
+
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(serverConfig, clientConfig);
+        factory.setShareNativeConnection(false);  // Streams용 독립 연결
+        factory.setValidateConnection(true);       // 연결 검증 활성화
+        factory.afterPropertiesSet();
+
+        log.info("Redis ConnectionFactory 생성 완료: shareNativeConnection={}, validateConnection={}",
+                 false, true);
+
+        return factory;
     }
 
+
     /**
-     * 일반적인 Redis 작업용 템플릿 (JSON 직렬화)
+     * Redis Streams 전용 RedisTemplate
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        log.info("RedisTemplate Bean 생성 중...");
-
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // Key는 String으로 직렬화
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setHashKeySerializer(new StringRedisSerializer());
+        StringRedisSerializer stringSerializer = new StringRedisSerializer();
 
-        // Value는 JSON으로 직렬화 (Object 타입 지원)
-        GenericJackson2JsonRedisSerializer jsonSerializer = new GenericJackson2JsonRedisSerializer();
-        template.setValueSerializer(jsonSerializer);
-        template.setHashValueSerializer(jsonSerializer);
+        // Serializer 설정
+        template.setKeySerializer(stringSerializer);
+        template.setValueSerializer(stringSerializer);
+        template.setHashKeySerializer(stringSerializer);
+        template.setHashValueSerializer(stringSerializer);
 
-        template.afterPropertiesSet();
-        log.info("RedisTemplate Bean 생성 완료");
+        log.info("RedisTemplate 설정 완료: StringRedisSerializer (MapRecord 최적화)");
         return template;
-    }
-
-    /**
-     * String 전용 Redis 템플릿 (Presence 서비스용)
-     */
-    @Bean
-    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
-        log.info("StringRedisTemplate Bean 생성 중...");
-
-        StringRedisTemplate template = new StringRedisTemplate();
-        template.setConnectionFactory(connectionFactory);
-
-        log.info("StringRedisTemplate Bean 생성 완료");
-        return template;
-    }
-
-    /**
-     * Redis 연결 상태 확인
-     */
-    @PostConstruct
-    public void checkRedisConnection() {
-        log.info("Redis 연결 상태 확인 중...");
-        // 실제 연결은 첫 번째 작업 시에 이루어짐
     }
 }

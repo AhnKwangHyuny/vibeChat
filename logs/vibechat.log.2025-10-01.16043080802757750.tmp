@@ -1,0 +1,59 @@
+2025-10-02 02:43:31.276 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-02 02:43:31.372 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-02 02:43:31.372 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-02 02:43:31.372 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-02 02:43:31.372 [http-nio-8080-exec-6] WARN  c.v.c.auth.AuthUserArgumentResolver - No cookies found in request
+2025-10-02 02:43:31.372 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: false
+2025-10-02 02:43:31.372 [http-nio-8080-exec-6] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-02 02:43:31.373 [http-nio-8080-exec-6] WARN  c.v.c.auth.AuthUserArgumentResolver - Session is null, isRequired: true
+2025-10-02 02:43:31.394 [http-nio-8080-exec-6] WARN  c.v.exception.GlobalExceptionHandler - 미인증 사용자 오류 at /api/auth/me: 인증이 필요합니다.
+2025-10-02 02:43:31.457 [http-nio-8080-exec-7] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-02 02:43:31.457 [http-nio-8080-exec-7] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-02 02:43:31.457 [http-nio-8080-exec-7] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-02 02:43:31.457 [http-nio-8080-exec-7] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-02 02:43:31.458 [http-nio-8080-exec-7] WARN  c.v.c.auth.AuthUserArgumentResolver - No cookies found in request
+2025-10-02 02:43:31.458 [http-nio-8080-exec-7] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: false
+2025-10-02 02:43:31.458 [http-nio-8080-exec-7] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-02 02:43:31.458 [http-nio-8080-exec-7] WARN  c.v.c.auth.AuthUserArgumentResolver - Session is null, isRequired: true
+2025-10-02 02:43:31.458 [http-nio-8080-exec-7] WARN  c.v.exception.GlobalExceptionHandler - 미인증 사용자 오류 at /api/auth/me: 인증이 필요합니다.
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] WARN  c.v.c.auth.AuthUserArgumentResolver - No cookies found in request
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: false
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] WARN  c.v.c.auth.AuthUserArgumentResolver - Session is null, isRequired: true
+2025-10-02 02:43:31.482 [http-nio-8080-exec-8] WARN  c.v.exception.GlobalExceptionHandler - 미인증 사용자 오류 at /api/auth/me: 인증이 필요합니다.
+2025-10-02 02:43:31.489 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-02 02:43:31.489 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-02 02:43:31.489 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-02 02:43:31.489 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-02 02:43:31.489 [http-nio-8080-exec-10] WARN  c.v.c.auth.AuthUserArgumentResolver - No cookies found in request
+2025-10-02 02:43:31.490 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: false
+2025-10-02 02:43:31.490 [http-nio-8080-exec-10] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-02 02:43:31.490 [http-nio-8080-exec-10] WARN  c.v.c.auth.AuthUserArgumentResolver - Session is null, isRequired: true
+2025-10-02 02:43:31.490 [http-nio-8080-exec-10] WARN  c.v.exception.GlobalExceptionHandler - 미인증 사용자 오류 at /api/auth/me: 인증이 필요합니다.
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] WARN  c.v.c.auth.AuthUserArgumentResolver - No cookies found in request
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: false
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] WARN  c.v.c.auth.AuthUserArgumentResolver - Session is null, isRequired: true
+2025-10-02 02:43:31.497 [http-nio-8080-exec-1] WARN  c.v.exception.GlobalExceptionHandler - 미인증 사용자 오류 at /api/auth/me: 인증이 필요합니다.
+2025-10-02 02:43:31.508 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - === [ArgumentResolver] resolveArgument called ===
+2025-10-02 02:43:31.508 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Parameter name: principal
+2025-10-02 02:43:31.509 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Request URI: /api/auth/me
+2025-10-02 02:43:31.509 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - Request Method: GET
+2025-10-02 02:43:31.509 [http-nio-8080-exec-9] WARN  c.v.c.auth.AuthUserArgumentResolver - No cookies found in request
+2025-10-02 02:43:31.510 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - HttpSession exists: false
+2025-10-02 02:43:31.510 [http-nio-8080-exec-9] INFO  c.v.c.auth.AuthUserArgumentResolver - AuthUser required: true
+2025-10-02 02:43:31.510 [http-nio-8080-exec-9] WARN  c.v.c.auth.AuthUserArgumentResolver - Session is null, isRequired: true
+2025-10-02 02:43:31.510 [http-nio-8080-exec-9] WARN  c.v.exception.GlobalExceptionHandler - 미인증 사용자 오류 at /api/auth/me: 인증이 필요합니다.
+2025-10-02 03:00:06.771 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m57s881ms).
+2025-10-02 03:08:02.941 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m26s77ms).
+2025-10-02 03:13:31.583 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-02 03:13:31.747 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-10-02 03:13:31.777 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

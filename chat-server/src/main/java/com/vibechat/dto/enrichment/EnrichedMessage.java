@@ -23,6 +23,8 @@ public class EnrichedMessage {
     private final String fileName;
     private final String thumbnailUrl;
     private final Long userId;
+    private final String nickname;
+    private final String avatarUrl;
     private final Long roomId;
     private final LocalDateTime timestamp;
     private final String clientTempId;
