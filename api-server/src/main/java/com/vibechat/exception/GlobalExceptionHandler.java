@@ -3,6 +3,10 @@ package com.vibechat.exception;
 import com.vibechat.exception.auth.LogoutProcessException;
 import com.vibechat.exception.auth.NoActiveSessionException;
 import com.vibechat.exception.auth.UserNotLoggedInException;
+import com.vibechat.exception.room.InvalidInviteCodeException;
+import com.vibechat.exception.room.RoomAccessDeniedException;
+import com.vibechat.exception.room.RoomCreationException;
+import com.vibechat.exception.room.RoomNotFoundException;
 import com.vibechat.exception.tag.TagNotFoundException;
 import com.vibechat.exception.tag.TagCreationException;
 import com.vibechat.exception.tag.InvalidTagNameException;
@@ -161,6 +165,68 @@ public class GlobalExceptionHandler {
         problemDetail.setProperty("timestamp", Instant.now());
         problemDetail.setProperty("path", request.getRequestURI());
         return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    // ==================== Room 관련 예외 처리 ====================
+
+    @ExceptionHandler(RoomNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleRoomNotFound(RoomNotFoundException ex, HttpServletRequest request) {
+        log.warn("방을 찾을 수 없음 at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setTitle("방을 찾을 수 없음");
+        problemDetail.setType(URI.create("https://vibechat.com/problems/room-not-found"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getRequestURI());
+        if (ex.getRoomId() != null) {
+            problemDetail.setProperty("roomId", ex.getRoomId());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    @ExceptionHandler(RoomAccessDeniedException.class)
+    public ResponseEntity<ProblemDetail> handleRoomAccessDenied(RoomAccessDeniedException ex, HttpServletRequest request) {
+        log.warn("방 접근 권한 없음 at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        problemDetail.setTitle("방 접근 권한 없음");
+        problemDetail.setType(URI.create("https://vibechat.com/problems/room-access-denied"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getRequestURI());
+        if (ex.getRoomId() != null) {
+            problemDetail.setProperty("roomId", ex.getRoomId());
+        }
+        if (ex.getAction() != null) {
+            problemDetail.setProperty("action", ex.getAction());
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
+    }
+
+    @ExceptionHandler(InvalidInviteCodeException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidInviteCode(InvalidInviteCodeException ex, HttpServletRequest request) {
+        log.warn("잘못된 초대 코드 at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problemDetail.setTitle("잘못된 초대 코드");
+        problemDetail.setType(URI.create("https://vibechat.com/problems/invalid-invite-code"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getRequestURI());
+        if (ex.getRoomId() != null) {
+            problemDetail.setProperty("roomId", ex.getRoomId());
+        }
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    @ExceptionHandler(RoomCreationException.class)
+    public ResponseEntity<ProblemDetail> handleRoomCreation(RoomCreationException ex, HttpServletRequest request) {
+        log.error("방 생성 오류 at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        problemDetail.setTitle("방 생성 오류");
+        problemDetail.setType(URI.create("https://vibechat.com/problems/room-creation-error"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getRequestURI());
+        return ResponseEntity.internalServerError().body(problemDetail);
     }
 
     @ExceptionHandler(RuntimeException.class)

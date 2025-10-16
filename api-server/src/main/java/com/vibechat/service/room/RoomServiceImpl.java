@@ -20,6 +20,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * 레거시 RoomServiceImpl (Deprecated)
+ * 
+ * @deprecated 새로운 Service Layer로 완전히 대체됨. 삭제 예정.
+ */
+@Deprecated
 @Slf4j
 @Service
 @RequiredArgsConstructor

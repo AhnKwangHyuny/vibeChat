@@ -5,7 +5,6 @@ import * as z from 'zod';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-// Import components from our component library
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Tooltip } from '../components/ui/Tooltip';

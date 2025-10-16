@@ -1,0 +1,96 @@
+2025-10-16 00:09:50.961 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Retrograde clock change detected (housekeeper delta=27s912ms), soft-evicting connections from pool.
+2025-10-16 04:29:06.478 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m2s546ms).
+2025-10-16 04:35:04.859 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m28s366ms).
+2025-10-16 04:41:02.848 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m27s983ms).
+2025-10-16 05:02:19.918 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m17s26ms).
+2025-10-16 05:17:25.767 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=11m5s794ms).
+2025-10-16 05:35:32.524 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m6s730ms).
+2025-10-16 05:53:36.480 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m33s947ms).
+2025-10-16 06:12:25.354 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m18s851ms).
+2025-10-16 06:18:41.822 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m46s443ms).
+2025-10-16 06:37:22.062 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m10s211ms).
+2025-10-16 06:53:54.524 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m2s461ms).
+2025-10-16 07:12:14.851 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m20s310ms).
+2025-10-16 07:19:43.377 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=4m28s499ms).
+2025-10-16 07:36:59.494 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m46s91ms).
+2025-10-16 07:55:05.141 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m5s594ms).
+2025-10-16 08:11:11.689 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m36s539ms).
+2025-10-16 08:20:21.300 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m39s596ms).
+2025-10-16 08:38:58.684 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m37s361ms).
+2025-10-16 08:56:33.652 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m4s945ms).
+2025-10-16 09:14:09.107 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m35s435ms).
+2025-10-16 09:21:29.336 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m50s201ms).
+2025-10-16 09:39:13.165 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m43s804ms).
+2025-10-16 09:58:02.026 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m18s836ms).
+2025-10-16 10:17:53.185 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m51s114ms).
+2025-10-16 10:22:35.047 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m11s834ms).
+2025-10-16 10:41:35.517 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m30s445ms).
+2025-10-16 10:59:43.740 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m8s183ms).
+2025-10-16 11:18:31.760 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m48s6ms).
+2025-10-16 11:27:29.538 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m27s743ms).
+2025-10-16 11:35:27.490 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m27s918ms).
+2025-10-16 11:52:52.909 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s419ms).
+2025-10-16 12:12:01.891 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m8s961ms).
+2025-10-16 12:23:27.465 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9m25s552ms).
+2025-10-16 12:28:35.338 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m7s838ms).
+2025-10-16 14:21:59.023 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m44s6ms).
+2025-10-16 14:39:18.485 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=16m49s456ms).
+2025-10-16 14:55:32.159 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m43s674ms).
+2025-10-16 15:11:49.194 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=14m17s9ms).
+2025-10-16 15:18:47.640 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m28s434ms).
+2025-10-16 15:28:15.732 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m28s59ms).
+2025-10-16 15:30:44.825 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m29s92ms).
+2025-10-16 15:46:39.836 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopping...
+2025-10-16 15:46:39.839 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@5f45b3f8]]
+2025-10-16 15:46:39.840 [SpringApplicationShutdownHook] INFO  o.s.m.s.b.SimpleBrokerMessageHandler - Stopped.
+2025-10-16 15:46:39.867 [SpringApplicationShutdownHook] WARN  o.s.d.r.c.l.LettucePoolingConnectionProvider - LettucePoolingConnectionProvider contains unreleased connections
+2025-10-16 15:46:39.920 [redis-streams-consumer-126] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.921 [redis-streams-consumer-90] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.921 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.921 [redis-streams-consumer-127] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.922 [redis-streams-consumer-112] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.922 [redis-streams-consumer-87] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.923 [redis-streams-consumer-112] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.923 [redis-streams-consumer-126] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.923 [redis-streams-consumer-90] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.923 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.923 [redis-streams-consumer-87] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.923 [redis-streams-consumer-127] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-87] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-90] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-126] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-112] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-87] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-127] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-90] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-126] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-112] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-87] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.924 [redis-streams-consumer-127] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-90] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-126] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-112] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-87] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-127] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-126] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-90] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-112] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.925 [redis-streams-consumer-87] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.926 [redis-streams-consumer-127] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.926 [redis-streams-consumer-126] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.926 [redis-streams-consumer-88] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.926 [redis-streams-consumer-90] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: LettuceConnectionFactory is STOPPING
+2025-10-16 15:46:39.929 [redis-streams-consumer-111] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.930 [redis-streams-consumer-110] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.930 [redis-streams-consumer-113] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.930 [redis-streams-consumer-89] WARN  io.lettuce.core.RedisChannelHandler - Connection is already closed
+2025-10-16 15:46:39.930 [redis-streams-consumer-89] ERROR c.v.c.app.RedisStreamsConsumerConfig - [RedisStreamsContainer] 오류 발생: Redis exception
+2025-10-16 15:46:39.969 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-16 15:46:39.995 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-10-16 15:46:40.001 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
