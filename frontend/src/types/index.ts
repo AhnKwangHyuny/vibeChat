@@ -6,6 +6,9 @@
 // Room 관련 타입
 export * from './room';
 
+// Room List 관련 타입 (무한 스크롤)
+export * from './roomList';
+
 // User 관련 타입
 export * from './user';
 
