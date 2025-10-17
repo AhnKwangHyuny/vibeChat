@@ -8,6 +8,7 @@ import com.vibechat.exception.room.RoomAccessDeniedException;
 import com.vibechat.exception.room.RoomCreationException;
 import com.vibechat.exception.room.RoomNotFoundException;
 import com.vibechat.exception.tag.TagNotFoundException;
+import com.vibechat.exception.user.UserNotFoundException;
 import com.vibechat.exception.tag.TagCreationException;
 import com.vibechat.exception.tag.InvalidTagNameException;
 import lombok.extern.slf4j.Slf4j;
@@ -180,6 +181,21 @@ public class GlobalExceptionHandler {
         problemDetail.setProperty("path", request.getRequestURI());
         if (ex.getRoomId() != null) {
             problemDetail.setProperty("roomId", ex.getRoomId());
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleUserNotFound(UserNotFoundException ex, HttpServletRequest request) {
+        log.warn("사용자를 찾을 수 없음 at {}: {}", request.getRequestURI(), ex.getMessage());
+
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problemDetail.setTitle("사용자를 찾을 수 없음");
+        problemDetail.setType(URI.create("https://vibechat.com/problems/user-not-found"));
+        problemDetail.setProperty("timestamp", Instant.now());
+        problemDetail.setProperty("path", request.getRequestURI());
+        if (ex.getUserId() != null) {
+            problemDetail.setProperty("userId", ex.getUserId());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
